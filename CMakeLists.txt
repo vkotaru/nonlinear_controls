@@ -6,13 +6,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(include)
 
+set(CONTROL_HEADERS
+        include/manifolds.hpp
+        include/data_types.hpp 
+        include/base_control.h 
+        include/geometric_control.h
+	include/SO3_control.h
+	include/SE3_control.h)
+
+
 set(CONTROL_SRCS
         src/base_control.cpp
         src/geometric_control.cpp
-        src/SO3_control.cpp)
+	src/SO3_control.cpp
+	src/SE3_control.cpp)
 
-add_library(libcontrol ${CONTROL_SRCS})
-target_include_directories(libcontrol PUBLIC .)
+add_library(nonlinear_controls ${CONTROL_HEADERS} ${CONTROL_SRCS})
+target_include_directories(nonlinear_controls PUBLIC "${CMAKE_CURRENT_SOURCE_DIR/include}")
 
-add_executable(test_main src/main.cpp ${CONTROL_SRCS})
-target_link_libraries(test_main libcontrol)
+# add_executable(test_main src/main.cpp ${CONTROL_SRCS})
+# target_link_libraries(test_main libcontrol)

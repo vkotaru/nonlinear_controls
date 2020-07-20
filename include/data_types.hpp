@@ -11,8 +11,8 @@ using namespace manifolds;
 
 template <typename T>
 class TSO3 {
-   private:
-   public:
+  private:
+  public:
     TSO3(/* args */) {
         R.setIdentity();
         Omega.setZero();
@@ -21,14 +21,14 @@ class TSO3 {
     ~TSO3() {}
 
     template <typename OtherDerived>
-    TSO3 &operator=(const TSO3<OtherDerived> &other) {
+    TSO3& operator=(const TSO3<OtherDerived>& other) {
         this->R = other.R;
         this->Omega = other.Omega;
         this->dOmega = other.dOmega;
     }
 
     template <typename OtherDerived>
-    Eigen::Matrix<T, 6, 1> &operator-(const TSO3<OtherDerived> &other) {
+    Eigen::Matrix<T, 6, 1>& operator-(const TSO3<OtherDerived>& other) {
         return (Eigen::Matrix<T, 6, 1>() << R.error(other.R), Omega - R.transpose() * other.R * other.Omega).finished();
     }
 
@@ -38,19 +38,57 @@ class TSO3 {
 };
 
 template <typename T>
+class TSE3 : public TSO3<T> {
+  private:
+  public:
+    TSE3(/* args */) : TSO3<T>() {
+    }
+    ~TSE3() {}
+
+    Eigen::Matrix<T, 3, 1> position;
+    Eigen::Matrix<T, 3, 1> velocity;
+    Eigen::Matrix<T, 3, 1> acceleration; // feed-forward
+
+    template <typename OtherDerived>
+    TSE3& operator=(const TSE3<OtherDerived>& other) {
+        this->position = other.position;
+        this->velocity = other.velocity;
+        this->acceleration = other.acceleration;
+        this->R = other.R;
+        this->Omega = other.Omega;
+        this->dOmega = other.dOmega;
+    }
+
+    template <typename OtherDerived>
+    Eigen::Matrix<T, 12, 1>& operator-(const TSE3<OtherDerived>& other) {
+        return (Eigen::Matrix<T, 12, 1>() << position - other.position,
+                velocity - other.velocity,
+                this->R.error(other.R),
+                this->Omega - this->R.transpose() * other.R * other.Omega).finished();
+    }
+};
+
+
+template <typename T>
 class Gains {
-   private:
+  private:
     Eigen::Matrix<T, 3, 1> kp_;
     Eigen::Matrix<T, 3, 1> kd_;
     Eigen::Matrix<T, 3, 1> ki_;
 
-   public:
+  public:
     Gains(void) {}
     ~Gains(void) {}
 
-    inline const Eigen::Matrix<T, 3, 1> kp() const { return kp_; }
-    inline const Eigen::Matrix<T, 3, 1> ki() const { return ki_; }
-    inline const Eigen::Matrix<T, 3, 1> kd() const { return kd_; }
+    inline const Eigen::Matrix<T, 3, 1> kp() const {
+        return kp_;
+    }
+    inline const Eigen::Matrix<T, 3, 1> ki() const {
+        return ki_;
+    }
+    inline const Eigen::Matrix<T, 3, 1> kd() const {
+        return kd_;
+    }
 
     template <typename OtherDerived>
     void set_kp(Eigen::Matrix<OtherDerived, 3, 1> _kp) {
@@ -70,12 +108,12 @@ class Gains {
 
 template <typename T>
 class Wrench {
-   public:
+  public:
     Wrench(/* args */);
     ~Wrench();
 
     Eigen::Matrix<T, 3, 1> force;
-    Eigen::Matrix<T, 4, 1> torque;
+    Eigen::Matrix<T, 3, 1> torque;
 
     void reset() {
         force.setZero();
