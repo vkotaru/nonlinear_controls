@@ -7,7 +7,7 @@ namespace nonlinear_control {
 
 template <typename T>
 class BaseController {
-  public:
+   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     BaseController();
     ~BaseController();
@@ -15,8 +15,8 @@ class BaseController {
     virtual void init();
     virtual void run();
 
-  private:
+   private:
 };
 
-} // namespace nonlinear_control
-#endif // NLC_BASE_CONTROLLER_H
+}  // namespace nonlinear_control
+#endif  // NLC_BASE_CONTROLLER_H
