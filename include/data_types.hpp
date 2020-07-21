@@ -109,8 +109,8 @@ class Gains {
 template <typename T>
 class Wrench {
   public:
-    Wrench(/* args */);
-    ~Wrench();
+    Wrench(/* args */) {}
+    ~Wrench() {}
 
     Eigen::Matrix<T, 3, 1> force;
     Eigen::Matrix<T, 3, 1> torque;
@@ -124,6 +124,6 @@ class Wrench {
         return (Eigen::Matrix<T, 6, 1>() << force, torque).finished();
     }
 };
-
+template class Wrench<float>;
 }  // namespace nonlinear_control
 #endif  // NLC_DATA_TYPES_H

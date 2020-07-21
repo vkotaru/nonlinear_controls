@@ -17,7 +17,10 @@ void SE3Controller<T>::run(T dt, TSE3<T> x, TSE3<T> xd, Wrench<T>& u) {
     auto ev = errors.segment(3, 3);
     auto eR = errors.segment(6, 3);
     auto eOm = errors.tail(3);
-
+    std::cout << "ex = " << ex << std::endl;
+    std::cout << "ev = " << ev << std::endl;
+    std::cout << "eR = " << eR << std::endl;
+    std::cout << "eOm = " << eOm << std::endl;
     u.force = -pgains_.kp().cwiseProduct(ex) - pgains_.kd().cwiseProduct(ev);
     u.force += mass_ * (Eigen::Matrix<T, 3, 1>() << 0.0, 0.0, 9.81).finished();
 

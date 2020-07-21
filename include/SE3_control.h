@@ -3,7 +3,7 @@
 
 #include "data_types.hpp"
 #include "SO3_control.h"
-
+#include<iostream>
 namespace nonlinear_control {
 template <typename T>
 class SE3Controller : public SO3Controller<T> {
