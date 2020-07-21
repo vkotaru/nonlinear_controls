@@ -24,5 +24,5 @@ set(CONTROL_SRCS
 add_library(nonlinear_controls ${CONTROL_HEADERS} ${CONTROL_SRCS})
 target_include_directories(nonlinear_controls PUBLIC "${CMAKE_CURRENT_SOURCE_DIR/include}")
 
-# add_executable(test_main src/main.cpp ${CONTROL_SRCS})
-# target_link_libraries(test_main libcontrol)
+add_executable(test_main src/test_nlc.cpp)
+target_link_libraries(test_main nonlinear_controls)

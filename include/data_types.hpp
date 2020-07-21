@@ -11,8 +11,8 @@ using namespace manifolds;
 
 template <typename T>
 class TSO3 {
-  private:
-  public:
+   private:
+   public:
     TSO3(/* args */) {
         R.setIdentity();
         Omega.setZero();
@@ -39,15 +39,18 @@ class TSO3 {
 
 template <typename T>
 class TSE3 : public TSO3<T> {
-  private:
-  public:
+   private:
+   public:
     TSE3(/* args */) : TSO3<T>() {
+        position.setZero();
+        velocity.setZero();
+        acceleration.setZero();
     }
     ~TSE3() {}
 
     Eigen::Matrix<T, 3, 1> position;
     Eigen::Matrix<T, 3, 1> velocity;
-    Eigen::Matrix<T, 3, 1> acceleration; // feed-forward
+    Eigen::Matrix<T, 3, 1> acceleration;  // feed-forward
 
     template <typename OtherDerived>
     TSE3& operator=(const TSE3<OtherDerived>& other) {
@@ -59,24 +62,49 @@ class TSE3 : public TSO3<T> {
         this->dOmega = other.dOmega;
     }
 
+    void print() const {
+        std::cout << "position: " << this->position.transpose() << std::endl;
+        std::cout << "velocity: " << this->velocity.transpose() << std::endl;
+        std::cout << "rotation: " << this->R << std::endl;
+        std::cout << "angular velocity: " << this->Omega.transpose() << std::endl;
+    }
+
     template <typename OtherDerived>
-    Eigen::Matrix<T, 12, 1>& operator-(const TSE3<OtherDerived>& other) {
+    Eigen::Matrix<T, 12, 1> error(const TSE3<OtherDerived>& other) {
+        std::cout << "this " << std::endl;
+        this->print();
+
+        std::cout << "other" << std::endl;
+        other.print();
+
+        auto pos_err = this->position - other.position;
+        auto vel_err = this->velocity - other.velocity;
+        auto rot_err = this->R.error(other.R);
+        auto ang_vel_err = this->Omega - this->R.transpose() * other.R * other.Omega;
+
+        Eigen::Matrix<T, 12, 1> err_;
+        err_ << pos_err, vel_err, rot_err, ang_vel_err;
+        return err_;
+    }
+
+    template <typename OtherDerived>
+    Eigen::Matrix<T, 12, 1> operator-(const TSE3<OtherDerived>& other) {
         return (Eigen::Matrix<T, 12, 1>() << position - other.position,
                 velocity - other.velocity,
                 this->R.error(other.R),
-                this->Omega - this->R.transpose() * other.R * other.Omega).finished();
+                this->Omega - this->R.transpose() * other.R * other.Omega)
+            .finished();
     }
 };
 
-
 template <typename T>
 class Gains {
-  private:
+   private:
     Eigen::Matrix<T, 3, 1> kp_;
     Eigen::Matrix<T, 3, 1> kd_;
     Eigen::Matrix<T, 3, 1> ki_;
 
-  public:
+   public:
     Gains(void) {}
     ~Gains(void) {}
 
@@ -108,7 +136,7 @@ class Gains {
 
 template <typename T>
 class Wrench {
-  public:
+   public:
     Wrench(/* args */) {}
     ~Wrench() {}
 
