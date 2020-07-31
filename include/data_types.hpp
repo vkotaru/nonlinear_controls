@@ -19,6 +19,9 @@ class TSO3 {
         dOmega.setZero();
     }
     ~TSO3() {}
+    SO3<T> R;
+    Eigen::Matrix<T, 3, 1> Omega;
+    Eigen::Matrix<T, 3, 1> dOmega;  // feed-forward usage
 
     template <typename OtherDerived>
     TSO3 &operator=(const TSO3<OtherDerived> &other) {
@@ -31,10 +34,6 @@ class TSO3 {
     Eigen::Matrix<T, 6, 1> &operator-(const TSO3<OtherDerived> &other) {
         return (Eigen::Matrix<T, 6, 1>() << R.error(other.R), Omega - R.transpose() * other.R * other.Omega).finished();
     }
-
-    SO3<T> R;
-    Eigen::Matrix<T, 3, 1> Omega;
-    Eigen::Matrix<T, 3, 1> dOmega;
 };
 
 template <typename T>
