@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "SO3_control.h"
+#include "cvxgen_interface.h"
 using namespace nonlinear_control;
 using namespace manifolds;
 

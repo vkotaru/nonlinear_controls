@@ -1,0 +1,28 @@
+# Produced by CVXGEN, 2020-07-30 04:42:34 -0400.
+# CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com.
+# The code in this file is Copyright (C) 2006-2017 Jacob Mattingley.
+# CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial
+# applications without prior written permission from Jacob Mattingley.
+
+# Filename: description.cvxgen.
+# Description: A description of the CVXGEN problem.
+
+parameters
+  A (1,3)
+  b (1)
+  Q (3,3) psd  # quadratic penalty.
+  c (3)  # linear cost term.
+  xlb (3)
+  xub (3)
+end
+
+variables
+  x (3)
+end
+
+minimize
+  quad(x, Q) + c'*x
+subject to
+  A*x <= b
+  xlb <= x <= xub  # box constraint on x.
+end

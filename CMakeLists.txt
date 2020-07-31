@@ -3,8 +3,13 @@ project(nonlinear_control)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "-Wall -Os")
 
-include_directories(include)
+
+include_directories(
+include
+third_party/cvxgen
+)
 
 set(CONTROL_HEADERS
         include/manifolds.hpp
@@ -22,6 +27,7 @@ set(CONTROL_SRCS
 	src/SE3_control.cpp)
 
 add_library(nonlinear_controls ${CONTROL_HEADERS} ${CONTROL_SRCS})
+target_link_libraries(nonlinear_controls m)
 target_include_directories(nonlinear_controls PUBLIC "${CMAKE_CURRENT_SOURCE_DIR/include}")
 
 add_executable(test_main src/test_nlc.cpp)
