@@ -87,9 +87,7 @@ int main() {
     std::cout << "error2 :  [" << error2.transpose() << " ]^T" << std::endl;
     std::cout << "error using -: [" << error.transpose() << " ]^T" << std::endl;
     std::cout << "norm of the difference = " << (error - outside_error).norm() << std::endl;
-    std::cout
-        << "\n"
-        << "testing done" << std::endl;
+    std::cout << "\n" << "testing done" << std::endl;
     // std::cout << R.config_error(Rd) << std::endl;
     // std::cout << SO3d::config_error(R, Rd) << std::endl;
 
