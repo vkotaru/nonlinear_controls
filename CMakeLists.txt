@@ -9,6 +9,8 @@ set(CMAKE_CXX_FLAGS "-Wall -Os")
 include_directories(
 include
 third_party/cvxgen
+third_party/qpOASES
+third_party/qpOASES/include
 )
 
 set(CONTROL_HEADERS
@@ -30,8 +32,10 @@ set(CONTROL_SRCS
         src/qp_interface.cpp
         src/clf_qp.cpp)
 
+add_subdirectory(third_party)
+
 add_library(nonlinear_controls ${CONTROL_SRCS})
-target_link_libraries(nonlinear_controls)
+target_link_libraries(nonlinear_controls qpOASES)
 target_include_directories(nonlinear_controls PUBLIC "${CMAKE_CURRENT_SOURCE_DIR/include}")
 
 add_executable(test_main src/test_nlc.cpp)
