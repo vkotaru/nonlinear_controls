@@ -2,28 +2,22 @@
 
 namespace nonlinear_control {
 
-template <typename T>
-QPInterface<T>::QPInterface() {
+QPInterface::QPInterface() {
 
 }
 
-template <typename T>
-QPInterface<T>::~QPInterface() {
+QPInterface::~QPInterface() {
 
 }
 
-template <typename T>
-void QPInterface<T>::setup() {
+void QPInterface::setup() {
     
 }
 
-template <typename T>
-void QPInterface<T>::solve() {
+void QPInterface::solve() {
     
 }
 
-template class QPInterface<float>;
-template class QPInterface<double>;
 
 }
 

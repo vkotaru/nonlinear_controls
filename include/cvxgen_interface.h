@@ -1,5 +1,9 @@
 #ifndef NLC_CVXGEN_INTERFACE_H
 #define NLC_CVXGEN_INTERFACE_H
+#include <math.h>   // fixes namespace issue using math.h 
+#include <stdio.h>  // fixes namespace issue using stdio.h 
+#include <stdlib.h>
+#include <string.h>
 
 namespace nonlinear_control {
 
@@ -9,16 +13,8 @@ namespace clf3D {
 extern "C" {
 #include "CLF_3D/solver.h"
 }
-Workspace work;
-Vars vars;
-Params params;
-Settings settings;
-#include "CLF_3D/ldl.c"
-#include "CLF_3D/matrix_support.c"
-#include "CLF_3D/solver.c"
-#include "CLF_3D/util.c"
-}  // namespace clf3D
-#endif  // NLC_CVXGEN_CLF_3D
+} // namespace clf3D
+#endif // NLC_CVXGEN_CLF_3D
 
 // #ifndef NLC_CVXGEN_MPC_3D
 // #define NLC_CVXGEN_MPC_3D
@@ -35,6 +31,6 @@ Settings settings;
 // }  // namespace mpc3D
 // #endif  // NLC_CVXGEN_MPC_3D
 
-}  // namespace nonlinear_control
+} // namespace nonlinear_control
 
-#endif  // NLC_CVXGEN_INTERFACE_H
+#endif // NLC_CVXGEN_INTERFACE_H

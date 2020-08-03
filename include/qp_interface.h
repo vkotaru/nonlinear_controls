@@ -5,25 +5,25 @@
 
 namespace nonlinear_control {
 
-template <typename T>
 struct QuadProg {
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> H, A, Aeq;
-    Eigen::Matrix<T, Eigen::Dynamic, 1> f, b, beq;
-    Eigen::Matrix<T, Eigen::Dynamic, 1> lb, ub;
+    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> H, A, Aeq;
+    Eigen::Matrix<double, Eigen::Dynamic, 1> f, b, beq;
+    Eigen::Matrix<double, Eigen::Dynamic, 1> xlb, xub;
 };
 
-template <typename T>
+
 class QPInterface {
    protected:
-    QuadProg<T> problem_; 
 
    public:
     QPInterface(/* args */);
     ~QPInterface();
+    QuadProg problem_; 
 
     virtual void setup();
     virtual void solve();
 };
+
 
 }  // namespace nonlinear_control
 

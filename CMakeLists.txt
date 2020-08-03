@@ -17,17 +17,21 @@ set(CONTROL_HEADERS
         include/base_control.h 
         include/geometric_control.h
         include/SO3_control.h
-        include/SE3_control.h)
+        include/SE3_control.h
+        include/qp_interface.h
+        include/clf_qp.h)
 
 
 set(CONTROL_SRCS
         src/base_control.cpp
         src/geometric_control.cpp
         src/SO3_control.cpp
-        src/SE3_control.cpp)
+        src/SE3_control.cpp
+        src/qp_interface.cpp
+        src/clf_qp.cpp)
 
-add_library(nonlinear_controls ${CONTROL_HEADERS} ${CONTROL_SRCS})
-target_link_libraries(nonlinear_controls m)
+add_library(nonlinear_controls ${CONTROL_SRCS})
+target_link_libraries(nonlinear_controls)
 target_include_directories(nonlinear_controls PUBLIC "${CMAKE_CURRENT_SOURCE_DIR/include}")
 
 add_executable(test_main src/test_nlc.cpp)

@@ -106,7 +106,7 @@ void fillrhs_start(void);
 long solve(void);
 
 /* Function definitions in testsolver.c: */
-int main(int argc, char **argv);
+// int main(int argc, char **argv);
 void load_default_data(void);
 
 /* Function definitions in util.c: */
