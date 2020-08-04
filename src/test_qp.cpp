@@ -1,7 +1,7 @@
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <qpOASES.hpp>
-
+#include "qpoases_eigen.hpp"
 #include "clf_qp.h"
 
 namespace nlc = nonlinear_control;
@@ -41,25 +41,29 @@ int main() {
     std::cout << testqp.getOptimizer() << std::endl;
 
     USING_NAMESPACE_QPOASES
+    Eigen::Matrix<nlc_real, 1, 1> lbAmat, ubAmat; lbAmat << -100; ubAmat << -3;
 
     /* Setup data of first QP. */
-    real_t H[2 * 2] = {1.0, 0.0, 0.0, 0.5};
-    real_t A[1 * 2] = {1.0, 1.0};
-    real_t g[2] = {1.5, 1.0};
-    real_t lb[2] = {0.5, -2.0};
-    real_t ub[2] = {5.0, 2.0};
-    real_t lbA[1] = {-1.0};
-    real_t ubA[1] = {2.0};
-
-    /* Setup data of second QP. */
-    real_t g_new[2] = {1.0, 1.5};
-    real_t lb_new[2] = {0.0, -1.0};
-    real_t ub_new[2] = {5.0, -0.5};
-    real_t lbA_new[1] = {-2.0};
-    real_t ubA_new[1] = {1.0};
-
+    // real_t H[3*3], A[3], g[3], lb[3], ub[3], 
+    // real_t lbA[1], ubA[1];
+    real_t *H, *A, *g, *lb, *ub, *lbA, *ubA;
+    H = testqp.problem_.H.transpose().data();
+    A = testqp.problem_.A.transpose().data();
+    g = testqp.problem_.f.transpose().data();
+    lb = testqp.problem_.xlb.transpose().data();
+    ub = testqp.problem_.xub.transpose().data();
+    lbA = lbAmat.transpose().data();
+    ubA = ubAmat.transpose().data();
+    // Eigen::Map<Eigen::Matrix<double, 3, 3>>(H, 3, 3) = testqp.problem_.H.transpose();
+    for (int i = 0; i <9 ; i++) printf("H[%d]= %f\n", i, H[i]);
+    // Eigen::Map<Eigen::Matrix<double, 3, 1>>(A, 3, 1) = testqp.problem_.A.transpose();
+    // Eigen::Map<Eigen::Matrix<double, 1, 3>>(g, 1, 3) = testqp.problem_.f.transpose();
+    // Eigen::Map<Eigen::Matrix<double, 1, 3>>(lb, 1, 3) = testqp.problem_.xlb.transpose();
+    // Eigen::Map<Eigen::Matrix<double, 1, 3>>(ub, 1, 3) = testqp.problem_.xub.transpose();
+    // lbA[0] = -100;
+    // ubA[0] = -3;
     /* Setting up QProblem object. */
-    QProblem example(2, 1);
+    QProblem example(3, 1);
 
     Options options;
     example.setOptions(options);
@@ -69,15 +73,27 @@ int main() {
     example.init(H, g, A, lb, ub, lbA, ubA, nWSR);
 
     /* Get and print solution of first QP. */
-    real_t xOpt[2];
-    real_t yOpt[2 + 1];
+    real_t xOpt[3];
+    real_t yOpt[3 + 1];
     example.getPrimalSolution(xOpt);
     example.getDualSolution(yOpt);
-    printf("\nxOpt = [ %e, %e ];  yOpt = [ %e, %e, %e ];  objVal = %e\n\n",
-           xOpt[0], xOpt[1], yOpt[0], yOpt[1], yOpt[2], example.getObjVal());
-    // ub = 100 * Eigen::Matrix<nlc_real, 3, 1>::Ones();
-    // lb = -100 * Eigen::Matrix<nlc_real, 3, 1>::Ones();
+    printf("\nxOpt = [ %e, %e, %e ];  yOpt = [ %e, %e, %e ];  objVal = %e\n\n",
+           xOpt[0], xOpt[1], xOpt[2], yOpt[0], yOpt[1], yOpt[2], example.getObjVal());
     /*************************************/
+
+
+    nlc::QPOasesEigen example2(3,1);
+    example2.data_.H = 2 * Eigen::Matrix<real_t, 3, 3>::Identity();
+    example2.data_.g = Eigen::Matrix<real_t, 3, 1>::Zero();
+    example2.data_.A = Eigen::Matrix<real_t, 1, 3>::Ones();
+    example2.data_.lbA = -100*Eigen::Matrix<real_t, 1, 1>::Ones();
+    example2.data_.ubA = -3*Eigen::Matrix<real_t, 1, 1>::Ones();
+    example2.data_.lb = -100*Eigen::Matrix<real_t, 3, 1>::Ones();
+    example2.data_.ub = 100*Eigen::Matrix<real_t, 3, 1>::Ones();
+    example2.setup();
+    example2.solve();
+    std::cout << example2.getOptimizer() << std::endl;
+
 
     //     std::cout << "H: \n"
     //               << H << "\nf: \n"
