@@ -16,7 +16,6 @@ struct QPOasesData {
 class QPOasesEigen {
    protected:
     qpOASES::QProblem problem;
-    qpOASES::Options options;
     int nvars, ncons;
 
     qpOASES::real_t *H, *A, *g, *lb, *ub, *lbA, *ubA;
@@ -43,6 +42,7 @@ class QPOasesEigen {
         data_.lbA.resize(n,1);
         data_.ubA.resize(n,1);
         data_.nWSR = 10;
+        reset_data();
     }
     ~QPOasesEigen() {
     }
@@ -62,6 +62,27 @@ class QPOasesEigen {
     }
 
     QPOasesData data_;
+    qpOASES::Options options;
+
+    void print() {
+        std::cout << "--------------------------------------------------" << std::endl;
+        std::cout << "*           QP setup       *" << std::endl;
+        std::cout << "--------------------------------------------------" << std::endl;
+        std::cout << "H: \n" << data_.H << "\nf: \n" << data_.g.transpose() << std::endl;
+        std::cout << "\nlbA: \n" << data_.lbA.transpose() << "\nA: \n" << data_.A << "\nubA: \n" << data_.ubA.transpose() << std::endl;
+        std::cout << "\nlb: " << data_.lb.transpose() << "\nub: " << data_.ub.transpose() << std::endl;
+        std::cout << "-------------------*****---------------------------" << std::endl;
+    }
+
+    void reset_data() {
+        data_.H.setIdentity();
+        data_.A.setZero();
+        data_.g.setZero();
+        data_.lb.setZero();
+        data_.ub.setZero();
+        data_.lbA.setZero();
+        data_.ubA.setZero();
+    }
 };
 
 }  // namespace nonlinear_control

@@ -10,8 +10,14 @@ include_directories(
 include
 third_party/cvxgen
 third_party/qpOASES
-third_party/qpOASES/include
-)
+third_party/qpOASES/include 
+) # doesn't seem to be including qpOASES.hpp
+
+set(INCLUDE_DIRS 
+include
+third_party/cvxgen
+third_party/qpOASES
+third_party/qpOASES/include)
 
 set(CONTROL_HEADERS
         include/manifolds.hpp
@@ -36,7 +42,7 @@ add_subdirectory(third_party)
 
 add_library(nonlinear_controls ${CONTROL_SRCS})
 target_link_libraries(nonlinear_controls qpOASES)
-target_include_directories(nonlinear_controls PUBLIC "${CMAKE_CURRENT_SOURCE_DIR/include}")
+target_include_directories(nonlinear_controls PUBLIC ${INCLUDE_DIRS})
 
 add_executable(test_main src/test_nlc.cpp)
 target_link_libraries(test_main nonlinear_controls)
