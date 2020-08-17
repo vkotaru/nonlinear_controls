@@ -20,23 +20,25 @@ third_party/qpOASES
 third_party/qpOASES/include)
 
 set(CONTROL_HEADERS
-        include/manifolds.hpp
-        include/data_types.hpp 
-        include/base_control.h 
-        include/geometric_control.h
-        include/SO3_control.h
-        include/SE3_control.h
-        include/qp_interface.h
-        include/clf_qp.h)
+include/manifolds.hpp
+include/data_types.hpp 
+include/base_control.h 
+include/geometric_control.h
+include/SO3_control.h
+include/SE3_control.h
+include/qp_interface.h
+include/clf_qp.h
+)
 
 
 set(CONTROL_SRCS
-        src/base_control.cpp
-        src/geometric_control.cpp
-        src/SO3_control.cpp
-        src/SE3_control.cpp
-        src/qp_interface.cpp
-        src/clf_qp.cpp)
+src/base_control.cpp
+src/geometric_control.cpp
+src/SO3_control.cpp
+src/SE3_control.cpp
+src/qp_interface.cpp
+src/clf_qp.cpp
+)
 
 add_subdirectory(third_party)
 
