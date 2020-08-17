@@ -35,12 +35,14 @@ class QPOasesEigen {
    public:
     QPOasesEigen(const int n, const int m) : problem(n, m), nvars(n), ncons(m) {
         data_.H.resize(n,n);
-        data_.A.resize(m,n);
         data_.g.resize(n,1);
         data_.lb.resize(n,1);
         data_.ub.resize(n,1);
-        data_.lbA.resize(n,1);
-        data_.ubA.resize(n,1);
+        
+        data_.A.resize(m,n);
+        data_.lbA.resize(m,1);
+        data_.ubA.resize(m,1);
+        
         data_.nWSR = 10;
         reset_data();
     }
