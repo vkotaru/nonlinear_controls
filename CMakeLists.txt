@@ -27,7 +27,8 @@ set(CONTROL_HEADERS
         include/SO3_control.h
         include/SE3_control.h
         include/qp_interface.h
-        include/clf_qp.h)
+        include/clf_qp.h
+        include/mpc_base.h)
 
 
 set(CONTROL_SRCS
@@ -36,7 +37,8 @@ set(CONTROL_SRCS
         src/SO3_control.cpp
         src/SE3_control.cpp
         src/qp_interface.cpp
-        src/clf_qp.cpp)
+        src/clf_qp.cpp
+        src/mpc_base.cpp)
 
 add_subdirectory(third_party)
 
