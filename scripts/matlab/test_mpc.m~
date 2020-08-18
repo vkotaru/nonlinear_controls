@@ -1,0 +1,22 @@
+N = 5;
+nx = 6;
+nu = 3;
+dt = 1/200;
+
+A = eye(nx);
+A(1:3, 4:end) = A(1:3, 4:end) + dt*eye(3);
+
+
+Sx = zeros(nx*(N+1), nx);
+Su = zeros(nx*(N+1), N*nu);
+Sx(1:nx, :) = eye(nx);
+for i = 1:N
+    Sx(nx*(i)+1:nx*(i+1),:) = Sx(nx*(i-1)+1:nx*(i),:)*A;
+    if (i==0)
+        tmp = B;
+    else
+       tmp = A*Su(nx*(i-1)+1:nx*(i),1:nu);
+    end
+    Su(nx*(i)+1:nx*(i+1),:) = [tmp, nx*(i)+1:nx*(i+1),1:end-nu-1)];
+        
+end

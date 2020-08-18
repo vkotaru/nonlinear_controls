@@ -28,6 +28,7 @@ include/SO3_control.h
 include/SE3_control.h
 include/qp_interface.h
 include/clf_qp.h
+include/mpc_base.h
 )
 
 
@@ -38,6 +39,7 @@ src/SO3_control.cpp
 src/SE3_control.cpp
 src/qp_interface.cpp
 src/clf_qp.cpp
+src/mpc_base.cpp
 )
 
 add_subdirectory(third_party)
@@ -46,8 +48,9 @@ add_library(nonlinear_controls ${CONTROL_SRCS})
 target_link_libraries(nonlinear_controls qpOASES)
 target_include_directories(nonlinear_controls PUBLIC ${INCLUDE_DIRS})
 
-add_executable(test_main src/test_nlc.cpp)
+add_executable(test_main tests/test_nlc.cpp)
 target_link_libraries(test_main nonlinear_controls)
-
-add_executable(test_qp src/test_qp.cpp)
+add_executable(test_qp tests/test_qp.cpp)
 target_link_libraries(test_qp nonlinear_controls)
+add_executable(test_mpc tests/test_mpc.cpp)
+target_link_libraries(test_mpc nonlinear_controls)
