@@ -1,6 +1,6 @@
 #ifndef NLC_UTILS_H
 #define NLC_UTILS_H
-
+#include "eigen3/Eigen/Dense"
 namespace nonlinear_control {
 namespace utils {
 
@@ -17,11 +17,11 @@ Eigen::Matrix<T, 3, 1> vee(const Eigen::Matrix<T, 3, 3> mat_) {
     return (Eigen::Matrix<T, 3, 1>() << mat_(2, 1), mat_(0, 2), mat_(1, 0)).finished();
 }
 
-typedef hat<float> hatf;
-typedef hat<double> hatd;
+#define hatf hat<float>
+#define hatd hat<double>
 
-typedef vee<float> veef;
-typedef vee<double> veed;
+#define veef vee<float>
+#define veed vee<double>
 
 }  // namespace utils
 }  // namespace nonlinear_control

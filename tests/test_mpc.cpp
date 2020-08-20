@@ -5,6 +5,7 @@
 #include "mpc_base.h"
 #include "qpoases_eigen.hpp"
 #include "position_mpc3D.hpp"
+#include "SO3_vbl_mpc.hpp"
 
 namespace nlc = nonlinear_control;
 
@@ -38,6 +39,8 @@ int main() {
 
     //     mpc.construct();
     //     mpc.setup();
+
+    nlc::SO3VblMPC att_mpc_(N, dt);
 
     nlc::PositionMPC3D pos_mpc_(N, dt);
     pos_mpc_.init();
