@@ -6,6 +6,7 @@
 #include "qpoases_eigen.hpp"
 #include "position_mpc3D.hpp"
 #include "SO3_vbl_mpc.hpp"
+#include "data_types.hpp"
 
 namespace nlc = nonlinear_control;
 
@@ -40,24 +41,33 @@ int main() {
     //     mpc.construct();
     //     mpc.setup();
 
-    nlc::SO3VblMPC att_mpc_(N, dt);
+    Eigen::Matrix3d J;
+    J << 112533, 0, 0, 0, 36203, 0, 0, 0, 42673;
+    J = J*1e-6;
+    nlc::SO3VblMPC att_mpc_(N, dt, J);
+    att_mpc_.init();
+    std::cout << "MPC Constructed" << std::endl;
 
-    nlc::PositionMPC3D pos_mpc_(N, dt);
-    pos_mpc_.init();
+    // nlc::TSO3<double> att, attd;
+    // att.print();
+    // attd.print();
 
-    Eigen::Matrix<double, 6, 1> Xgoal, X0;
-    Xgoal << 1.0, 1.0, 1.0, 0.0, 0.0, 0.0;
-    X0.setZero();
-    std::cout << "\n X0: " << X0.transpose() << std::endl;
-    std::cout << "\n Xgoal: " << Xgoal.transpose() << std::endl;
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> uOpt;
+    // nlc::PositionMPC3D pos_mpc_(N, dt);
+    // pos_mpc_.init();
 
-    float T = 20; 
-    for (int j = 0; j < int(T/dt); ++j) {
-        uOpt = pos_mpc_.run(X0-Xgoal);
-        std::cout << "X0: " << X0.transpose() << " uOpt: " << uOpt.transpose() << std::endl;
-        pos_mpc_.updateState(X0, uOpt);
-    }
+    // Eigen::Matrix<double, 6, 1> Xgoal, X0;
+    // Xgoal << 1.0, 1.0, 1.0, 0.0, 0.0, 0.0;
+    // X0.setZero();
+    // std::cout << "\n X0: " << X0.transpose() << std::endl;
+    // std::cout << "\n Xgoal: " << Xgoal.transpose() << std::endl;
+    // Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> uOpt;
+
+    // float T = 20; 
+    // for (int j = 0; j < int(T/dt); ++j) {
+    //     uOpt = pos_mpc_.run(X0-Xgoal);
+    //     std::cout << "X0: " << X0.transpose() << " uOpt: " << uOpt.transpose() << std::endl;
+    //     pos_mpc_.updateState(X0, uOpt);
+    // }
 
     // std::cout << "\n Ulb >>>> \n" << mpc.Ulb.transpose() << "\n Uub >>>> \n" << mpc.Uub.transpose() << std::endl;
     // std::cout << "\n Qbar >>>> \n" << mpc.Qbar << "\n Rbar >>>> \n" << mpc.Rbar << std::endl;

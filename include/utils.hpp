@@ -6,9 +6,9 @@ namespace utils {
 
 template <typename T>
 Eigen::Matrix<T, 3, 3> hat(const Eigen::Matrix<T, 3, 1> vector_) {
-    return (Eigen::Matrix<T, 3, 3>() << 0.0, -vector_(3), vector_(2),
-            vector_(3), 0.0, -vector_(1),
-            -vector_(2), vector_(1), 0.0)
+    return (Eigen::Matrix<T, 3, 3>() << 0.0, -vector_(2), vector_(1),
+            vector_(2), 0.0, -vector_(0),
+            -vector_(1), vector_(0), 0.0)
         .finished();
 }
 

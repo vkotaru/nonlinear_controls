@@ -28,9 +28,10 @@ class SO3VblMPC {
         SO3VblMPC(_N, _dt, J);
     }
 
-    SO3VblMPC(const int _N, const double _dt, const Eigen::Matrix3d _J) : N(_N), dt(_dt), J(_J) {
+    SO3VblMPC(const int _N, const double _dt, const Eigen::Matrix3d _J) : N(_N), dt(_dt) {
         nx = 6;
         nu = 3;
+        J = _J;
         iJ = J.inverse();
         mpcSolver = new MPCBase(true, N, nx, nu);
 
@@ -38,18 +39,10 @@ class SO3VblMPC {
          * dot eta_{k} = -hat(Omega_d)*eta_{k} + I*(\delta\Omega_{k})
          * dot I*(\delta\Omega_{k}) = (JQ^{-1}(\hat(JQ*Omegad)-hat(\Omegad)*JQ))*(\delta\Omega_{k})
          */
-        // TODO
+        // TODO            
         Eigen::Matrix<double, 3, 3> Rd = Eigen::Matrix<double, 3, 3>::Identity();
         Eigen::Matrix<double, 3, 1> Omd = Eigen::Matrix<double, 3, 1>::Zero();
-        Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Identity();
-        Eigen::Matrix<double, 6, 3> B = Eigen::Matrix<double, 6, 3>::Zero();
-        A <<  -utils::hatd(Omd), Eigen::Matrix<double, 3, 3>::Identity(),
-                Eigen::Matrix<double, 3, 3>::Zero(), iJ*(utils::hatd(J*Omd)-utils::hatd(Omd)*J);
-        B << Eigen::Matrix<double, 3, 3>::Zero(), iJ;
-
-        mpcSolver->problem_.A.setIdentity();
-        mpcSolver->problem_.A += dt * A;
-        mpcSolver->problem_.B = B;
+        updateDynamics(Omd);            
 
         mpcSolver->gains.Q = Eigen::Matrix<double, 6, 6>::Identity();
         mpcSolver->gains.P = 100 * Eigen::Matrix<double, 6, 6>::Identity();
@@ -61,9 +54,22 @@ class SO3VblMPC {
         mpcSolver->state.ub = 500 * Eigen::Matrix<double, 6, 1>::Ones();
 
         uOpt.resize(3 * N, 1);
+        init();
     }
 
     ~SO3VblMPC() {}
+
+    void updateDynamics(Eigen::Vector3d Omd) {
+        Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Identity();
+        Eigen::Matrix<double, 6, 3> B = Eigen::Matrix<double, 6, 3>::Zero();
+        A <<  -utils::hatd(Omd), Eigen::Matrix<double, 3, 3>::Identity(),
+                Eigen::Matrix<double, 3, 3>::Zero(), iJ*(utils::hatd(J*Omd)-utils::hatd(Omd)*J);
+        B << Eigen::Matrix<double, 3, 3>::Zero(), iJ;
+        
+        mpcSolver->problem_.A.setIdentity();
+        mpcSolver->problem_.A += dt * A;
+        mpcSolver->problem_.B = B * dt;    
+    }
 
     void init() {
         mpcSolver->construct();
