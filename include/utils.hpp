@@ -5,7 +5,7 @@ namespace nonlinear_control {
 namespace utils {
 
 template <typename T>
-Eigen::Matrix<T, 3, 3> hat(const Eigen::Matrix<T, 3, 1> vector_) {
+inline Eigen::Matrix<T, 3, 3> hat(const Eigen::Matrix<T, 3, 1> vector_) {
     return (Eigen::Matrix<T, 3, 3>() << 0.0, -vector_(2), vector_(1),
             vector_(2), 0.0, -vector_(0),
             -vector_(1), vector_(0), 0.0)
@@ -13,7 +13,7 @@ Eigen::Matrix<T, 3, 3> hat(const Eigen::Matrix<T, 3, 1> vector_) {
 }
 
 template <typename T>
-Eigen::Matrix<T, 3, 1> vee(const Eigen::Matrix<T, 3, 3> mat_) {
+inline Eigen::Matrix<T, 3, 1> vee(const Eigen::Matrix<T, 3, 3> mat_) {
     return (Eigen::Matrix<T, 3, 1>() << mat_(2, 1), mat_(0, 2), mat_(1, 0)).finished();
 }
 

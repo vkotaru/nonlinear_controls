@@ -29,6 +29,7 @@ include/SE3_control.h
 include/qp_interface.h
 include/clf_qp.h
 include/mpc_base.h
+src/SO3_vblmpc.h
 )
 
 
@@ -40,6 +41,7 @@ src/SE3_control.cpp
 src/qp_interface.cpp
 src/clf_qp.cpp
 src/mpc_base.cpp
+src/SO3_vblmpc.cpp
 )
 
 add_subdirectory(third_party)

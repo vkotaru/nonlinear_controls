@@ -31,8 +31,18 @@ class TSO3 {
     }
 
     template <typename OtherDerived>
-    Eigen::Matrix<T, 6, 1>& operator-(const TSO3<OtherDerived>& other) {
-        return (Eigen::Matrix<T, 6, 1>() << R.error(other.R), Omega - R.transpose() * other.R * other.Omega).finished();
+    Eigen::Matrix<T, 6, 1> error(const TSO3<OtherDerived>& other) {
+        Eigen::Matrix<T, 6, 1> err_;
+        err_ << this->R.error(other.R), this->Omega - this->R.transpose() * other.R * other.Omega;
+        return err_;
+
+    }
+
+    template <typename OtherDerived>
+    Eigen::Matrix<T, 6, 1> operator-(const TSO3<OtherDerived>& other) {
+        Eigen::Matrix<T, 6, 1> err_;
+        err_ << this->R.error(other.R), this->Omega - this->R.transpose() * other.R * other.Omega;
+        return err_;
     }
 
     void print() const {

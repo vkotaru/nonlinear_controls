@@ -12,7 +12,7 @@ class PositionMPC3D {
     int N, nx, nu;
     double dt;
 
-    MPCBase *mpcSolver;
+    LinearMPCBase *mpcSolver;
     const double g = 9.81;
     Eigen::Matrix<double, 6, 1> err_state;
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> uOpt;
@@ -21,7 +21,7 @@ class PositionMPC3D {
     PositionMPC3D(const int _N, const double _dt) : N(_N), dt(_dt) {
         nx = 6;
         nu = 3;
-        mpcSolver = new MPCBase(true, N, nx, nu);
+        mpcSolver = new LinearMPCBase(true, N, nx, nu);
 
         /* setting up discrete-translational dynamics
          * x_{k+1} = x_{k} + dt*v_{k} + 0.5*dt*dt*a_{k}
@@ -47,7 +47,6 @@ class PositionMPC3D {
 
     void init() {
         mpcSolver->construct();
-        mpcSolver->setup();
     }
 
     Eigen::Vector3d run(Eigen::Matrix<double, 6, 1> _err_state) {

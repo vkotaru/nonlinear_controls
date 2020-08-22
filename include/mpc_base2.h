@@ -19,7 +19,7 @@ struct MPCProblem {
     int N, nx, nu;
 };
 
-class LinearMPCBase {
+class MPCBase {
    private:
     QPOasesEigen *qp;
 
@@ -28,8 +28,8 @@ class LinearMPCBase {
     int nVars, nCons;
 
    public:
-    LinearMPCBase(const bool _isLTI, const int _N, const int _nx, const int _nu);
-    ~LinearMPCBase();
+    MPCBase(const bool _isLTI, const int _N, const int _nx, const int _nu);
+    ~MPCBase();
 
     MPCProblem problem_;
     MPCBounds state, input;
@@ -40,9 +40,13 @@ class LinearMPCBase {
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Sx, Su, Qbar, Rbar, H, F;
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Ulb, Uub, Xlb, Xub;
 
+    void setup();
     void construct();
     void debug_print();
-    Eigen::Matrix<double, Eigen::Dynamic, 1> update(const bool verbose, const Eigen::Matrix<double, Eigen::Dynamic, 1> x0);
+    void print() {
+      qp->print();
+    }
+    Eigen::Matrix<double, Eigen::Dynamic, 1> update(const bool verbose, const Eigen::Matrix<double, Eigen::Dynamic, 1> &x0);
 };
 
 }  // namespace nonlinear_control
