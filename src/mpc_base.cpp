@@ -92,7 +92,7 @@ void LinearMPCBase::construct() {
     H = Su.transpose() * Qbar * Su + Rbar;
     F = Sx.transpose() * Qbar * Su;
 
-    debug_print();
+    // debug_print();
 }
 
 Eigen::Matrix<double, Eigen::Dynamic, 1> LinearMPCBase::update(const bool verbose, const Eigen::Matrix<double, Eigen::Dynamic, 1> x0) {

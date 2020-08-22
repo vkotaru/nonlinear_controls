@@ -1,25 +1,14 @@
 #ifndef NONLINEAR_CONTROLS_MPC_BASE_H
 #define NONLINEAR_CONTROLS_MPC_BASE_H
+
 #include "deque"
+#include "mpc_base.h"
 #include "qpoases_eigen.hpp"
 #include "vector"
+
 namespace nonlinear_control {
 
-struct MPCGains {
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Q, R, P;
-};
-
-struct MPCBounds {
-    Eigen::Matrix<double, Eigen::Dynamic, 1> lb, ub;
-};
-
-struct MPCProblem {
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> A, B;
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> lb, ub;
-    int N, nx, nu;
-};
-
-class MPCBase {
+class LinearMPC {
    private:
     QPOasesEigen *qp;
 
@@ -43,9 +32,6 @@ class MPCBase {
     void setup();
     void construct();
     void debug_print();
-    void print() {
-      qp->print();
-    }
     Eigen::Matrix<double, Eigen::Dynamic, 1> update(const bool verbose, const Eigen::Matrix<double, Eigen::Dynamic, 1> &x0);
 };
 

@@ -13,6 +13,12 @@ namespace nlc = nonlinear_control;
 
 #define nlc_real double
 
+void sinusoidalTraj(double& yd, double& dyd, double& d2yd, const float t, const double freq, const double amp, const double ampPercent, double ampOffset, double freqOffset) {
+    yd = amp * (1 - ampPercent + ampPercent * pow(cos(freq * t + freqOffset), 2)) + ampOffset;
+    dyd = -amp * ampPercent * freq * sin(2 * freq * t + freqOffset);
+    d2yd =  -2 * amp * ampPercent * pow(freq, 2) * cos(2 * freq * t + freqOffset);
+}
+
 int main() {
     const int N = 5;
     const double dt = double(1 / 200.0);  // 200 Hz
@@ -41,7 +47,7 @@ int main() {
 
     mpc.construct();
 
-    /******************************************************************************/
+    /************************** position MPC **************************************/
     nlc::PositionMPC3D pos_mpc_(N, dt);
     pos_mpc_.init();
 
@@ -59,7 +65,7 @@ int main() {
         pos_mpc_.updateState(X0, uOpt);
     }
 
-    /******************************************************************************/
+    /************************** attitude MPC **************************************/
     Eigen::Matrix3d J, iJ;
     J << 112533, 0, 0, 0, 36203, 0, 0, 0, 42673;
     J = J*1e-6;
@@ -68,7 +74,7 @@ int main() {
     att_mpc_.init();
     std::cout << "MPC Constructed" << std::endl;
 
-    nlc::TSO3<double> att, attd;
+    nlc::TSE3<double> att, attd;
     att.R.setZero();
     att.R(0,2) = 1; att.R(1,1) = 1; att.R(2,0) = -1;
     att.print();
@@ -85,11 +91,26 @@ int main() {
     P = P*100;
     R = R*1e-3;
 
+    double ydp;
+    double dydp;
+    double d2ydp;
+    double freqp = 0.5;
+
+
+
     att_mpc_.updateGains(Q, P, R);
     att_mpc_.reconstructMPC();
     for (int j = 0; j < int(T/dt); ++j) {
-        att_mpc_.run(att-attd, uMoment);
-        std::cout << "att.R: \n" << att.R << "\n uOpt: " << uMoment.transpose() << " Omega: " << att.Omega.transpose() << std::endl;
+
+        sinusoidalTraj(ydp, dydp, d2ydp, dt*j, freqp, 0.25, 1, -0.125, 3.141 / 4);
+        attd.R = nlc::utils::rotmZ(0) * nlc::utils::rotmY(ydp);
+        attd.Omega(1) = dydp;
+        attd.dOmega(1) = d2ydp;
+        // att_mpc_.run(att-attd, uMoment);
+        att_mpc_.run(dt, att.extractTSO3(), attd.extractTSO3(), uMoment);
+        std::cout << "att error: " << (att-attd).transpose() << " uOpt: " << uMoment.transpose()  << std::endl;
+
+        // dynamics integration
         Eigen::Matrix<double, 3, 3> hat_Om = nlc::utils::hatd(att.Omega);
         att.R = att.R*(hat_Om*dt).exp();
         Eigen::Vector3d dOm;

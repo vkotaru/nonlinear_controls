@@ -108,6 +108,13 @@ class TSE3 : public TSO3<T> {
                 this->Omega - this->R.transpose() * other.R * other.Omega)
             .finished();
     }
+
+    TSO3<T> extractTSO3() {
+        TSO3<T> att;
+        att.R = this->R;
+        att.Omega = this->Omega;
+        return att;
+    }
 };
 
 template <typename T>

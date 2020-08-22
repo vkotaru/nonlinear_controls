@@ -82,13 +82,17 @@ void SO3VblMPC<T>::init() {
 
 template <typename T>
 void SO3VblMPC<T>::run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1>& u) {
+    // time-varying tracjectory with only operating point used for the dynamics for the next N steps
     updateDynamics(xd.Omega);
     uOpt = mpcSolver->update(false, (x.error(xd)).template cast<double>());
-    u = uOpt.block(0, 0, 3, 1).cast<T>();
+    u = uOpt.block(0, 0, 3, 1).template cast<T>();
+    u += x.Omega.cross(inertia_.template cast<T>() * x.Omega);
+    u += -inertia_.template cast<T>() * (x.Omega.cross(x.R.transpose() * xd.R * xd.Omega) - x.R.transpose() * xd.R * xd.dOmega);
 }
 
 template <typename T>
 void SO3VblMPC<T>::run(Eigen::Matrix<T, 6, 1> _err_state, Eigen::Matrix<T, 3, 1>& u) {
+    // time-invariant dynamics
     uOpt = mpcSolver->update(false, _err_state.template cast<double>());
     u = uOpt.block(0, 0, 3, 1).cast<T>();
 }
