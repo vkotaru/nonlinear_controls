@@ -46,6 +46,10 @@ class PositionMPC3D {
     ~PositionMPC3D() {}
 
     void init() {
+        reconstructMPC();
+    }
+    
+    void reconstructMPC() {
         mpcSolver->construct();
     }
 

@@ -10,7 +10,7 @@ LinearMPCBase::LinearMPCBase(const bool _isLTI, const int _N, const int _nx, con
     qp->options.setToMPC();
     qp->options.printLevel = qpOASES::PL_LOW;
     qp->setup();
-    qp->data_.nWSR = 20;
+    qp->data_.nWSR = 10e5;
 
     // initialize matrices
     problem_.N = N;

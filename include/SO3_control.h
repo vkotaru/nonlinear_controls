@@ -3,6 +3,7 @@
 
 #include "data_types.hpp"
 #include "geometric_control.h"
+#include <iostream>
 
 namespace nonlinear_control {
 
@@ -15,6 +16,11 @@ class SO3Controller : public GeometricController<T> {
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     SO3Controller(/* args */);
+    SO3Controller(const Eigen::Matrix<T, 3, 3>& J) {
+        inertia_ = J;
+      gains_.set_kp((Eigen::Matrix<T, 3, 1>()<< 1000.0, 1000, 1000).finished());
+      gains_.set_kd((Eigen::Matrix<T, 3, 1>()<< 100.0, 100, 100).finished());
+    }
     ~SO3Controller();
 
     inline const TSO3<T>& state() const {
