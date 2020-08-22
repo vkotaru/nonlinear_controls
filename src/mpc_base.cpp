@@ -37,7 +37,7 @@ LinearMPCBase::LinearMPCBase(const bool _isLTI, const int _N, const int _nx, con
     gains.Q.setIdentity();
     gains.R.resize(nu, nu);
     gains.R.setIdentity();
-    gains.P.resize(nu, nu);
+    gains.P.resize(nx, nx);
     gains.P.setIdentity();
 
     H.resize(nVars, nVars);
