@@ -4,36 +4,40 @@
 #include "qpoases_eigen.hpp"
 #include "vector"
 namespace nonlinear_control {
+//template<typename T>
 
+template <typename T>
 struct MPCGains {
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Q, R, P;
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> Q, R, P;
 };
 
+template <typename T>
 struct MPCBounds {
-    Eigen::Matrix<double, Eigen::Dynamic, 1> lb, ub;
+    Eigen::Matrix<T, Eigen::Dynamic, 1> lb, ub;
 };
 
+template <typename T>
 struct MPCProblem {
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> A, B;
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> lb, ub;
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> A, B;
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> lb, ub;
     int N, nx, nu;
 };
 
 class LinearMPCBase {
-   private:
-    QPOasesEigen *qp;
+  private:
+    QPOasesEigen* qp;
 
     bool isLTI;
     const int nx, nu, N;
     int nVars, nCons;
 
-   public:
+  public:
     LinearMPCBase(const bool _isLTI, const int _N, const int _nx, const int _nu);
     ~LinearMPCBase();
 
-    MPCProblem problem_;
-    MPCBounds state, input;
-    MPCGains gains;
+    MPCProblem<double> problem_;
+    MPCBounds<double> state, input;
+    MPCGains<double> gains;
 
     // temporary (move to private after debug is complete)
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Au, Ax, Af, bx, bu, bf;
