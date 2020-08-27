@@ -6,6 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-Wall -Os")
 SET( CMAKE_BUILD_TYPE Debug)
 
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
+
 include_directories(
 include
 third_party/cvxgen
@@ -17,7 +21,9 @@ set(INCLUDE_DIRS
 include
 third_party/cvxgen
 third_party/qpOASES
-third_party/qpOASES/include)
+third_party/qpOASES/include
+third_party/matplotlib-cpp # TODO learn why this is working and not include_directories
+)
 
 set(CONTROL_HEADERS
 include/manifolds.hpp
@@ -49,7 +55,7 @@ src/SO3_vblmpc.cpp
 add_subdirectory(third_party)
 
 add_library(nonlinear_controls ${CONTROL_SRCS})
-target_link_libraries(nonlinear_controls qpOASES)
+target_link_libraries(nonlinear_controls qpOASES ${PYTHON_LIBRARIES})
 target_include_directories(nonlinear_controls PUBLIC ${INCLUDE_DIRS})
 
 add_executable(test_main tests/test_nlc.cpp)

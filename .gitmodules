@@ -1,3 +1,6 @@
 [submodule "third_party/qpOASES"]
 	path = third_party/qpOASES
 	url = git@github.com:coin-or/qpOASES.git
+[submodule "third_party/matplotlib-cpp"]
+	path = third_party/matplotlib-cpp
+	url = git@github.com:lava/matplotlib-cpp.git
