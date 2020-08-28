@@ -3,6 +3,8 @@ Nonlinear controls, linear controls, lyapunov based controls, barrier functions,
 
 
 ### MPC Usage
+Makes use `Eigen` and `qpOASES` (currently, the applications are very specific)
+
 #### LTI Dynamics: `LinearMPC`
 ```
 namespace nlc = nonlinear_control;
