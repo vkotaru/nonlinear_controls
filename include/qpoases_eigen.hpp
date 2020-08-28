@@ -14,12 +14,12 @@ struct QPOasesData {
 };
 
 class QPOasesEigen {
-   protected:
+  protected:
     qpOASES::QProblem problem;
     int nvars, ncons;
 
-    qpOASES::real_t *H, *A, *g, *lb, *ub, *lbA, *ubA;
-    qpOASES::int_t nWSR; 
+    qpOASES::real_t* H, *A, *g, *lb, *ub, *lbA, *ubA;
+    qpOASES::int_t nWSR;
 
     void eigen2array() {
         H       = data_.H.transpose().data();
@@ -32,17 +32,17 @@ class QPOasesEigen {
         nWSR    = data_.nWSR;
     }
 
-   public:
+  public:
     QPOasesEigen(const int n, const int m) : problem(n, m), nvars(n), ncons(m) {
-        data_.H.resize(n,n);
-        data_.g.resize(n,1);
-        data_.lb.resize(n,1);
-        data_.ub.resize(n,1);
-        
-        data_.A.resize(m,n);
-        data_.lbA.resize(m,1);
-        data_.ubA.resize(m,1);
-        
+        data_.H.resize(n, n);
+        data_.g.resize(n, 1);
+        data_.lb.resize(n, 1);
+        data_.ub.resize(n, 1);
+
+        data_.A.resize(m, n);
+        data_.lbA.resize(m, 1);
+        data_.ubA.resize(m, 1);
+
         data_.nWSR = 10;
         reset_data();
     }
@@ -51,9 +51,23 @@ class QPOasesEigen {
     void setup() {
         problem.setOptions(options);
     }
-    void solve() {
+    qpOASES::returnValue solve() {
         eigen2array();
-        problem.init(H, g, A, lb, ub, lbA, ubA, nWSR);
+        qpOASES::returnValue sol =  problem.init(H, g, A, lb, ub, lbA, ubA, nWSR);
+        //        if (sol == qpOASES::SUCCESSFUL_RETURN) {
+        //            std::cout << "SUCCESSFUL_RETURN" << std::endl;
+        //        } else if (sol == qpOASES::RET_MAX_NWSR_REACHED) {
+        //            std::cout << "RET_MAX_NWSR_REACHED" << std::endl;
+        //        } else if (sol == qpOASES::RET_INIT_FAILED) {
+        //            std::cout << "RET_INIT_FAILED" << std::endl;
+        //        } else {
+        //            std::cout << "Something else" << std::endl;
+        //        }
+        return sol;
+    }
+    void hotstart() {
+        eigen2array();
+        problem.hotstart(g, lb, ub, lbA, ubA, nWSR);
     }
     Eigen::Matrix<double, Eigen::Dynamic, 1> getOptimizer() {
         qpOASES::real_t xOpt[nvars];

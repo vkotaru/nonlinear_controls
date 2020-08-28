@@ -34,8 +34,7 @@ include/SO3_control.h
 include/SE3_control.h
 include/qp_interface.h
 include/clf_qp.h
-include/mpc_base.h
-include/mpc_base2.h
+include/linear_mpc.h
 include/SO3_vblmpc.h
 )
 
@@ -47,9 +46,8 @@ src/SO3_control.cpp
 src/SE3_control.cpp
 src/qp_interface.cpp
 src/clf_qp.cpp
-src/mpc_base.cpp
-src/mpc_base2.cpp
-src/SO3_vblmpc.cpp
+src/linear_mpc.cpp
+#src/SO3_vblmpc.cpp
 )
 
 add_subdirectory(third_party)
@@ -64,5 +62,3 @@ add_executable(test_qp tests/test_qp.cpp)
 target_link_libraries(test_qp nonlinear_controls)
 add_executable(test_mpc tests/test_mpc.cpp)
 target_link_libraries(test_mpc nonlinear_controls)
-add_executable(test_mpc2 tests/test_mpc2.cpp)
-target_link_libraries(test_mpc2 nonlinear_controls)
