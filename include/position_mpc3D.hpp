@@ -8,16 +8,16 @@
 namespace nonlinear_control {
 
 class PositionMPC3D {
-   protected:
+  protected:
     int N, nx, nu;
     double dt;
 
-    LinearMPCBase *mpcSolver;
+    LinearMPCBase* mpcSolver;
     const double g = 9.81;
     Eigen::Matrix<double, 6, 1> err_state;
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> uOpt;
 
-   public:
+  public:
     PositionMPC3D(const int _N, const double _dt) : N(_N), dt(_dt) {
         nx = 6;
         nu = 3;
@@ -29,18 +29,29 @@ class PositionMPC3D {
          */
         mpcSolver->problem_.A.setIdentity();
         mpcSolver->problem_.A.topRightCorner(3, 3) += dt * Eigen::Matrix<double, 3, 3>::Identity();
-        mpcSolver->problem_.B << 0.5 * dt * dt * Eigen::Matrix<double, 3, 3>::Identity(), dt * Eigen::Matrix<double, 3, 3>::Identity();
+        mpcSolver->problem_.B << 0.5 * dt* dt* Eigen::Matrix<double, 3, 3>::Identity(), dt* Eigen::Matrix<double, 3, 3>::Identity();
 
         mpcSolver->gains.Q = Eigen::Matrix<double, 6, 6>::Identity();
         mpcSolver->gains.P = 100 * Eigen::Matrix<double, 6, 6>::Identity();
-        mpcSolver->gains.R = 1e-6 * Eigen::Matrix<double, 3, 3>::Identity();
+        mpcSolver->gains.R = 1e-2 * Eigen::Matrix<double, 3, 3>::Identity();
+
+        mpcSolver->gains.Q << 1000 * Eigen::Matrix3d::Identity(), Eigen::Matrix3d::Zero(),
+                  Eigen::Matrix3d::Zero(), 100 * Eigen::Matrix3d::Identity();
+        mpcSolver->gains.P <<     8.1314,    0.0000,   - 0.0000,    0.6327,   - 0.0000,   - 0.0000,
+                  0.0000,    8.1314,    0.0000,    0.0000,    0.6327,    0.0000,
+                  - 0.0000,    0.0000,    8.1314,   - 0.0000,    0.0000,    0.6327,
+                  0.6327,    0.0000,   - 0.0000,    0.2606,   - 0.0000,   - 0.0000,
+                  - 0.0000,    0.6327,    0.0000,   - 0.0000,    0.2606,    0.0000,
+                  - 0.0000,    0.0000,    0.6327,   - 0.0000,    0.0000,    0.2606;
+        //        mpcSolver->gains.P = 1e4 * mpcSolver->gains.R;
+
 
         mpcSolver->input.lb << -g, -g, -g;
         mpcSolver->input.ub << g, g, g;
-        mpcSolver->state.lb = -100*Eigen::Matrix<double, 6, 1>::Ones();
-        mpcSolver->state.ub = 100*Eigen::Matrix<double, 6, 1>::Ones();
+        mpcSolver->state.lb = -100 * Eigen::Matrix<double, 6, 1>::Ones();
+        mpcSolver->state.ub = 100 * Eigen::Matrix<double, 6, 1>::Ones();
 
-        uOpt.resize(3*N,1);
+        uOpt.resize(3 * N, 1);
     }
 
     ~PositionMPC3D() {}
@@ -48,18 +59,18 @@ class PositionMPC3D {
     void init() {
         reconstructMPC();
     }
-    
+
     void reconstructMPC() {
         mpcSolver->construct();
     }
 
     Eigen::Vector3d run(Eigen::Matrix<double, 6, 1> _err_state) {
         uOpt = mpcSolver->update(false, _err_state);
-        return uOpt.block(0,0,3,1);
+        return uOpt.block(0, 0, 3, 1);
     }
 
-    void updateState(Eigen::Matrix<double, 6, 1> &state, Eigen::Vector3d input) {
-        state = mpcSolver->problem_.A*state + mpcSolver->problem_.B*input;
+    void updateState(Eigen::Matrix<double, 6, 1>& state, Eigen::Vector3d input) {
+        state = mpcSolver->problem_.A * state + mpcSolver->problem_.B * input;
     }
 };
 

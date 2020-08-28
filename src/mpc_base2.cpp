@@ -51,13 +51,17 @@ LinearMPCBase2<T>::LinearMPCBase2(const bool _isLTI, const int _N, const int _nx
     set_mpc_gains(gains);
 
     Ulb.resize(nu * N, 1);
-    Ulb = -INFINITY *  MatrixX<T>(nu * N, 1);
+    Ulb.setOnes();
+    Ulb = -1e6 * Ulb;
     Uub.resize(nu * N, 1);
-    Uub = INFINITY *  MatrixX<T>(nu * N, 1);
+    Uub.setOnes();
+    Uub = 1e6 * Uub;
     Xlb.resize(nx * N, 1);
-    Xlb = -INFINITY * MatrixX<T>(nx * N, 1);
+    Xlb.setOnes();
+    Xlb = -1e6 * Xlb;
     Xub.resize(nx * N, 1);
-    Xub = INFINITY *  MatrixX<T>(nx * N, 1);
+    Xub.setOnes();
+    Xub = 1e6 * Xub;
     set_mpc_bounds();
     std::cout << "LinearMPCBase2 Constructor done" << std::endl;
 
@@ -221,15 +225,15 @@ VectorX<T> LinearMPCBase2<T>::update(const VectorX<T> x0) {
     QP->data_.lbA = (E0 * x0 - tolCons).template cast<double>();
     QP->data_.ubA = (E0 * x0 + tolCons).template cast<double>();
 
-    std::cout << "****************************" << std::endl;
-    std::cout << QP->data_.H << std::endl;
-    std::cout << QP->data_.g.transpose() << std::endl;
-    std::cout << QP->data_.lb.transpose() << std::endl;
-    std::cout << QP->data_.ub.transpose() << std::endl;
-    std::cout << QP->data_.lbA.transpose() << std::endl;
-    std::cout << QP->data_.ubA.transpose() << std::endl;
-    std::cout << QP->data_.A << std::endl;
-    std::cout << "****************************" << std::endl;
+    //    std::cout << "****************************" << std::endl;
+    //    std::cout << QP->data_.H << std::endl;
+    //    std::cout << QP->data_.g.transpose() << std::endl;
+    //    std::cout << QP->data_.lb.transpose() << std::endl;
+    //    std::cout << QP->data_.ub.transpose() << std::endl;
+    //    std::cout << QP->data_.lbA.transpose() << std::endl;
+    //    std::cout << QP->data_.ubA.transpose() << std::endl;
+    //    std::cout << QP->data_.A << std::endl;
+    //    std::cout << "****************************" << std::endl;
 
     QP->solve();
     return QP->getOptimizer().template cast<T>();
