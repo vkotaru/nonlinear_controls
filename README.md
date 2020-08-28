@@ -15,7 +15,7 @@ mpc_.set_state_bounds(state_lb, state_ub);
 
 mpc_.construct(); // constructs the necessary cost and constraint matrices 
 for(;;) {
-  zOpt = pos_mpc_.run(err_state);
+  zOpt = mpc_.run(err_state);
   uOpt = zOpt.block(0, 0, nu, 1);
 }
 ```
@@ -35,7 +35,7 @@ mpc_.set_state_bounds(state_lb, state_ub);
 
 mpc_.construct(); // constructs the necessary cost and constraint matrices 
 for(;;) {
-  zOpt = pos_mpc_.run(err_state, A(i+N), B(i+N));
+  zOpt = mpc_.run(err_state, A(i+N), B(i+N));
   uOpt = zOpt.block(0, 0, nu, 1);
 }
 ```
