@@ -25,20 +25,6 @@ third_party/qpOASES/include
 third_party/matplotlib-cpp # TODO learn why this is working and not include_directories
 )
 
-set(CONTROL_HEADERS
-include/manifolds.hpp
-include/data_types.hpp 
-include/base_control.h 
-include/geometric_control.h
-include/SO3_control.h
-include/SE3_control.h
-include/qp_interface.h
-include/clf_qp.h
-include/linear_mpc.h
-include/SO3_vblmpc.h
-)
-
-
 set(CONTROL_SRCS
 src/base_control.cpp
 src/geometric_control.cpp
@@ -47,7 +33,8 @@ src/SE3_control.cpp
 src/qp_interface.cpp
 src/clf_qp.cpp
 src/linear_mpc.cpp
-#src/SO3_vblmpc.cpp
+src/SO3_vblmpc.cpp
+src/SE3_vblmpc.cpp
 )
 
 add_subdirectory(third_party)

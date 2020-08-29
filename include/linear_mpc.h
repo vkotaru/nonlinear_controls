@@ -39,14 +39,14 @@ class LinearMPC {
     // main functions
     virtual void construct(); // TODO: define an init function
     virtual VectorX<T> run (const VectorX<T> x0);
-
+    virtual VectorX<T> run (const VectorX<T> x0, const MatrixX<T> A, const MatrixX<T> B);
     // dynamics
     virtual void init_dynamics(MatrixX<T> A, MatrixX<T> B);
     virtual void update_dynamics(MatrixX<T> A, MatrixX<T> B);
 
     // setters
     void set_max_iter(const int MAX_ITER) {
-	QP->data_.nWSR = MAX_ITER;
+        QP->data_.nWSR = MAX_ITER;
     }
     void set_mpc_gains(MatrixX<T> Q, MatrixX<T> P, MatrixX<T> R);
     void set_input_bounds(VectorX<T> lb, VectorX<T> ub);
@@ -69,7 +69,7 @@ class LinearMPCt : public LinearMPC<T> {
 
     // main functions
     virtual void construct() override;
-    virtual VectorX<T> run (const VectorX<T> x0, const MatrixX<T> A, const MatrixX<T> B) ;
+    virtual VectorX<T> run (const VectorX<T> x0, const MatrixX<T> A, const MatrixX<T> B) override;
 
     // dynamics
     virtual void init_dynamics(MatrixX<T> A, MatrixX<T> B) override;

@@ -7,7 +7,7 @@
 
 #include "data_types.hpp"
 #include "geometric_control.h"
-#include "mpc_base.h"
+#include "linear_mpc.h"
 #include "qpoases_eigen.hpp"
 #include "utils.hpp"
 
@@ -15,33 +15,51 @@ namespace nonlinear_control {
 
 template <typename T>
 class SO3VblMPC : public GeometricController<T> {
-   protected:
+  protected:
+    const double g = 9.81;
     int N, nx, nu;
     T dt;
-    Eigen::Matrix3d inertia_, inertia_inv_;
+    Eigen::Matrix<T, 3, 3> inertia_, inertia_inv_;
     TSO3<T> state_;
-    bool isLTI; // is linear time invariant
+    bool IS_LTI = true; // is linear time invariant
 
-    LinearMPCBase *mpcSolver;
-    const double g = 9.81;
-    Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> uOpt;
+    LinearMPC<T>* mpcSolver;
+    VectorX<T> err_state, uOpt;
+    TSO3<T> state_des;
 
-   public:
-    SO3VblMPC(const int _N, const double _dt);
-    SO3VblMPC(const int _N, const double _dt, const Eigen::Matrix<T, 3, 3> _J);
+    MatrixX<T> A, B; // Dynamics
+    MatrixX<T> Q, P, R; // gains
+    VectorX<T> state_lb, state_ub, input_lb, input_ub; // bounds
+
+  public:
+    SO3VblMPC(bool islti, int _N, double _dt);
+    SO3VblMPC(bool islti, int _N, double _dt, Eigen::Matrix<T, 3, 3> _J);
     ~SO3VblMPC();
 
-    virtual void init();
+    void generate_dynamics(Eigen::Matrix<T, 3, 1> Omd, MatrixX<T>& A);
+    void init_dynamics(Eigen::Matrix<T, 3, 1> Omd);
+    void init_dynamics(TSO3<T> attd);
+    void construct() {
+        mpcSolver->construct();
+    }
+
+    virtual void init() {}
     virtual void run(T dt) {}
+    VectorX<T> run(VectorX<T> _err_state) {
+        uOpt = mpcSolver->run(_err_state);
+        return uOpt.block(0, 0, nu, 1);
+    }
+    VectorX<T> run(TSO3<T> state) {
+        uOpt = mpcSolver->run(state - state_des);
+        return uOpt.block(0, 0, nu, 1);
+    }
     void run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1>& u);
-    void run(Eigen::Matrix<T, 6, 1> _err_state, Eigen::Matrix<T, 3, 1>& u);
-    void updateDynamics(Eigen::Matrix<T, 3, 1> Omd);
-    void updateGains(Eigen::Matrix<T, 6, 6> Q, Eigen::Matrix<T, 6, 6> P, Eigen::Matrix<T, 3, 3> R);
+    void set_gains(const MatrixX<T> Q, const MatrixX<T> P, const MatrixX<T> R);
+    void set_input_bounds(VectorX<T> lb, VectorX<T> ub);
+    void set_state_bounds(VectorX<T> lb, VectorX<T> ub);
 
-    void reconstructMPC();
-
-    // funtion to integrate dynamics
-    void updateState(Eigen::Matrix<double, 6, 1> &state, Eigen::Vector3d input);
+    /// funtion to integrate dynamics
+    void updateState(Eigen::Matrix<double, 6, 1>& state, Eigen::Vector3d input);
 };
 
 }  // namespace nonlinear_control

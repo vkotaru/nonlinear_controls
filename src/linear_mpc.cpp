@@ -157,7 +157,10 @@ VectorX<T> LinearMPC<T>::run(const VectorX<T> x0) {
     /// return
     return QP->getOptimizer().template cast<T>();
 }
-
+template <typename T>
+VectorX<T> LinearMPC<T>::run (const VectorX<T> x0, const MatrixX<T> A, const MatrixX<T> B) {
+    return LinearMPC<T>::run(x0);
+}
 
 //////////////////////////////////////////
 /// Linear Time Varying Dynamics MPC

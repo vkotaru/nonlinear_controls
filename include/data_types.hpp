@@ -11,8 +11,8 @@ using namespace manifolds;
 
 template <typename T>
 class TSO3 {
-   private:
-   public:
+  private:
+  public:
     TSO3(/* args */) {
         R.setIdentity();
         Omega.setZero();
@@ -33,7 +33,7 @@ class TSO3 {
     template <typename OtherDerived>
     Eigen::Matrix<T, 6, 1> error(const TSO3<OtherDerived>& other) {
         Eigen::Matrix<T, 6, 1> err_;
-        err_ << this->R.error(other.R), this->Omega - this->R.transpose() * other.R * other.Omega;
+        err_ << this->R.error(other.R), this->Omega - this->R.transpose() * other.R* other.Omega;
         return err_;
 
     }
@@ -41,7 +41,7 @@ class TSO3 {
     template <typename OtherDerived>
     Eigen::Matrix<T, 6, 1> operator-(const TSO3<OtherDerived>& other) {
         Eigen::Matrix<T, 6, 1> err_;
-        err_ << this->R.error(other.R), this->Omega - this->R.transpose() * other.R * other.Omega;
+        err_ << this->R.error(other.R), this->Omega - this->R.transpose() * other.R* other.Omega;
         return err_;
     }
 
@@ -53,8 +53,8 @@ class TSO3 {
 
 template <typename T>
 class TSE3 : public TSO3<T> {
-   private:
-   public:
+  private:
+  public:
     TSE3(/* args */) : TSO3<T>() {
         position.setZero();
         velocity.setZero();
@@ -106,7 +106,7 @@ class TSE3 : public TSO3<T> {
                 velocity - other.velocity,
                 this->R.error(other.R),
                 this->Omega - this->R.transpose() * other.R * other.Omega)
-            .finished();
+               .finished();
     }
 
     TSO3<T> extractTSO3() {
@@ -119,12 +119,12 @@ class TSE3 : public TSO3<T> {
 
 template <typename T>
 class Gains {
-   private:
+  private:
     Eigen::Matrix<T, 3, 1> kp_;
     Eigen::Matrix<T, 3, 1> kd_;
     Eigen::Matrix<T, 3, 1> ki_;
 
-   public:
+  public:
     Gains(void) {}
     ~Gains(void) {}
 
@@ -156,7 +156,7 @@ class Gains {
 
 template <typename T>
 class Wrench {
-   public:
+  public:
     Wrench(/* args */) {}
     ~Wrench() {}
 

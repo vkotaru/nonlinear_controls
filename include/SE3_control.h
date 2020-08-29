@@ -3,7 +3,9 @@
 
 #include "data_types.hpp"
 #include "SO3_control.h"
+#include "linear_mpc.h"
 #include<iostream>
+
 namespace nonlinear_control {
 template <typename T>
 class SE3Controller : public SO3Controller<T> {
@@ -23,8 +25,6 @@ class SE3Controller : public SO3Controller<T> {
 
     Gains<T> pgains_;
     void run(T dt, TSE3<T> x, TSE3<T> xd, Wrench<T>& u);
-
-
 };
 
 
