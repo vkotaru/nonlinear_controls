@@ -35,6 +35,7 @@ src/clf_qp.cpp
 src/linear_mpc.cpp
 src/SO3_vblmpc.cpp
 src/SE3_vblmpc.cpp
+src/SO3_clf.cpp
 )
 
 add_subdirectory(third_party)
