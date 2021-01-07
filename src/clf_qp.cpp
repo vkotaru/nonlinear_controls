@@ -1,5 +1,5 @@
-#include "clf_qp.h"
-namespace nonlinear_control {
+#include "controls/clf_qp.h"
+namespace nonlinear_controls {
 
 namespace clf3D {
 #include "CLF_3D/ldl.c"
@@ -62,4 +62,4 @@ Eigen::Vector3d ClfQP::getOptimizer() {
     return Eigen::Vector3d(clf3D::vars.x[0], clf3D::vars.x[1], clf3D::vars.x[2]);
 }
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls

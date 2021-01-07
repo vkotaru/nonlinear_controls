@@ -5,7 +5,7 @@
 #include <iostream>
 #include <qpOASES.hpp>
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 struct QPOasesData {
     Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic> H, A;
@@ -101,6 +101,6 @@ class QPOasesEigen {
     }
 };
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 
 #endif  // QPOASES_EIGEN_H

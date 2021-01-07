@@ -5,13 +5,13 @@
 #include <iostream>
 #include <qpOASES.hpp>
 
-#include "data_types.hpp"
+#include "data_types/data_types.hpp"
 #include "geometric_control.h"
 #include "linear_mpc.h"
-#include "qpoases_eigen.hpp"
-#include "utils.hpp"
+#include "common/qpoases_eigen.hpp"
+#include "common/utils.hpp"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T>
 class SO3VblMPC : public GeometricController<T> {
@@ -62,5 +62,5 @@ class SO3VblMPC : public GeometricController<T> {
     void updateState(Eigen::Matrix<double, 6, 1>& state, Eigen::Vector3d input);
 };
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 #endif  // NONLINEAR_CONTROLS_SO3_VBLMPC_H

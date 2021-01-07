@@ -4,8 +4,6 @@ build/
 .vscode/
 *.m~
 *.pyc
-nonlinear_controls.config
-nonlinear_controls.creator
-nonlinear_controls.files
-nonlinear_controls.includes
 docs/
+.idea
+

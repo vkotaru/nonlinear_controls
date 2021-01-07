@@ -1,10 +1,10 @@
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <qpOASES.hpp>
-#include "qpoases_eigen.hpp"
-#include "clf_qp.h"
+#include "common/qpoases_eigen.hpp"
+#include "controls/clf_qp.h"
 
-namespace nlc = nonlinear_control;
+namespace nlc = nonlinear_controls;
 
 #define nlc_real double
 

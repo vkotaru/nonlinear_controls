@@ -1,9 +1,9 @@
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 
-#include "SO3_control.h"
-#include "cvxgen_interface.h"
-using namespace nonlinear_control;
+#include "controls/SO3_control.h"
+#include "common/cvxgen_interface.h"
+using namespace nonlinear_controls;
 using namespace manifolds;
 
 #define GREEN "\033[01;32m"

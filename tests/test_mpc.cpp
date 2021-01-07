@@ -6,17 +6,17 @@
 #include <iostream>
 #include <qpOASES.hpp>
 
-#include "utils.hpp"
-#include "linear_mpc.h"
-#include "data_types.hpp"
-#include "double_int_mpc.hpp"
-#include "SE3_vblmpc.h"
-#include "SO3_clf.h"
+#include "common/utils.hpp"
+#include "controls/linear_mpc.h"
+#include "data_types/data_types.hpp"
+#include "controls/double_int_mpc.hpp"
+#include "controls/SE3_vblmpc.h"
+#include "controls/SO3_clf.h"
 
 #include "matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
-namespace nlc = nonlinear_control;
+namespace nlc = nonlinear_controls;
 
 #define nlc_real double
 

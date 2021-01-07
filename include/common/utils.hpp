@@ -2,7 +2,7 @@
 #define NLC_UTILS_H
 #include "eigen3/Eigen/Dense"
 #include <sys/time.h>
-namespace nonlinear_control {
+namespace nonlinear_controls {
 namespace utils {
 
 static struct timeval tv;
@@ -96,6 +96,6 @@ inline Eigen::Vector3d eulerAngleXYZToZYX(const Eigen::Vector3d& rpy) {
 #define veed vee<double>
 //////////////////////////////////////////
 }  // namespace utils
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 
 #endif  // NLC_UTILS_H

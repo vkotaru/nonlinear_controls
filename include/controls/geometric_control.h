@@ -2,9 +2,9 @@
 #define NLC_GEOMETRIC_CONTROL_H
 
 #include "base_control.h"
-#include "data_types.hpp"
+#include "data_types/data_types.hpp"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T>
 class GeometricController : public BaseController<T> {
@@ -19,5 +19,5 @@ class GeometricController : public BaseController<T> {
     virtual void run();
 };
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 #endif  // NLC_GEOMETRIC_CONTROL_H

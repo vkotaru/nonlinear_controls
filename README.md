@@ -7,7 +7,7 @@ Makes use `Eigen` and `qpOASES` (currently, the applications are very specific)
 
 #### LTI Dynamics: `LinearMPC`
 ```
-namespace nlc = nonlinear_control;
+namespace nlc = nonlinear_controls;
 
 nlc::LinearMPC<double> mpc_(N, nx, nu);
 mpc_.init_dynamics(A, B);
@@ -24,7 +24,7 @@ for(;;) {
 
 #### LTV Dynamics: `LinearMPCt`
 ```
-namespace nlc = nonlinear_control;
+namespace nlc = nonlinear_controls;
 
 nlc::LinearMPCt<double> mpc_(N, nx, nu);
 for (int i = 0; i < N; ++i) {

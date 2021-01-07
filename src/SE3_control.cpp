@@ -1,6 +1,6 @@
-#include "SE3_control.h"
+#include "controls/SE3_control.h"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 template <typename T>
 SE3Controller<T>::SE3Controller() : SO3Controller<T>() {
 }
@@ -27,4 +27,4 @@ void SE3Controller<T>::run(T dt, TSE3<T> x, TSE3<T> xd, Wrench<T>& u) {
 template class SE3Controller<float>;
 template class SE3Controller<double>;
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls

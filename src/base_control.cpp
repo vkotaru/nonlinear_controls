@@ -1,6 +1,6 @@
-#include "base_control.h"
+#include "controls/base_control.h"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T>
 BaseController<T>::BaseController() {}
@@ -17,4 +17,4 @@ void BaseController<T>::run() {}
 template class BaseController<float>;
 template class BaseController<double>;
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls

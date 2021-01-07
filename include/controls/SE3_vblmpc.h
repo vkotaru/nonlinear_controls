@@ -1,12 +1,12 @@
 #ifndef NONLINEAR_CONTROL_SE3_VBLMPC_H
 #define NONLINEAR_CONTROL_SE3_VBLMPC_H
 
-#include "data_types.hpp"
+#include "data_types/data_types.hpp"
 #include "double_int_mpc.hpp"
 #include "geometric_control.h"
 #include "SO3_vblmpc.h"
-#include<iostream>
-namespace nonlinear_control {
+#include <iostream>
+namespace nonlinear_controls {
 
 template <typename T>
 class SE3VblMPC: public GeometricController<T> {
@@ -26,5 +26,5 @@ class SE3VblMPC: public GeometricController<T> {
 
     void run(T dt, TSE3<T> x, TSE3<T> xd, Wrench<T>& u);
 };
-} // namespace nonlinear_control
+} // namespace nonlinear_controls
 #endif // NONLINEAR_CONTROL_SE3_VBLMPC_H

@@ -1,6 +1,6 @@
-#include "qp_interface.h" 
+#include "common/qp_interface.h"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 QPInterface::QPInterface() {
 

@@ -1,6 +1,6 @@
-#include "SO3_control.h"
+#include "controls/SO3_control.h"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T>
 SO3Controller<T>::SO3Controller() {
@@ -39,4 +39,4 @@ void SO3Controller<T>::run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1>& 
 template class SO3Controller<float>;
 template class SO3Controller<double>;
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls

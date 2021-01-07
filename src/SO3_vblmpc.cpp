@@ -1,6 +1,6 @@
-#include "SO3_vblmpc.h"
+#include "controls/SO3_vblmpc.h"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T>
 SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt) {
@@ -142,4 +142,4 @@ void SO3VblMPC<T>::set_state_bounds(VectorX<T> lb, VectorX<T> ub) {
 //////////////////////////////////
 template class  SO3VblMPC<float>;
 template class  SO3VblMPC<double>;
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls

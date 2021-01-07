@@ -1,5 +1,5 @@
-#include "SE3_vblmpc.h"
-namespace nonlinear_control {
+#include "controls/SE3_vblmpc.h"
+namespace nonlinear_controls {
 template <typename T>
 SE3VblMPC<T>::SE3VblMPC(bool islti, int N, T dt, const T m, const Eigen::Matrix<T, 3, 3>J) :
     GeometricController<T>(), IS_LTI(islti), N(N), mass_(m), inertia_(J), pos_mpc_(N, dt), att_mpc_(islti, N, dt, J) {
@@ -25,4 +25,4 @@ void SE3VblMPC<T>::run(T dt, TSE3<T> x, TSE3<T> xd, Wrench<T>& u) {
 template class SE3VblMPC<float>;
 template class SE3VblMPC<double>;
 
-} // nonlinear_control
+} // nonlinear_controls

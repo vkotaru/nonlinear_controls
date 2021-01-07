@@ -1,6 +1,6 @@
-#include "geometric_control.h"
+#include "controls/geometric_control.h"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T>
 GeometricController<T>::GeometricController(/* args */) : BaseController<T>() {
@@ -24,4 +24,4 @@ void GeometricController<T>::run() {}
 template class GeometricController<float>;
 template class GeometricController<double>;
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls

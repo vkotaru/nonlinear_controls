@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 #ifndef NLC_CVXGEN_CLF_3D
 #define NLC_CVXGEN_CLF_3D
@@ -31,6 +31,6 @@ extern "C" {
 // }  // namespace mpc3D
 // #endif  // NLC_CVXGEN_MPC_3D
 
-} // namespace nonlinear_control
+} // namespace nonlinear_controls
 
 #endif // NLC_CVXGEN_INTERFACE_H

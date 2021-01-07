@@ -1,9 +1,9 @@
 #ifndef NLC_CLF_QP_H
 #define NLC_CLF_QP_H
 
-#include "cvxgen_interface.h"
-#include "qp_interface.h"
-namespace nonlinear_control {
+#include "common/cvxgen_interface.h"
+#include "common/qp_interface.h"
+namespace nonlinear_controls {
 
 class ClfQP : public QPInterface {
    protected:
@@ -18,5 +18,5 @@ class ClfQP : public QPInterface {
     Eigen::Vector3d getOptimizer();
 };
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 #endif  // NLC_CLF_QP_H

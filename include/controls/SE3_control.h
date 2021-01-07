@@ -1,12 +1,12 @@
 #ifndef NLC_SE3_CONTROL_H
 #define NLC_SE3_CONTROL_H
 
-#include "data_types.hpp"
+#include "data_types/data_types.hpp"
 #include "SO3_control.h"
 #include "linear_mpc.h"
 #include<iostream>
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 template <typename T>
 class SE3Controller : public SO3Controller<T> {
 

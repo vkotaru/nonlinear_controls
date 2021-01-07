@@ -6,7 +6,7 @@
 
 #include "manifolds.hpp"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 using namespace manifolds;
 
 template <typename T>
@@ -173,5 +173,5 @@ class Wrench {
     }
 };
 template class Wrench<float>;
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 #endif  // NLC_DATA_TYPES_H

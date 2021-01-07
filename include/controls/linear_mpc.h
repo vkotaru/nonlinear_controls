@@ -2,8 +2,8 @@
 #define NONLINEAR_CONTROLS_LINEAR_MPC_H
 #include "deque"
 #include "vector"
-#include "qpoases_eigen.hpp"
-namespace nonlinear_control {
+#include "common/qpoases_eigen.hpp"
+namespace nonlinear_controls {
 //////////////////////////////////////////
 /// Eigen Dynamic Matrices and Vectors
 //////////////////////////////////////////
@@ -77,5 +77,5 @@ class LinearMPCt : public LinearMPC<T> {
 
 };
 
-} // namespace nonlinear_control
+} // namespace nonlinear_controls
 #endif // NONLINEAR_CONTROLS_LINEAR_MPC_H

@@ -3,7 +3,7 @@
 
 #include <eigen3/Eigen/Dense>
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T>
 class BaseController {
@@ -18,5 +18,5 @@ class BaseController {
    private:
 };
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 #endif  // NLC_BASE_CONTROLLER_H

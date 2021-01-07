@@ -1,11 +1,11 @@
 #ifndef NLC_SO3_CONTROL_H
 #define NLC_SO3_CONTROL_H
 
-#include "data_types.hpp"
+#include "data_types/data_types.hpp"
 #include "geometric_control.h"
 #include <iostream>
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T>
 class SO3Controller : public GeometricController<T> {
@@ -37,6 +37,6 @@ class SO3Controller : public GeometricController<T> {
     void run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1>& u);
 };
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 
 #endif  // NLC_SO3_CONTROL_H

@@ -1,5 +1,5 @@
-#include "linear_mpc.h"
-namespace nonlinear_control {
+#include "controls/linear_mpc.h"
+namespace nonlinear_controls {
 //////////////////////////////////////////
 /// Linear Time Invariant Dynamics MPC
 //////////////////////////////////////////
@@ -241,5 +241,5 @@ template class LinearMPC<double>;
 template class LinearMPCt<float>;
 template class LinearMPCt<double>;
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 

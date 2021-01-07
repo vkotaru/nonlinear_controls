@@ -5,7 +5,7 @@
 #include <eigen3/unsupported/Eigen/MatrixFunctions>
 #include <iostream>
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 namespace manifolds {
 
 template <typename T, int _Dim>
@@ -68,5 +68,5 @@ typedef SO3<float> SO3f;
 typedef SO3<double> SO3d;
 
 }  // namespace manifolds
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 #endif  // NLC_MANIFOLDS_H

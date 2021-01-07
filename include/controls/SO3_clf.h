@@ -5,19 +5,20 @@
 #include <iostream>
 #include <qpOASES.hpp>
 
-#include "data_types.hpp"
+#include "data_types/data_types.hpp"
 #include "geometric_control.h"
 #include "SO3_control.h"
 #include "linear_mpc.h"
-#include "qpoases_eigen.hpp"
-#include "utils.hpp"
+#include "common/qpoases_eigen.hpp"
+#include "common/utils.hpp"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T>
 class SO3Clf: public GeometricController<T> {
   protected:
     Eigen::Matrix<T, 3, 3> inertia_, inertia_scaled_;
+    T min_eigval_inertia_;
     Eigen::Matrix<T, 3, 3> dR, dRc;
     Eigen::Matrix<T, 3, 1> eR, deR, eOmega;
 

@@ -3,7 +3,7 @@
 
 #include "eigen3/Eigen/Dense"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 struct QuadProg {
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> H, A, Aeq;
@@ -25,6 +25,6 @@ class QPInterface {
 };
 
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 
 #endif  // NLC_QP_INTERFACE_H

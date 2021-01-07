@@ -4,9 +4,9 @@
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <qpOASES.hpp>
-#include <qpoases_eigen.hpp>
+#include <common/qpoases_eigen.hpp>
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 typedef Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic> QPMatrix;
 
 QPMatrix qpOases_solve(const int n, const int m, QPOasesData &data) {

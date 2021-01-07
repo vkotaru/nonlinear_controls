@@ -5,7 +5,7 @@
 #include <qpOASES.hpp>
 #include "linear_mpc.h"
 
-namespace nonlinear_control {
+namespace nonlinear_controls {
 
 template <typename T, unsigned int D>
 class DoubleIntMPC {
@@ -112,5 +112,5 @@ class DoubleIntMPC {
     }
 };
 
-}  // namespace nonlinear_control
+}  // namespace nonlinear_controls
 #endif // NONLINEAR_CONTROLS_DOUBLE_INT_MPC_HPP
