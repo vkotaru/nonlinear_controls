@@ -41,7 +41,7 @@ src/SO3_clf.cpp
 add_subdirectory(third_party)
 
 add_library(nonlinear_controls ${CONTROL_SRCS})
-target_link_libraries(nonlinear_controls qpOASES ${PYTHON_LIBRARIES})
+target_link_libraries(nonlinear_controls qpOASES_cpp ${PYTHON_LIBRARIES})
 target_include_directories(nonlinear_controls PUBLIC ${INCLUDE_DIRS})
 
 add_executable(test_main tests/test_nlc.cpp)
