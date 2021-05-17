@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(nonlinear_control)
+project(nonlinear_controls)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -42,7 +42,7 @@ add_subdirectory(third_party)
 
 add_library(nonlinear_controls ${CONTROL_SRCS})
 target_link_libraries(nonlinear_controls qpOASES_cpp ${PYTHON_LIBRARIES})
-target_include_directories(nonlinear_controls PUBLIC ${INCLUDE_DIRS})
+target_include_directories(nonlinear_controls PUBLIC . ${INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_executable(test_main tests/test_nlc.cpp)
 target_link_libraries(test_main nonlinear_controls)
