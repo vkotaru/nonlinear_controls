@@ -4,39 +4,39 @@ project(nonlinear_controls)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-Wall -Os")
-SET( CMAKE_BUILD_TYPE Debug)
+SET(CMAKE_BUILD_TYPE Debug)
 
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_DIRS})
 add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
 
 include_directories(
-include
-third_party/cvxgen
-third_party/qpOASES
-third_party/qpOASES/include 
+        include
+        third_party/cvxgen
+        third_party/qpOASES
+        third_party/qpOASES/include
 ) # doesn't seem to be including qpOASES.hpp
 
-set(INCLUDE_DIRS 
-include
-third_party/cvxgen
-third_party/qpOASES
-third_party/qpOASES/include
-third_party/matplotlib-cpp # TODO learn why this is working and not include_directories
-)
+set(INCLUDE_DIRS
+        include
+        third_party/cvxgen
+        third_party/qpOASES
+        third_party/qpOASES/include
+        third_party/matplotlib-cpp # TODO learn why this is working and not include_directories
+        )
 
 set(CONTROL_SRCS
-src/base_control.cpp
-src/geometric_control.cpp
-src/SO3_control.cpp
-src/SE3_control.cpp
-src/qp_interface.cpp
-src/clf_qp.cpp
-src/linear_mpc.cpp
-src/SO3_vblmpc.cpp
-src/SE3_vblmpc.cpp
-src/SO3_clf.cpp
-)
+        src/base_control.cpp
+        src/geometric_control.cpp
+        src/SO3_control.cpp
+        src/SE3_control.cpp
+        src/qp_interface.cpp
+        src/clf_qp.cpp
+        src/linear_mpc.cpp
+        src/SO3_vblmpc.cpp
+        src/SE3_vblmpc.cpp
+        src/SO3_clf.cpp
+        )
 
 add_subdirectory(third_party)
 
