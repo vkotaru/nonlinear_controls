@@ -6,8 +6,7 @@ SE3Controller<T>::SE3Controller() : SO3Controller<T>() {
 }
 
 template <typename T>
-SE3Controller<T>::~SE3Controller() {
-}
+SE3Controller<T>::~SE3Controller() = default;
 
 template <typename T>
 void SE3Controller<T>::run(T dt, TSE3<T> x, TSE3<T> xd, Wrench<T>& u) {
