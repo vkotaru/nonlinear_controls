@@ -24,6 +24,7 @@ public:
   DoubleIntMPC<T, 3> pos_mpc_;
   SO3VblMPC<T> att_mpc_;
 
+  void init();
   void run(T dt, TSE3<T> x, TSE3<T> xd, Wrench<T> &u);
 };
 

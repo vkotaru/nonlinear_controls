@@ -13,23 +13,30 @@ template <typename T> SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt) {
 template <typename T>
 SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt,
                         Eigen::Matrix<T, 3, 3> _J)
-    : IS_LTI(islti), N(_N), dt(_dt) {
+    : IS_LTI(islti), dt(_dt), N(_N) {
   nx = 6;
   nu = 3;
   inertia_ = _J;
   inertia_inv_ = inertia_.inverse();
+
+  if (!IS_LTI) {
+    std::cout << "IS LTV is not yet implemented" << std::endl;
+  }
+
+  if (verbose) {
+    std::cout << "//////////////////////////////" << std::endl;
+    std::cout << "SO3VblMPC constructor" << std::endl;
+    std::cout << "inertia\n" << inertia_ << std::endl;
+    std::cout << "inertia_inv\n" << inertia_inv_ << std::endl;
+  }
 
   if (IS_LTI) {
     mpcSolver = new LinearMPC<T>(N, nx, nu);
   } else {
     mpcSolver = new LinearMPCt<T>(N, nx, nu);
   }
-  /////////////////////////////////////////////////
-  /// setting up discrete-translational dynamics
-  /// dot eta_{k} = -hat(Omega_d)*eta_{k} + I*(\delta\Omega_{k})
-  /// dot I*(\delta\Omega_{k})
-  ///     = (JQ^{-1}(\hat(JQ*Omegad)-hat(\Omegad)*JQ))*(\delta\Omega_{k})
-  /////////////////////////////////////////////////
+
+  // initialize dynamics
   Eigen::Matrix<T, 3, 1> Omd;
   Omd.setZero();
   A.resize(nx, nx);
@@ -38,13 +45,16 @@ SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt,
   generate_dynamics(Omd, A);
   B << Eigen::Matrix<T, 3, 3>::Zero(), inertia_inv_;
   B = B * dt;
-  std::cout << "Initializing dynamics ... " << std::endl;
-  std::cout << "A: \n" << A << std::endl;
-  std::cout << "B: \n" << B << std::endl;
   if (IS_LTI) {
     mpcSolver->init_dynamics(A, B);
   }
-
+  if (verbose) {
+    std::cout << "//////////////////////////////" << std::endl;
+    std::cout << "dt " << dt << std::endl;
+    std::cout << "Initializing dynamics ... " << std::endl;
+    std::cout << "A: \n" << A << std::endl;
+    std::cout << "B: \n" << B << std::endl;
+  }
   /// gains
   Q.resize(nx, nx);
   P.resize(nx, nx);
@@ -66,8 +76,8 @@ SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt,
   input_ub.resize(nu, 1);
   state_lb.resize(nx, 1);
   state_ub.resize(nx, 1);
-  input_lb << -2, -2, -2;
-  input_ub << 2, 2, 2;
+  input_lb << -10, -10, -10;
+  input_ub << 10, 10, 10;
   state_lb.setOnes();
   state_lb = -100 * state_lb;
   state_ub = -state_lb;
@@ -98,6 +108,13 @@ template <typename T>
 void SO3VblMPC<T>::init_dynamics(Eigen::Matrix<T, 3, 1> Omd) {
   generate_dynamics(Omd, A);
   mpcSolver->init_dynamics(A, B);
+  if (verbose) {
+    std::cout << "////////////////////////////////////\n"
+                 "Omega "
+              << Omd.transpose() << std::endl;
+    std::cout << "A\n" << A << std::endl;
+    std::cout << "B\n" << B << std::endl;
+  }
 }
 template <typename T> void SO3VblMPC<T>::init_dynamics(TSO3<T> attd) {
   generate_dynamics(attd.Omega, A);
@@ -108,8 +125,22 @@ template <typename T>
 void SO3VblMPC<T>::run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1> &u) {
   // time-varying trajectory with only operating point used for the dynamics
   // for the next N steps
+  auto x0 = x - xd;
+  if (verbose) {
+    std::cout << "x\n" << std::endl;
+    x.print();
+    std::cout << "xd\n" << std::endl;
+    xd.print();
+    std::cout << "x0: " << x0.transpose() << std::endl;
+  }
+
   if (IS_LTI) {
-    uOpt = mpcSolver->run(x - xd);
+    mpcSolver->print();
+    uOpt = mpcSolver->run(x0);
+
+    if (verbose) {
+      std::cout << "uOpt " << uOpt.transpose() << std::endl;
+    }
   } else {
     generate_dynamics(xd.Omega, A);
     uOpt = mpcSolver->run(x - xd, A, B);
@@ -126,6 +157,14 @@ void SO3VblMPC<T>::set_gains(const MatrixX<T> &_Q, const MatrixX<T> &_P,
   this->Q = Q;
   this->P = P;
   this->R = R;
+
+  std::cout << "SO3VblMPC: setting gains\n Q:\n" << std::endl;
+  std::cout << _Q << std::endl;
+  std::cout << "P:\n";
+  std::cout << _P << std::endl;
+  std::cout << "R:\n" << std::endl;
+  std::cout << _R << std::endl;
+
   mpcSolver->set_mpc_gains(Q, P, R);
 }
 template <typename T>

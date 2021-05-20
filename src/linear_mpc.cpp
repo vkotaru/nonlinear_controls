@@ -4,7 +4,7 @@ namespace nonlinear_controls {
 /// Linear Time Invariant Dynamics MPC
 //////////////////////////////////////////
 template <typename T>
-LinearMPC<T>::LinearMPC(const int _N, const int _nx, const int _nu) : N(_N), nx(_nx), nu(_nu) {
+LinearMPC<T>::LinearMPC(const int &_N, const int &_nx, const int &_nu) : N(_N), nx(_nx), nu(_nu) {
     nVars = N * nu;
     nCons = (N + 1) * nx;
 
@@ -55,7 +55,7 @@ LinearMPC<T>::LinearMPC(const int _N, const int _nx, const int _nu) : N(_N), nx(
 }
 
 template <typename T>
-LinearMPC<T>::~LinearMPC() {}
+LinearMPC<T>::~LinearMPC() = default;
 
 
 template <typename T>
@@ -138,7 +138,7 @@ void LinearMPC<T>::construct() {
 }
 
 template <typename T>
-VectorX<T> LinearMPC<T>::run(const VectorX<T> x0) {
+VectorX<T> LinearMPC<T>::run(const VectorX<T> &x0) {
     /// update:
     ///  constraints bounds
     ///  linear cost
@@ -158,7 +158,7 @@ VectorX<T> LinearMPC<T>::run(const VectorX<T> x0) {
     return QP->getOptimizer().template cast<T>();
 }
 template <typename T>
-VectorX<T> LinearMPC<T>::run (const VectorX<T> x0, const MatrixX<T> A, const MatrixX<T> B) {
+VectorX<T> LinearMPC<T>::run (const VectorX<T> &x0, const MatrixX<T> &A, const MatrixX<T> &B) {
     return LinearMPC<T>::run(x0);
 }
 
@@ -166,12 +166,12 @@ VectorX<T> LinearMPC<T>::run (const VectorX<T> x0, const MatrixX<T> A, const Mat
 /// Linear Time Varying Dynamics MPC
 /////////////////////////////////////////
 template <typename T>
-LinearMPCt<T>::LinearMPCt(const int _N, const int _nx, const int _nu) : LinearMPC<T>(_N, _nx, _nu) {
+LinearMPCt<T>::LinearMPCt(const int &_N, const int &_nx, const int &_nu) : LinearMPC<T>(_N, _nx, _nu) {
 
 }
 
 template <typename T>
-LinearMPCt<T>::~LinearMPCt() {}
+LinearMPCt<T>::~LinearMPCt() = default;
 
 template <typename T>
 void LinearMPCt<T>::init_dynamics(MatrixX<T> A, MatrixX<T> B) {
@@ -212,7 +212,7 @@ void LinearMPCt<T>::construct() {
 }
 
 template <typename T>
-VectorX<T> LinearMPCt<T>::run(const VectorX<T> x0, const MatrixX<T> A, const MatrixX<T> B) {
+VectorX<T> LinearMPCt<T>::run(const VectorX<T> &x0, const MatrixX<T> &A, const MatrixX<T> &B) {
     /// update:
     ///  constraints bounds
     ///  linear cost
@@ -225,7 +225,7 @@ VectorX<T> LinearMPCt<T>::run(const VectorX<T> x0, const MatrixX<T> A, const Mat
 
     /// update dynamics with A_{k+N}, B_{k+N}
     update_dynamics(A, B);
-    /// reconstrunt the matrices
+    /// reconstruct the matrices
     construct();
 
     /// return

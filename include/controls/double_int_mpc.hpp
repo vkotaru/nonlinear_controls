@@ -80,6 +80,14 @@ public:
     this->Q = _Q;
     this->P = _P;
     this->R = _R;
+
+    std::cout << "SO3VblMPC: setting gains\n Q:\n" << std::endl;
+    std::cout << _Q << std::endl;
+    std::cout << "P:\n";
+    std::cout << _P << std::endl;
+    std::cout << "R:\n" << std::endl;
+    std::cout << _R << std::endl;
+
     mpcSolver->set_mpc_gains(_Q, _P, _R);
   }
 
