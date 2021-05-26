@@ -14,7 +14,7 @@ int QPSwiftEigen::solve() {
   // Setup Function //
   myQP = QP_SETUP_dense(this->nv, this->ni, this->ne, this->H.data(),
                         this->Aeq.data(), this->A.data(), this->f.data(),
-                        this->b.data(), this->beq.data(), NULL);
+                        this->b.data(), this->beq.data(), nullptr);
 
   /****************************************
    *	After this, you can change the solver settings like this

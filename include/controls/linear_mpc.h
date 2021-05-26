@@ -11,6 +11,11 @@ template <typename T>
 using MatrixX = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
 template <typename T> using VectorX = Eigen::Matrix<T, Eigen::Dynamic, 1>;
 
+typedef MatrixX<double> MatrixXd;
+typedef MatrixX<float> MatrixXf;
+typedef VectorX<double> VectorXd;
+typedef VectorX<float> VectorXf;
+
 //////////////////////////////////////////
 /// Linear Time Invariant Dynamics MPC
 //////////////////////////////////////////
