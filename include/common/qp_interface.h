@@ -5,7 +5,7 @@
 
 namespace nonlinear_controls {
 
-struct QuadProg {
+struct QuadProgData {
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> H, A, Aeq;
     Eigen::Matrix<double, Eigen::Dynamic, 1> f, b, beq;
     Eigen::Matrix<double, Eigen::Dynamic, 1> xlb, xub;
@@ -18,7 +18,7 @@ class QPInterface {
    public:
     QPInterface(/* args */);
     ~QPInterface();
-    QuadProg problem_; 
+    QuadProgData problem_;
 
     virtual void setup();
     virtual void solve();

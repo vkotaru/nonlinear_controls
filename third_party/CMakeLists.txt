@@ -24,3 +24,4 @@ add_library(qpOASES_cpp ${qpOASES_SRCS})
 target_include_directories(qpOASES_cpp PUBLIC . ${qpOASES_SRC_DIR}/include)
 include_directories(matplotlib-cpp)
 
+add_subdirectory(qpSWIFT)

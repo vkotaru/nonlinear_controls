@@ -11,11 +11,11 @@ QPInterface::~QPInterface() {
 }
 
 void QPInterface::setup() {
-    
+
 }
 
 void QPInterface::solve() {
-    
+
 }
 
 

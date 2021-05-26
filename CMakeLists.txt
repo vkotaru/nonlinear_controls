@@ -25,6 +25,10 @@ set(INCLUDE_DIRS
         third_party/matplotlib-cpp # TODO learn why this is working and not include_directories
         )
 
+set(QUADPROG_SRCS
+        src/quadprog/quadprog.cpp
+        src/quadprog/qpswift_eigen.cpp)
+
 set(CONTROL_SRCS
         src/base_control.cpp
         src/geometric_control.cpp
@@ -36,12 +40,13 @@ set(CONTROL_SRCS
         src/SO3_vblmpc.cpp
         src/SE3_vblmpc.cpp
         src/SO3_clf.cpp
+        src/tracking_lmpc.cpp
         )
 
 add_subdirectory(third_party)
 
-add_library(nonlinear_controls ${CONTROL_SRCS})
-target_link_libraries(nonlinear_controls qpOASES_cpp ${PYTHON_LIBRARIES})
+add_library(nonlinear_controls ${CONTROL_SRCS} ${QUADPROG_SRCS})
+target_link_libraries(nonlinear_controls qpOASES_cpp qpswift ${PYTHON_LIBRARIES})
 target_include_directories(nonlinear_controls PUBLIC . ${INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_executable(test_main tests/test_nlc.cpp)
