@@ -15,7 +15,7 @@ int QPSwiftEigen::solve() {
   myQP = QP_SETUP_dense(this->nv, this->ni, this->ne, this->H.data(),
                         this->Aeq.data(), this->A.data(), this->f.data(),
                         this->b.data(), this->beq.data(), nullptr);
-
+  myQP->options->maxit  = 100;
   /****************************************
    *	After this, you can change the solver settings like this
    *	myQP->options->maxit  = 30   (to change the maximum number of
@@ -31,7 +31,7 @@ int QPSwiftEigen::solve() {
    *recommended not to change this)
    *
    *myQP->options->VERBOSE  = 0 (displays no output when set to 0; default
-   is *1 which corresponds to complete verbose mode)
+   is 1 which corresponds to complete verbose mode)
    ******************************************/
 
   /* The Solution can be found as real pointer in myQP->x;It is an array of
