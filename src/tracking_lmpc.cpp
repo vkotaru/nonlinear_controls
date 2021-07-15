@@ -96,17 +96,14 @@ void TrackingLinearMPC::construct() {
   /// if dynamics, input bounds or
   /// MPC gains are updated
   ////////////////////////////////////////
-  Sx.block(0, 0, nx, nx).setIdentity();
-  Su.block(0, 0, nx, N * nu).setZero();
-
   for (int i = 0; i < N; ++i) {
-    Sx.block(nx * (i + 1), 0, nx, nx) =
-        Sx.block(nx * i, 0, nx, nx) * A;
-    if (i == 0)
-      Su.block(nx * (i + 1), 0, nx, nu) = B;
-    else {
-      Su.block(nx * (i + 1), 0, nx, nu) = A * Su.block(nx * i, 0, nx, nu);
-      Su.block(nx * (i + 1), nu, nx, nu * (N - 1)) = Su.block(nx * i, 0, nx, nu * (N - 1));
+    if (i == 0) {
+      Sx.block(nx * i, 0, nx, nx) = A;
+      Su.block(nx * i, 0, nx, nu) = B;
+    } else {
+      Sx.block(nx * i, 0, nx, nx) = A * Sx.block(nx * (i - 1), 0, nx, nx);
+      Su.block(nx * i, 0, nx, nu) = A * Su.block(nx * (i-1), 0, nx, nu);
+      Su.block(nx * i, nu, nx, nu * (N - 1)) = Su.block(nx * (i - 1), 0, nx, nu * (N - 1));
     }
   }
   // Cost function
