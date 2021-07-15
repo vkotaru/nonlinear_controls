@@ -11,7 +11,7 @@ struct QPOasesData {
   Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic> H, A;
   Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic> g, lb, ub, lbA,
       ubA;
-  qpOASES::int_t nWSR;
+  qpOASES::int_t nWSR{};
 };
 
 class QPOasesEigen {
@@ -19,8 +19,8 @@ protected:
   qpOASES::QProblem problem;
   int nvars, ncons;
 
-  qpOASES::real_t *H, *A, *g, *lb, *ub, *lbA, *ubA;
-  qpOASES::int_t nWSR;
+  qpOASES::real_t *H{}, *A{}, *g{}, *lb{}, *ub{}, *lbA{}, *ubA{};
+  qpOASES::int_t nWSR{};
 
   void eigen2array() {
     H = data_.H.transpose().data();
@@ -50,20 +50,22 @@ public:
     this->options.setToFast();
     this->options.printLevel = qpOASES::PL_LOW;
   }
-  ~QPOasesEigen() {}
+  ~QPOasesEigen() = default;
+
   void setup() { problem.setOptions(options); }
+
   qpOASES::returnValue solve() {
     eigen2array();
     qpOASES::returnValue sol = problem.init(H, g, A, lb, ub, lbA, ubA, nWSR);
-    //        if (sol == qpOASES::SUCCESSFUL_RETURN) {
-    //            std::cout << "SUCCESSFUL_RETURN" << std::endl;
-    //        } else if (sol == qpOASES::RET_MAX_NWSR_REACHED) {
-    //            std::cout << "RET_MAX_NWSR_REACHED" << std::endl;
-    //        } else if (sol == qpOASES::RET_INIT_FAILED) {
-    //            std::cout << "RET_INIT_FAILED" << std::endl;
-    //        } else {
-    //            std::cout << "Something else" << std::endl;
-    //        }
+    if (sol == qpOASES::SUCCESSFUL_RETURN) {
+      std::cout << "SUCCESSFUL_RETURN" << std::endl;
+    } else if (sol == qpOASES::RET_MAX_NWSR_REACHED) {
+      std::cout << "RET_MAX_NWSR_REACHED" << std::endl;
+    } else if (sol == qpOASES::RET_INIT_FAILED) {
+      std::cout << "RET_INIT_FAILED" << std::endl;
+    } else {
+      std::cout << "Something else" << std::endl;
+    }
     return sol;
   }
   void hotstart() {
