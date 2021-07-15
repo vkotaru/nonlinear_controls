@@ -40,7 +40,7 @@ set(CONTROL_SRCS
         src/SO3_vblmpc.cpp
         src/SE3_vblmpc.cpp
         src/SO3_clf.cpp
-        src/tracking_lmpc.cpp
+        src/tracking_mpc.cpp
         )
 
 add_subdirectory(third_party)

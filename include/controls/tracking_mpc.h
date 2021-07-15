@@ -2,18 +2,18 @@
 // Created by kotaru on 5/26/21.
 //
 
-#ifndef NONLINEAR_CONTROLS_TRACKING_LMPC_H
-#define NONLINEAR_CONTROLS_TRACKING_LMPC_H
+#ifndef NONLINEAR_CONTROLS_TRACKING_MPC_H
+#define NONLINEAR_CONTROLS_TRACKING_MPC_H
 
-#include "deque"
-#include "quadprog/quadprog.h"
-#include "quadprog/qpswift_eigen.h"
-#include "vector"
 #include "controls/linear_mpc.h"
+#include "deque"
+#include "quadprog/qpswift_eigen.h"
+#include "quadprog/quadprog.h"
+#include "vector"
 
 namespace nonlinear_controls {
 
-class TrackingLinearMPC {
+class TrackingMPC {
 protected:
   /// \brief Time Horizon
   int N;
@@ -45,8 +45,8 @@ protected:
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> H, F;
 
 public:
-  TrackingLinearMPC(const int &_N, const int &_nx, const int &_nu);
-  ~TrackingLinearMPC();
+  TrackingMPC(const int &_N, const int &_nx, const int &_nu);
+  ~TrackingMPC();
 
   /**
    * Function to set MPC cost gains
@@ -54,7 +54,8 @@ public:
    * @param _P
    * @param _R
    */
-  void set_mpc_gains(const MatrixXd &_Q, const MatrixXd &_P, const MatrixXd &_R);
+  void set_mpc_gains(const MatrixXd &_Q, const MatrixXd &_P,
+                     const MatrixXd &_R);
   /**
    * Function to set MPC input bounds
    * @param _ulb
@@ -75,10 +76,10 @@ public:
   void set_lti_dynamics(const MatrixXd &_A, const MatrixXd &_B);
 
   void construct();
-  void run(const VectorXd &x0, const VectorXd &Xd);
-
+  void run(const VectorXd &x0);
+  void run(const VectorXd &x0, const VectorXd &Xd, const VectorXd &Ud);
 };
 
 } // namespace nonlinear_controls
 
-#endif // NONLINEAR_CONTROLS_TRACKING_LMPC_H
+#endif // NONLINEAR_CONTROLS_TRACKING_MPC_H
