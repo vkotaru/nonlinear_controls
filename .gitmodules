@@ -1,9 +1,6 @@
 [submodule "third_party/qpOASES"]
 	path = third_party/qpOASES
 	url = git@github.com:vkotaru/qpOASES.git
-[submodule "third_party/matplotlib-cpp"]
-	path = third_party/matplotlib-cpp
-	url = git@github.com:vkotaru/matplotlib-cpp.git
 [submodule "third_party/qpSWIFT"]
 	path = third_party/qpSWIFT
 	url = git@github.com:vkotaru/qpSWIFT.git
