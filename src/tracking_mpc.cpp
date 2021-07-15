@@ -102,9 +102,14 @@ void TrackingMPC::construct() {
       Su.block(nx * i, 0, nx, nu) = B;
     } else {
       Sx.block(nx * i, 0, nx, nx) = A * Sx.block(nx * (i - 1), 0, nx, nx);
-      Su.block(nx * i, 0, nx, nu) = A * Su.block(nx * (i - 1), 0, nx, nu);
+
+      Su.block(nx * i, 0, nx, nu) = A * Su.block(nx * (i-1), 0, nx, nu);
+      Su.block(nx * i, nu, nx, nu * (N - 1)) = Su.block(nx * (i - 1), 0, nx, nu * (N - 1));
+
+/*      Su.block(nx * i, 0, nx, nu) = A * Su.block(nx * (i - 1), 0, nx, nu);
       Su.block(nx * i, nu, nx, nu * (N - 1)) =
-          Su.block(nx * (i - 1), 0, nx, nu * (N - 1));
+          Su.block(nx * (i - 1), 0, nx, nu * (N - 1)); */
+
     }
   }
   // Cost function
