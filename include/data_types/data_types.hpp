@@ -162,9 +162,9 @@ public:
   }
 };
 
-template class Wrench<float>;
-template class TSO3<float>;
-template class TSE3<float>;
+//template class Wrench<float>;
+//template class TSO3<float>;
+//template class TSE3<float>;
 
 typedef TSO3<float> TSO3f;
 typedef TSO3<double> TSO3d;
