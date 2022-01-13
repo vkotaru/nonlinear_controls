@@ -4,7 +4,7 @@
 
 #ifndef NONLINEAR_CONTROLS_QPSWIFT_EIGEN_H
 #define NONLINEAR_CONTROLS_QPSWIFT_EIGEN_H
-#include "Prime.h"
+#include "qpSWIFT.h"
 #include "quadprog/quadprog.h"
 #include <iostream>
 

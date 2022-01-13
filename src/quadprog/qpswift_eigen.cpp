@@ -14,7 +14,7 @@ int QPSwiftEigen::solve() {
   // Setup Function //
   myQP = QP_SETUP_dense(this->nv, this->ni, this->ne, this->H.data(),
                         this->Aeq.data(), this->A.data(), this->f.data(),
-                        this->b.data(), this->beq.data(), nullptr);
+                        this->b.data(), this->beq.data(), nullptr, COLUMN_MAJOR_ORDERING);
   myQP->options->maxit  = 100;
   /****************************************
    *	After this, you can change the solver settings like this
