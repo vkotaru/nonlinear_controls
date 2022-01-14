@@ -42,6 +42,7 @@ template <typename T> class TS2 {
 public:
   TS2() {
     q << static_cast<T>(0.), static_cast<T>(0.), static_cast<T>(1.);
+    dq.setZero ();
     omega.setZero();
     domega.setZero();
   }
@@ -49,12 +50,14 @@ public:
   ~TS2() = default;
 
   S2<T> q;
+  Eigen::Matrix<T, 3, 1> dq;
   Eigen::Matrix<T, 3, 1> omega;
   Eigen::Matrix<T, 3, 1> domega;
 
   template <typename OtherDerived>
   TS2 &operator=(const TS2<OtherDerived> &other) {
     this->q = other.q;
+    this->dq = other.dq;
     this->omega = other.omega;
     this->domega = other.domega;
   }
