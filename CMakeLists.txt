@@ -27,7 +27,8 @@ set(INCLUDE_DIRS
 
 set(QUADPROG_SRCS
         src/quadprog/quadprog.cpp
-        src/quadprog/qpswift_eigen.cpp)
+        src/quadprog/qpswift_eigen.cpp
+)
 
 set(CONTROL_SRCS
         src/base_control.cpp
@@ -46,7 +47,7 @@ set(CONTROL_SRCS
 add_subdirectory(third_party)
 
 add_library(nonlinear_controls ${CONTROL_SRCS} ${QUADPROG_SRCS})
-target_link_libraries(nonlinear_controls qpOASES_cpp qpSWIFT-shared ${PYTHON_LIBRARIES})
+target_link_libraries(nonlinear_controls qpOASES_cpp ${PYTHON_LIBRARIES})
 target_include_directories(nonlinear_controls PUBLIC . ${INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_executable(test_main tests/test_nlc.cpp)
