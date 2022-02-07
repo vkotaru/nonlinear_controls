@@ -1,5 +1,5 @@
 #include "common/qpoases_eigen.hpp"
-#include "controls/clf_qp.h"
+#include "controls/clf_qp.hpp"
 #include "quadprog/qpswift_eigen.h"
 #include <chrono>
 #include <eigen3/Eigen/Dense>
