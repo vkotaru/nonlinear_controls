@@ -48,7 +48,7 @@ void clear_plot_vars() {
   Mz.clear();
 }
 
-template <typename T> struct FlatOutputs {
+template<typename T> struct FlatOutputs {
   Eigen::Matrix<T, 3, 1> x, dx, d2x, u;
 };
 
@@ -61,18 +61,18 @@ void sinusoidalTraj(double &yd, double &dyd, double &d2yd, const float t,
                     double freqOffset) {
   yd =
       amp * (1 - ampPercent + ampPercent * pow(cos(freq * t + freqOffset), 2)) +
-      ampOffset;
+          ampOffset;
   //    dyd = -amp * ampPercent * freq * sin(2 * freq * t + freqOffset);
   dyd = -2 * amp * ampPercent * freq * cos(freqOffset + freq * t) *
-        sin(freqOffset + freq * t);
+      sin(freqOffset + freq * t);
   //    d2yd =  -2 * amp * ampPercent * pow(freq, 2) * cos(2 * freq * t +
   //    freqOffset);
   d2yd =
       2 * amp * ampPercent * pow(freq, 2) * pow(sin(freqOffset + freq * t), 2) -
-      2 * amp * ampPercent * pow(freq, 2) * pow(cos(freqOffset + freq * t), 2);
+          2 * amp * ampPercent * pow(freq, 2) * pow(cos(freqOffset + freq * t), 2);
 }
 
-template <typename T> void circularTraj(T t, FlatOutputs<T> &flats) {
+template<typename T> void circularTraj(T t, FlatOutputs<T> &flats) {
   T x0 = 0., y0 = 0., z0 = 0, r = 1, f = 0.5;
   T w = 2 * f * M_PI;
 
@@ -93,11 +93,11 @@ void test_position_mpc() {
   std::cout << "Testing 3D position MPC with LTI Dynamics... " << std::endl;
   nx = 6;
   nu = 3;
-  N = 5;
-  nlc::LinearMPC<double> pos_mpc_(N, nx, nu);
+  N = 1;
+  nlc::LinearMPC pos_mpc_(N, nx, nu);
 
   // dynamics
-  nlc::MatrixX<double> A, B;
+  nlc::MatrixXd A, B;
   A.resize(nx, nx);
   B.resize(nx, nu);
   A.setIdentity();
@@ -110,7 +110,7 @@ void test_position_mpc() {
   pos_mpc_.init_dynamics(A, B);
 
   // gains
-  nlc::MatrixX<double> Q, P, R;
+  nlc::MatrixXd Q, P, R;
   Q.resize(nx, nx);
   P.resize(nx, nx);
   R.resize(nu, nu);
@@ -134,6 +134,7 @@ void test_position_mpc() {
   input_ub = -input_lb;
   pos_mpc_.set_input_bounds(input_lb, input_ub);
   pos_mpc_.set_state_bounds(state_lb, state_ub);
+  pos_mpc_.set_cpu_time_limit(dt);
 
   // construct the mpc
   pos_mpc_.construct();
@@ -144,25 +145,28 @@ void test_position_mpc() {
   state.setZero();
   std::cout << "\n X0: " << state.transpose() << std::endl;
   std::cout << "\n Xgoal: " << goal_state.transpose() << std::endl;
-  nlc::MatrixX<double> K, zOpt, uOpt;
+  nlc::MatrixXd K, zOpt, uOpt;
   uOpt.resize(nu, 1);
   zOpt.resize(N * nu, 1);
   K.resize(nu, nx);
   K << 30.6287 * Eigen::Matrix3d::Identity(),
       12.4527 * Eigen::Matrix3d::Identity();
 
+  bool mpc_initialized{false};
+
   clear_plot_vars();
   for (int j = 0; j < int(2 / dt); ++j) { // only for 2 seconds
 
     /// LQR (for sanity check)
-    //        uOpt = -K * (state - goal_state);
+    auto uPD = -K * (state - goal_state);
 
     /// running mpc controller
     zOpt = pos_mpc_.run((state - goal_state));
     uOpt = zOpt.block(0, 0, nu, 1);
 
     // integrating dynamics using the input at N = 0
-    //        std::cout << "Input:>>> " << uOpt.transpose() << std::endl;
+    std::cout << "PD Input:>>> " << uPD.transpose() << std::endl;
+    std::cout << "MPC Input:>>> " << uOpt.transpose() << std::endl;
     state = A * state + B * uOpt;
 
     t.push_back(dt * j);
@@ -201,10 +205,10 @@ void test_pos_traj_mpc() {
   nu = 3;
   N = 5;
   T = 5;
-  nlc::LinearMPCt<double> pos_mpc_(N, nx, nu);
+  nlc::LinearMPCt pos_mpc_(N, nx, nu);
 
   // dynamics
-  nlc::MatrixX<double> A, B;
+  nlc::MatrixXd A, B;
   A.resize(nx, nx);
   B.resize(nx, nu);
   A.setIdentity();
@@ -219,7 +223,7 @@ void test_pos_traj_mpc() {
   }
 
   // gains
-  nlc::MatrixX<double> Q, P, R;
+  nlc::MatrixXd Q, P, R;
   Q.resize(nx, nx);
   P.resize(nx, nx);
   R.resize(nu, nu);
@@ -254,7 +258,7 @@ void test_pos_traj_mpc() {
   state_ref.setZero();
   std::cout << "\n X0: " << state.transpose() << std::endl;
   std::cout << "\n Xgoal: " << goal_state.transpose() << std::endl;
-  nlc::MatrixX<double> K, zOpt, uOpt;
+  nlc::MatrixXd K, zOpt, uOpt;
   uOpt.resize(nu, 1);
   zOpt.resize(N * nu, 1);
   K.resize(nu, nx);
@@ -321,7 +325,7 @@ void test_attitude_mpc() {
   nx = 6;
   nu = 3;
   N = 5;
-  nlc::LinearMPC<double> att_mpc_(N, nx, nu);
+  nlc::LinearMPC att_mpc_(N, nx, nu);
 
   // dynamics
   Eigen::Matrix3d inertia, inertia_inv_;
@@ -330,15 +334,15 @@ void test_attitude_mpc() {
   inertia_inv_ = inertia.inverse();
   auto generate_dynamics = [&](Eigen::Vector3d Omd) {
     Eigen::Matrix<double, 6, 6> A;
-    A << -nlc::utils::hatd(Omd), Eigen::Matrix<double, 3, 3>::Identity(),
+    A << -nlc::utils::hat(Omd), Eigen::Matrix<double, 3, 3>::Identity(),
         Eigen::Matrix<double, 3, 3>::Zero(),
         inertia_inv_ *
-            (nlc::utils::hatd(inertia * Omd) - nlc::utils::hatd(Omd) * inertia);
+            (nlc::utils::hat(inertia * Omd) - nlc::utils::hat(Omd) * inertia);
     A = Eigen::Matrix<double, 6, 6>::Identity() + A * dt;
     return A;
   };
   Eigen::Vector3d Omd = Eigen::Vector3d::Zero();
-  nlc::MatrixX<double> A, B;
+  nlc::MatrixXd A, B;
   A.resize(nx, nx);
   B.resize(nx, nu);
   A = generate_dynamics(Omd);
@@ -350,7 +354,7 @@ void test_attitude_mpc() {
   att_mpc_.init_dynamics(A, B);
 
   // gains
-  nlc::MatrixX<double> Q, P, R;
+  nlc::MatrixXd Q, P, R;
   Q.resize(nx, nx);
   P.resize(nx, nx);
   R.resize(nu, nu);
@@ -379,7 +383,7 @@ void test_attitude_mpc() {
   att_mpc_.construct();
 
   // initialize simulation
-  nlc::TSE3<double> att, attd;
+  nlc::TSE3 att, attd;
   att.R.setZero();
   att.R(0, 2) = 1;
   att.R(1, 1) = 1;
@@ -387,7 +391,7 @@ void test_attitude_mpc() {
   att.print();
   attd.print();
   std::cout << att - attd << std::endl;
-  nlc::MatrixX<double> K, zOpt, uOpt, err;
+  nlc::MatrixXd K, zOpt, uOpt, err;
   uOpt.resize(nu, 1);
   err.resize(nx, 1);
   zOpt.resize(N * nu, 1);
@@ -411,10 +415,10 @@ void test_attitude_mpc() {
     uOpt += att.Omega.cross(inertia * att.Omega);
     uOpt +=
         -inertia * (att.Omega.cross(att.R.transpose() * attd.R * attd.Omega) -
-                    att.R.transpose() * attd.R * attd.dOmega);
+            att.R.transpose() * attd.R * attd.dOmega);
 
     /// integrating the full nonlinear-dynamics using the input at N = 0
-    Eigen::Matrix<double, 3, 3> hat_Om = nlc::utils::hatd(att.Omega);
+    Eigen::Matrix<double, 3, 3> hat_Om = nlc::utils::hat(att.Omega);
     att.R = att.R * (hat_Om * dt).exp();
     Eigen::Vector3d dOm;
     dOm = inertia_inv_ * (uOpt - att.Omega.cross(inertia * att.Omega));
@@ -454,7 +458,7 @@ void test_att_traj_mpc() {
   nx = 6;
   nu = 3;
   N = 10;
-  nlc::LinearMPCt<double> att_mpc_(N, nx, nu);
+  nlc::LinearMPCt att_mpc_(N, nx, nu);
 
   // dynamics
   Eigen::Matrix3d inertia, inertia_inv_;
@@ -463,15 +467,15 @@ void test_att_traj_mpc() {
   inertia_inv_ = inertia.inverse();
   auto generate_dynamics = [&](Eigen::Vector3d Omd) {
     Eigen::Matrix<double, 6, 6> A;
-    A << -nlc::utils::hatd(Omd), Eigen::Matrix<double, 3, 3>::Identity(),
+    A << -nlc::utils::hat(Omd), Eigen::Matrix<double, 3, 3>::Identity(),
         Eigen::Matrix<double, 3, 3>::Zero(),
         inertia_inv_ *
-            (nlc::utils::hatd(inertia * Omd) - nlc::utils::hatd(Omd) * inertia);
+            (nlc::utils::hat(inertia * Omd) - nlc::utils::hat(Omd) * inertia);
     A = Eigen::Matrix<double, 6, 6>::Identity() + A * dt;
     return A;
   };
   Eigen::Vector3d Omd = Eigen::Vector3d::Zero();
-  nlc::MatrixX<double> A, B;
+  nlc::MatrixXd A, B;
   A.resize(nx, nx);
   B.resize(nx, nu);
   A = generate_dynamics(Omd);
@@ -479,7 +483,7 @@ void test_att_traj_mpc() {
   B = B * dt;
 
   // gains
-  nlc::MatrixX<double> Q, P, R;
+  nlc::MatrixXd Q, P, R;
   Q.resize(nx, nx);
   P.resize(nx, nx);
   R.resize(nu, nu);
@@ -505,7 +509,7 @@ void test_att_traj_mpc() {
   att_mpc_.set_state_bounds(state_lb, state_ub);
 
   // initialize simulation
-  nlc::TSE3<double> att, attd;
+  nlc::TSE3 att, attd;
   att.R.setZero();
   att.R(0, 2) = 1;
   att.R(1, 1) = 1;
@@ -513,7 +517,7 @@ void test_att_traj_mpc() {
   att.print();
   attd.print();
   std::cout << att - attd << std::endl;
-  nlc::MatrixX<double> K, zOpt, uOpt, uRef, err;
+  nlc::MatrixXd K, zOpt, uOpt, uRef, err;
   uOpt.resize(nu, 1);
   uRef.resize(nu, 1);
   err.resize(nx, 1);
@@ -572,7 +576,7 @@ void test_att_traj_mpc() {
     //        uRef;
 
     /// integrating the full nonlinear-dynamics using the input at N = 0
-    Eigen::Matrix<double, 3, 3> hat_Om = nlc::utils::hatd(att.Omega);
+    Eigen::Matrix<double, 3, 3> hat_Om = nlc::utils::hat(att.Omega);
     att.R = att.R * (hat_Om * dt).exp();
     Eigen::Vector3d dOm;
     dOm = inertia_inv_ * (uOpt - att.Omega.cross(inertia * att.Omega));
@@ -610,14 +614,14 @@ void test_double_int_mpc() {
   std::cout << "------------------------------------------" << std::endl;
   std::cout << "Testing Position MPC class... " << std::endl;
   N = 5;
-  nlc::DoubleIntMPC<double, 3> pos_mpc_(N, dt);
+  nlc::DoubleIntMPC<3> pos_mpc_(N, dt);
   // initialize simulation
   Eigen::Matrix<double, 6, 1> goal_state, state;
   goal_state << 1.0, 2.0, 3.0, 0.0, 0.0, 0.0;
   state.setZero();
   std::cout << "\n X0: " << state.transpose() << std::endl;
   std::cout << "\n Xgoal: " << goal_state.transpose() << std::endl;
-  nlc::MatrixX<double> K, zOpt, uOpt;
+  nlc::MatrixXd K, zOpt, uOpt;
   uOpt.resize(nu, 1);
   zOpt.resize(N * nu, 1);
   K.resize(nu, nx);
@@ -674,13 +678,13 @@ void test_se3_vbl_mpc() {
   inertia = inertia * 1e-6;
   inertia_inv_ = inertia.inverse();
   double mass = 3;
-  nlc::SE3VblMPC<double> mpc_(false, N, dt, mass, inertia);
+  nlc::SE3VblMPC mpc_(false, N, dt, mass, inertia);
 
   // initialize simulation
-  nlc::VectorX<double> err;
+  nlc::VectorXd err;
   err.resize(12, 1);
-  nlc::TSE3<double> xd, state;
-  nlc::Wrench<double> input;
+  nlc::TSE3 xd, state;
+  nlc::Wrench input;
   state.position << 1.0, 2.0, 3.0;
   state.R.setZero();
   state.R(0, 2) = 1;
@@ -722,16 +726,16 @@ void test_se3_vbl_mpc() {
     //
     state.position +=
         dt * state.velocity +
-        0.5 * dt * dt *
-            (input.force -
-             mass * (Eigen::Vector3d() << 0.0, 0.0, 9.81).finished());
+            0.5 * dt * dt *
+                (input.force -
+                    mass * (Eigen::Vector3d() << 0.0, 0.0, 9.81).finished());
     state.velocity +=
         dt *
-        (input.force - mass * (Eigen::Vector3d() << 0.0, 0.0, 9.81).finished());
-    state.R = state.R * (nlc::utils::hatd(state.Omega * dt)).exp();
+            (input.force - mass * (Eigen::Vector3d() << 0.0, 0.0, 9.81).finished());
+    state.R = state.R * (nlc::utils::hat(state.Omega * dt)).exp();
     state.Omega += (inertia_inv_ *
-                    (input.torque - state.Omega.cross(inertia * state.Omega))) *
-                   dt;
+        (input.torque - state.Omega.cross(inertia * state.Omega))) *
+        dt;
 
     t.push_back(dt * j);
     x.push_back(state.position(0));
@@ -795,11 +799,11 @@ void test_att_traj_clf() {
   inertia << 0.0049, 0.0000055, 0.0000054, 0.0000055, 0.0053, 0.000021,
       0.0000054, 0.000021, 0.0098;
   inertia_inv_ = inertia.inverse();
-  nlc::SO3Clf<double> att_clf_(inertia);
+  nlc::SO3Clf att_clf_(inertia);
   att_clf_.init();
 
   // initialize simulation
-  nlc::TSO3<double> att, attd;
+  nlc::TSO3 att, attd;
   att.R.setZero();
   att.R(0, 2) = 1;
   att.R(1, 1) = 1;
@@ -830,7 +834,7 @@ void test_att_traj_clf() {
     att_clf_.run(dt, att, attd, uOpt);
 
     /// integrating the full nonlinear-dynamics using the input at N = 0
-    Eigen::Matrix<double, 3, 3> hat_Om = nlc::utils::hatd(att.Omega);
+    Eigen::Matrix<double, 3, 3> hat_Om = nlc::utils::hat(att.Omega);
     att.R = att.R * (hat_Om * dt).exp();
     Eigen::Vector3d dOm;
     dOm = inertia_inv_ * (uOpt - att.Omega.cross(inertia * att.Omega));
@@ -867,13 +871,13 @@ void test_att_traj_clf() {
 int main() {
 
   /// test position (time-invariant) mpc
-  //    test_position_mpc();
+  test_position_mpc();
 
   /// test position (trajectory) mpc
   //    test_pos_traj_mpc();
 
   /// test attitude (time-invariant) mpc
-  test_attitude_mpc();
+  //  test_attitude_mpc();
 
   /// test attitude (trajectory) mpc
   //        test_att_traj_mpc();

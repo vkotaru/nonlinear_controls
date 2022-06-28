@@ -6,4 +6,6 @@ build/
 *.pyc
 docs/
 .idea
-
+cmake-build-release/
+cmake-build-debug/
+cmake-build-relwithdebinfo/

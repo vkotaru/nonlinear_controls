@@ -1,7 +1,6 @@
 #ifndef NLC_SE3_HPP
 #define NLC_SE3_HPP
 
-
 #include <eigen3/Eigen/Dense>
 #include <eigen3/unsupported/Eigen/MatrixFunctions>
 
@@ -11,21 +10,16 @@
 namespace nonlinear_controls {
 using namespace manifolds;
 
-template <typename T> class TSE3 : public TSO3<T> {
+class TSE3 : public TSO3 {
 public:
-  TSE3(/* args */) : TSO3<T>() {
-    position.setZero();
-    velocity.setZero();
-    acceleration.setZero();
-  }
+  TSE3() : TSO3() {}
   ~TSE3() = default;
 
-  Eigen::Matrix<T, 3, 1> position;
-  Eigen::Matrix<T, 3, 1> velocity;
-  Eigen::Matrix<T, 3, 1> acceleration; // feed-forward
+  Eigen::Vector3d position{};
+  Eigen::Vector3d velocity{};
+  Eigen::Vector3d acceleration{}; // feed-forward
 
-  template <typename OtherDerived>
-  TSE3 &operator=(const TSE3<OtherDerived> &other) {
+  TSE3 &operator=(const TSE3 &other) {
     this->position = other.position;
     this->velocity = other.velocity;
     this->acceleration = other.acceleration;
@@ -37,47 +31,35 @@ public:
   void print() const override {
     std::cout << "position: " << this->position.transpose() << std::endl;
     std::cout << "velocity: " << this->velocity.transpose() << std::endl;
-    TSO3<T>::print();
+    TSO3::print();
   }
 
-  template <typename OtherDerived>
-  Eigen::Matrix<T, 12, 1> error(const TSE3<OtherDerived> &other) {
-    std::cout << "this " << std::endl;
-    this->print();
+  Eigen::Matrix<double, 12, 1> error(const TSE3 &other) {
+//    std::cout << "this " << std::endl;
+//    this->print();
+//    std::cout << "other" << std::endl;
+//    other.print();
 
-    std::cout << "other" << std::endl;
-    other.print();
-
-    auto pos_err = this->position - other.position;
-    auto vel_err = this->velocity - other.velocity;
-    auto rot_err = this->R.error(other.R);
-    auto ang_vel_err =
+    Eigen::Vector3d pos_err = this->position - other.position;
+    Eigen::Vector3d vel_err = this->velocity - other.velocity;
+    Eigen::Vector3d rot_err = this->R.error(other.R);
+    Eigen::Vector3d ang_vel_err =
         this->Omega - this->R.transpose() * other.R * other.Omega;
 
-    Eigen::Matrix<T, 12, 1> err_;
-    err_ << pos_err, vel_err, rot_err, ang_vel_err;
-    return err_;
+    return (Eigen::Matrix<double, 12, 1>() << pos_err, vel_err, rot_err, ang_vel_err).finished();
   }
 
-  template <typename OtherDerived>
-  Eigen::Matrix<T, 12, 1> operator-(const TSE3<OtherDerived> &other) {
-    return (Eigen::Matrix<T, 12, 1>() << position - other.position,
-            velocity - other.velocity, this->R.error(other.R),
-            this->Omega - this->R.transpose() * other.R * other.Omega)
-        .finished();
+  Eigen::Matrix<double, 12, 1> operator-(const TSE3 &other) {
+    return this->error(other);
   }
 
-  TSO3<T> extractTSO3() {
-    TSO3<T> att;
+  TSO3 extractTSO3() {
+    TSO3 att;
     att.R = this->R;
     att.Omega = this->Omega;
     return att;
   }
 };
-
-
-typedef TSE3<float> TSE3f;
-typedef TSE3<double> TSE3d;
 
 } // namespace nonlinear_controls
 

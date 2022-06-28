@@ -2,15 +2,13 @@
 
 namespace nonlinear_controls {
 
-template<typename T>
-SO3Clf<T>::SO3Clf(const Eigen::Matrix<T, 3, 3> &J)
-    : GeometricController<T>(), inertia_(J) {
-  Eigen::EigenSolver<Eigen::Matrix<T, 3, 3>> s(this->inertia_);
+SO3Clf::SO3Clf(const Eigen::Matrix3d &J)
+    : SO3Controller(), inertia_(J) {
+  Eigen::EigenSolver<Eigen::Matrix3d> s(this->inertia_);
   min_eigval_inertia_ = s.eigenvalues().real().minCoeff();
-  inertia_scaled_ =
-      this->inertia_ *
-          (1 /
-              min_eigval_inertia_); // 0.00489992 is min eigenvalue of inertia matrix
+  inertia_scaled_ = this->inertia_ *
+      (1 / min_eigval_inertia_);
+  // 0.00489992 is min eigenvalue of inertia matrix
 
   /// QP setup
   //    solver = new qpOASES::SQProblem(4, 1);
@@ -37,21 +35,19 @@ SO3Clf<T>::SO3Clf(const Eigen::Matrix<T, 3, 3> &J)
   }
   H[15] = 4e2;
   A[3] = -1;
-  lbA[0] = -INFINITY;
+  lbA[0] = -1. * INFINITY;
   ubA[0] = INFINITY;
   nWSR = 10;
   H_new[15] = 4e2;
   A_new[3] = -1;
-  lbA_new[0] = -INFINITY;
+  lbA_new[0] = -1. * INFINITY;
   ubA_new[0] = INFINITY;
   nWSR_new = 10;
 }
 
-template<typename T>
-SO3Clf<T>::~SO3Clf() {}
+SO3Clf::~SO3Clf() = default;
 
-template<typename T>
-void SO3Clf<T>::print_qp_setup() {
+void SO3Clf::print_qp_setup() {
   std::cout << "--------------------------------------------------"
             << std::endl;
   std::cout << "*           QP setup       *" << std::endl;
@@ -79,8 +75,7 @@ void SO3Clf<T>::print_qp_setup() {
             << std::endl;
 }
 
-template<typename T>
-void SO3Clf<T>::print_qp2_setup() {
+void SO3Clf::print_qp2_setup() {
   std::cout << "--------------------------------------------------"
             << std::endl;
   std::cout << "*           QP_new setup       *" << std::endl;
@@ -108,8 +103,7 @@ void SO3Clf<T>::print_qp2_setup() {
             << std::endl;
 }
 
-template<typename T>
-void SO3Clf<T>::init() {
+void SO3Clf::init() {
   std::cout << "/////////////////////////////////////////" << std::endl;
   std::cout << "///////////////// init //////////////////" << std::endl;
   std::cout << "inertia \n" << this->inertia_ << std::endl;
@@ -118,17 +112,16 @@ void SO3Clf<T>::init() {
   std::cout << "/////////////////////////////////////////" << std::endl;
 }
 
-template<typename T>
-void SO3Clf<T>::run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1> &u) {
+void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d &u) {
 
   /// computing errors
-  Eigen::Matrix<T, 6, 1> error = x - xd;
+  Eigen::Matrix<double, 6, 1> error = x - xd;
   eR = error.block(0, 0, 3, 1);
   eOmega = error.block(3, 0, 3, 1);
 
   dR = x.R * utils::hat(x.Omega);
   dRc = xd.R * utils::hat(xd.Omega);
-  Eigen::Matrix<T, 3, 3> m1, m2;
+  Eigen::Matrix3d m1, m2;
   m1 = (dRc.transpose() * x.R - x.R.transpose() * dRc);
   m2 = (xd.R.transpose() * dR - dR.transpose() * xd.R);
   deR = 0.5 * (utils::vee(m1) + utils::vee(m2));
@@ -162,7 +155,7 @@ void SO3Clf<T>::run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1> &u) {
     std::cout << "Optimal solution NOT found" << std::endl;
   }
   solver.getPrimalSolution(xOpt);
-  Eigen::Matrix<T, 3, 1> dOmega;
+  Eigen::Vector3d dOmega;
   dOmega << xOpt[0], xOpt[1], xOpt[2];
   printf("\nxOpt = [ %e, %e, %e ];  objVal = %e\n\n", xOpt[0], xOpt[1], xOpt[2],
          solver.getObjVal());
@@ -171,10 +164,5 @@ void SO3Clf<T>::run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1> &u) {
   /// computing the input
   u = this->inertia_ * dOmega + utils::hat(x.Omega) * this->inertia_ * x.Omega;
 }
-
-template
-class SO3Clf<float>;
-template
-class SO3Clf<double>;
 
 } // namespace nonlinear_controls

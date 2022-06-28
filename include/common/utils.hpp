@@ -1,38 +1,34 @@
-#ifndef NLC_UTILS_H
-#define NLC_UTILS_H
+#ifndef _NONLINEAR_CONTROLS_UTILS_H_
+#define _NONLINEAR_CONTROLS_UTILS_H_
+
 #include "eigen3/Eigen/Dense"
-#include <sys/time.h>
-namespace nonlinear_controls {
-namespace utils {
+#include <ctime>
+#include <chrono>
+#include "common/constants.h"
 
-static struct timeval tv;
+namespace nonlinear_controls::utils {
+
+static const std::chrono::time_point<std::chrono::system_clock>
+    NONLINEAR_CONTROLS_START_TIME = std::chrono::system_clock::now();
+
 inline unsigned long get_current_time() {
-  gettimeofday(&tv, NULL);
-  return 1000000 * tv.tv_sec + tv.tv_usec;
+  auto micros_ = std::chrono::duration_cast<std::chrono::microseconds>(
+      std::chrono::system_clock::now() - NONLINEAR_CONTROLS_START_TIME)
+      .count();
+  return static_cast<unsigned long>(micros_);
 }
 
-template <typename T>
-inline Eigen::Matrix<T, 3, 3> hat(const Eigen::Matrix<T, 3, 1> vector_) {
-  return (Eigen::Matrix<T, 3, 3>() << 0.0, -vector_(2), vector_(1), vector_(2),
-          0.0, -vector_(0), -vector_(1), vector_(0), 0.0)
+inline Eigen::Matrix3d hat(const Eigen::Vector3d &vector_) {
+  return (Eigen::Matrix3d() << 0.0, -vector_(2), vector_(1), vector_(2),
+      0.0, -vector_(0), -vector_(1), vector_(0), 0.0)
       .finished();
 }
 
-template <typename T>
-inline Eigen::Matrix<T, 3, 1> vee(const Eigen::Matrix<T, 3, 3> mat_) {
-  return (Eigen::Matrix<T, 3, 1>() << mat_(2, 1), mat_(0, 2), mat_(1, 0))
+inline Eigen::Vector3d vee(const Eigen::Matrix3d &mat_) {
+  return (Eigen::Vector3d() << mat_(2, 1), mat_(0, 2), mat_(1, 0))
       .finished();
 }
 
-// template <typename T>
-// inline Eigen::Matrix<T, 3, 1> vee(const Eigen::Matrix<T, 3, 3> mat_) {
-//    return (Eigen::Matrix<T, 3, 1>() << mat_(2, 1), mat_(0, 2), mat_(1,
-//    0)).finished();
-//}
-
-///////////////////////////////////////
-// TODO Clean and verify the following
-///////////////////////////////////////
 inline Eigen::Matrix<double, 3, 3> rotmX(const double roll) {
   Eigen::Matrix<double, 3, 3> R;
   R.row(0) << 1, 0, 0;
@@ -54,18 +50,19 @@ inline Eigen::Matrix<double, 3, 3> rotmZ(const double yaw) {
   R.row(2) << 0, 0, 1;
   return R;
 }
-inline Eigen::Matrix<double, 3, 3> rotmZYX(const Eigen::Vector3d eulerZYX) {
-  Eigen::Matrix<double, 3, 3> R;
+inline Eigen::Matrix3d rotmZYX(const Eigen::Vector3d &eulerZYX) {
+  Eigen::Matrix3d R;
   R = rotmZ(eulerZYX[0]) * rotmY(eulerZYX[1]) * rotmX(eulerZYX[2]);
   return R;
 }
-inline Eigen::Matrix<double, 3, 3> rotmXYZ(const Eigen::Vector3d eulerXYZ) {
+inline Eigen::Matrix3d rotmXYZ(const Eigen::Vector3d &eulerXYZ) {
   Eigen::Matrix<double, 3, 3> R;
   R = rotmX(eulerXYZ[0]) * rotmY(eulerXYZ[1]) * rotmZ(eulerXYZ[2]);
   return R;
 }
+
 inline Eigen::Vector3d
-rotmToZYXEulerAngles(const Eigen::Matrix<double, 3, 3> &R) {
+rotmToZYXEulerAngles(const Eigen::Matrix3d &R) {
   double thetaY = asin(-R(2, 0));
   double thetaZ = atan2(R(1, 0), R(0, 0));
   double thetaX = atan2(R(2, 1), R(2, 2));
@@ -74,7 +71,7 @@ rotmToZYXEulerAngles(const Eigen::Matrix<double, 3, 3> &R) {
   return v;
 }
 inline Eigen::Matrix<double, 4, 4>
-getTransformMat(const Eigen::Matrix<double, 3, 3> &R,
+getTransformMat(const Eigen::Matrix3d &R,
                 const Eigen::Vector3d &pos) {
   Eigen::Matrix<double, 4, 4> T = Eigen::MatrixXd::Zero(4, 4);
   T.block<3, 3>(0, 0) << R;
@@ -89,17 +86,9 @@ inline Eigen::Vector3d eulerAngleXYZToZYX(const Eigen::Vector3d &rpy) {
   ypr = rotmToZYXEulerAngles(R);
   return ypr;
 }
-///////////////////////////////////////////
+
 
 //////////////////////////////////////////
-/// templates
-//////////////////////////////////////////
-#define hatf hat<float>
-#define hatd hat<double>
-#define veef vee<float>
-#define veed vee<double>
-//////////////////////////////////////////
-} // namespace utils
 } // namespace nonlinear_controls
 
-#endif // NLC_UTILS_H
+#endif // _NONLINEAR_CONTROLS_UTILS_H_

@@ -5,17 +5,16 @@
 
 namespace nonlinear_controls {
 
-template <typename T>
 class BaseController {
-   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    BaseController();
-    ~BaseController();
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  BaseController() = default;
+  ~BaseController() = default;
 
-    virtual void init();
-    virtual void run();
+  virtual void init() {}
+  virtual void run() {}
 
-   private:
+private:
 };
 
 }  // namespace nonlinear_controls

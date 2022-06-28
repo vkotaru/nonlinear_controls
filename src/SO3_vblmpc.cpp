@@ -2,17 +2,16 @@
 
 namespace nonlinear_controls {
 
-template <typename T> SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt) {
+SO3VblMPC::SO3VblMPC(bool islti, int _N, double _dt) {
   // temporary inertia matrix
-  Eigen::Matrix<T, 3, 3> J;
+  Eigen::Matrix<double, 3, 3> J;
   J << 112533, 0, 0, 0, 36203, 0, 0, 0, 42673;
   J = J * 1e-6;
   SO3VblMPC(islti, _N, _dt, J);
 }
 
-template <typename T>
-SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt,
-                        Eigen::Matrix<T, 3, 3> _J)
+SO3VblMPC::SO3VblMPC(bool islti, int _N, double _dt,
+                     Eigen::Matrix<double, 3, 3> _J)
     : IS_LTI(islti), dt(_dt), N(_N) {
   nx = 6;
   nu = 3;
@@ -31,19 +30,19 @@ SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt,
   }
 
   if (IS_LTI) {
-    mpcSolver = new LinearMPC<T>(N, nx, nu);
+    mpcSolver = new LinearMPC(N, nx, nu);
   } else {
-    mpcSolver = new LinearMPCt<T>(N, nx, nu);
+    mpcSolver = new LinearMPCt(N, nx, nu);
   }
 
   // initialize dynamics
-  Eigen::Matrix<T, 3, 1> Omd;
+  Eigen::Matrix<double, 3, 1> Omd;
   Omd.setZero();
   A.resize(nx, nx);
   B.resize(nx, nu);
   A.setIdentity();
   generate_dynamics(Omd, A);
-  B << Eigen::Matrix<T, 3, 3>::Zero(), inertia_inv_;
+  B << Eigen::Matrix<double, 3, 3>::Zero(), inertia_inv_;
   B = B * dt;
   if (IS_LTI) {
     mpcSolver->init_dynamics(A, B);
@@ -59,16 +58,16 @@ SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt,
   Q.resize(nx, nx);
   P.resize(nx, nx);
   R.resize(nu, nu);
-  Q << 1000 * Eigen::Matrix<T, 3, 3>::Identity(),
-      Eigen::Matrix<T, 3, 3>::Zero(), Eigen::Matrix<T, 3, 3>::Zero(),
-      100 * Eigen::Matrix<T, 3, 3>::Identity();
+  Q << 1000 * Eigen::Matrix<double, 3, 3>::Identity(),
+      Eigen::Matrix<double, 3, 3>::Zero(), Eigen::Matrix<double, 3, 3>::Zero(),
+      100 * Eigen::Matrix<double, 3, 3>::Identity();
   P << 6.6514, -0.0000, -0.0000, 0.0894, -0.0000, -0.0000, -0.0000, 6.5123,
       -0.0000, -0.0000, 0.0440, -0.0000, -0.0000, -0.0000, 6.5231, -0.0000,
       -0.0000, 0.0475, 0.0894, -0.0000, -0.0000, 0.0293, -0.0000, -0.0000,
       -0.0000, 0.0440, -0.0000, -0.0000, 0.0141, -0.0000, -0.0000, -0.0000,
       0.0475, -0.0000, -0.0000, 0.0152;
   P = 1e4 * P;
-  R = 1 * Eigen::Matrix<T, 3, 3>::Identity();
+  R = 1 * Eigen::Matrix<double, 3, 3>::Identity();
   mpcSolver->set_mpc_gains(Q, P, R);
 
   /// bounds
@@ -92,20 +91,18 @@ SO3VblMPC<T>::SO3VblMPC(bool islti, int _N, double _dt,
   }
 }
 
-template <typename T> SO3VblMPC<T>::~SO3VblMPC() = default;
+SO3VblMPC::~SO3VblMPC() = default;
 
-template <typename T>
-void SO3VblMPC<T>::generate_dynamics(Eigen::Matrix<T, 3, 1> Omd,
-                                     MatrixX<T> &A) {
-  A << -utils::hat<T>(Omd), Eigen::Matrix<T, 3, 3>::Identity(),
-      Eigen::Matrix<T, 3, 3>::Zero(),
+void SO3VblMPC::generate_dynamics(Eigen::Matrix<double, 3, 1> Omd,
+                                  MatrixXd &A) {
+  A << -utils::hat(Omd), Eigen::Matrix<double, 3, 3>::Identity(),
+      Eigen::Matrix<double, 3, 3>::Zero(),
       inertia_inv_ *
-          (utils::hat<T>(inertia_ * Omd) - utils::hat<T>(Omd) * inertia_);
-  A = Eigen::Matrix<T, 6, 6>::Identity() + A * dt;
+          (utils::hat(inertia_ * Omd) - utils::hat(Omd) * inertia_);
+  A = Eigen::Matrix<double, 6, 6>::Identity() + A * dt;
 }
 
-template <typename T>
-void SO3VblMPC<T>::init_dynamics(Eigen::Matrix<T, 3, 1> Omd) {
+void SO3VblMPC::init_dynamics(Eigen::Matrix<double, 3, 1> Omd) {
   generate_dynamics(Omd, A);
   mpcSolver->init_dynamics(A, B);
   if (verbose) {
@@ -116,13 +113,12 @@ void SO3VblMPC<T>::init_dynamics(Eigen::Matrix<T, 3, 1> Omd) {
     std::cout << "B\n" << B << std::endl;
   }
 }
-template <typename T> void SO3VblMPC<T>::init_dynamics(TSO3<T> attd) {
+void SO3VblMPC::init_dynamics(TSO3 attd) {
   generate_dynamics(attd.Omega, A);
   mpcSolver->init_dynamics(A, B);
 }
 
-template <typename T>
-void SO3VblMPC<T>::run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1> &u) {
+void SO3VblMPC::run(double dt, TSO3 x, TSO3 xd, Eigen::Matrix<double, 3, 1> &u) {
   // time-varying trajectory with only operating point used for the dynamics
   // for the next N steps
   auto x0 = x - xd;
@@ -148,15 +144,14 @@ void SO3VblMPC<T>::run(T dt, TSO3<T> x, TSO3<T> xd, Eigen::Matrix<T, 3, 1> &u) {
   u = uOpt.block(0, 0, 3, 1);
   u += x.Omega.cross(inertia_ * x.Omega);
   u += -inertia_ * (x.Omega.cross(x.R.transpose() * xd.R * xd.Omega) -
-                    x.R.transpose() * xd.R * xd.dOmega);
+      x.R.transpose() * xd.R * xd.dOmega);
 }
 
-template <typename T>
-void SO3VblMPC<T>::set_gains(const MatrixX<T> &_Q, const MatrixX<T> &_P,
-                             const MatrixX<T> &_R) {
-  this->Q = Q;
-  this->P = P;
-  this->R = R;
+void SO3VblMPC::set_gains(const MatrixXd &_Q, const MatrixXd &_P,
+                          const MatrixXd &_R) {
+  this->Q = _Q;
+  this->P = _P;
+  this->R = _R;
 
   std::cout << "SO3VblMPC: setting gains\n Q:\n" << std::endl;
   std::cout << _Q << std::endl;
@@ -167,22 +162,16 @@ void SO3VblMPC<T>::set_gains(const MatrixX<T> &_Q, const MatrixX<T> &_P,
 
   mpcSolver->set_mpc_gains(Q, P, R);
 }
-template <typename T>
-void SO3VblMPC<T>::set_input_bounds(VectorX<T> lb, VectorX<T> ub) {
+
+void SO3VblMPC::set_input_bounds(VectorXd lb, VectorXd ub) {
   this->input_lb = lb;
   this->input_ub = ub;
   mpcSolver->set_input_bounds(lb, ub);
 }
-template <typename T>
-void SO3VblMPC<T>::set_state_bounds(VectorX<T> lb, VectorX<T> ub) {
+
+void SO3VblMPC::set_state_bounds(VectorXd lb, VectorXd ub) {
   this->state_lb = lb;
   this->state_ub = ub;
   mpcSolver->set_state_bounds(lb, ub);
 }
-
-//////////////////////////////////
-/// templates
-//////////////////////////////////
-template class SO3VblMPC<float>;
-template class SO3VblMPC<double>;
 } // namespace nonlinear_controls

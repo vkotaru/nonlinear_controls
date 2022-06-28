@@ -6,17 +6,14 @@
 
 namespace nonlinear_controls {
 
-template <typename T>
-class GeometricController : public BaseController<T> {
-   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    GeometricController(/* args */);
-    ~GeometricController();
+class GeometricController : public BaseController {
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  GeometricController(/* args */) = default;
+  ~GeometricController() = default;
 
-    // TODO: look into static_cast to access the state from the base class itself
-    // inline const TSO3<T>& state() const { return state_; }
-    virtual void init();
-    virtual void run();
+  void init() override {}
+  void run() override {}
 };
 
 }  // namespace nonlinear_controls

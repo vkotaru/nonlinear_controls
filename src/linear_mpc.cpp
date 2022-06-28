@@ -3,8 +3,8 @@ namespace nonlinear_controls {
 //////////////////////////////////////////
 /// Linear Time Invariant Dynamics MPC
 //////////////////////////////////////////
-template<typename T>
-LinearMPC<T>::LinearMPC(const int &_N, const int &_nx, const int &_nu) : N(_N), nx(_nx), nu(_nu) {
+
+LinearMPC::LinearMPC(const int &_N, const int &_nx, const int &_nu) : N(_N), nx(_nx), nu(_nu) {
   nVars = N * nu;
   nCons = (N + 1) * nx;
 
@@ -54,11 +54,9 @@ LinearMPC<T>::LinearMPC(const int &_N, const int &_nx, const int &_nu) : N(_N), 
   Xub = 1e6 * Xub;
 }
 
-template<typename T>
-LinearMPC<T>::~LinearMPC() = default;
+LinearMPC::~LinearMPC() = default;
 
-template<typename T>
-void LinearMPC<T>::set_mpc_gains(MatrixX<T> Q, MatrixX<T> P, MatrixX<T> R) {
+void LinearMPC::set_mpc_gains(MatrixXd Q, MatrixXd P, MatrixXd R) {
   assert(Q.rows() == nx && Q.cols() == nx);
   assert(P.rows() == nx && P.cols() == nx);
   assert(R.rows() == nu && R.cols() == nu);
@@ -72,8 +70,7 @@ void LinearMPC<T>::set_mpc_gains(MatrixX<T> Q, MatrixX<T> P, MatrixX<T> R) {
   this->Qbar.block(nx * N, nx * N, nx, nx) = P;
 }
 
-template<typename T>
-void LinearMPC<T>::set_input_bounds(VectorX<T> lb, VectorX<T> ub) {
+void LinearMPC::set_input_bounds(VectorXd lb, VectorXd ub) {
   assert(lb.rows() == nu && lb.cols() == 1);
   assert(ub.rows() == nu && ub.cols() == 1);
   Ulb = lb.replicate(N, 1);
@@ -84,27 +81,23 @@ void LinearMPC<T>::set_input_bounds(VectorX<T> lb, VectorX<T> ub) {
   data_.ub = Uub.template cast<double>();
 }
 
-template<typename T>
-void LinearMPC<T>::set_state_bounds(VectorX<T> lb, VectorX<T> ub) {
+void LinearMPC::set_state_bounds(VectorXd lb, VectorXd ub) {
   assert(lb.rows() == nx && lb.cols() == 1);
   assert(ub.rows() == nx && ub.cols() == 1);
   Xlb = lb.replicate(N + 1, 1);
   Xub = ub.replicate(N + 1, 1);
 }
 
-template<typename T>
-void LinearMPC<T>::init_dynamics(MatrixX<T> A, MatrixX<T> B) {
-  LinearMPC<T>::update_dynamics(A, B);
+void LinearMPC::init_dynamics(MatrixXd A, MatrixXd B) {
+  LinearMPC::update_dynamics(A, B);
 }
 
-template<typename T>
-void LinearMPC<T>::update_dynamics(MatrixX<T> A, MatrixX<T> B) {
+void LinearMPC::update_dynamics(MatrixXd A, MatrixXd B) {
   this->A = A;
   this->B = B;
 }
 
-template<typename T>
-void LinearMPC<T>::construct() {
+void LinearMPC::construct() {
   ////////////////////////////////////////
   /// Note: remember to call this function
   /// if dynamics, input bounds or
@@ -135,9 +128,7 @@ void LinearMPC<T>::construct() {
   QP_INITIALIZED = false;
 }
 
-
-template<typename T>
-void LinearMPC<T>::print() {
+void LinearMPC::print() {
   std::cout << "--------------------------------------------------"
             << std::endl;
   std::cout << "*           QP setup       *" << std::endl;
@@ -156,15 +147,11 @@ void LinearMPC<T>::print() {
             << std::endl;
 }
 
-
-template<typename T>
-void LinearMPC<T>::updateCArrays(const VectorX<T> &x0) {
+void LinearMPC::updateCArrays(const VectorXd &x0) {
   data_.lbA = (Xlb - Sx * x0).template cast<double>();
   data_.ubA = (Xub - Sx * x0).template cast<double>();
   data_.g = (2 * F.transpose() * x0).template cast<double>();
-
-  print();
-
+//  print();
   Hc = data_.H.transpose().data();
   Ac = data_.A.transpose().data();
   gc = data_.g.transpose().data();
@@ -174,19 +161,32 @@ void LinearMPC<T>::updateCArrays(const VectorX<T> &x0) {
   ubAc = data_.ubA.transpose().data();
 }
 
-template<typename T>
-VectorX<T> LinearMPC<T>::init(const VectorX<T> &x0) {
-  this->updateCArrays(x0);
-  solver->init(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, nWSR, 0);
+VectorXd LinearMPC::init(const VectorXd &x0) {
+
 }
 
-template<typename T>
-VectorX<T> LinearMPC<T>::run(const VectorX<T> &x0) {
+VectorXd LinearMPC::run(const VectorXd &x0) {
 
   this->updateCArrays(x0);
 
-//  double *cpu_time = 0.01;
-  qpOASES::returnValue sol = solver->hotstart(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, nWSR, 0);
+  /*
+   * NOTE: the qpOASES solver works only if the
+   * "n" is locally defined and passed to the solver
+   * otherwise, the solver becomes infeasible
+   *
+   * Please refer qpOASES github/forums for discussion on this
+   *
+   **/
+  int n = nWSR;
+  qpOASES::real_t cpu_time = cpu_time_limit; //produce result within the time-step
+
+  qpOASES::returnValue sol;
+  if (!solver_initialized) {
+    sol = solver->init(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, n, 0);
+    solver_initialized = true;
+  } else {
+    sol = solver->hotstart(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, n, 0);
+  }
 
   qpOASES::real_t xOpt[nVars];
   solver->getPrimalSolution(xOpt);
@@ -200,51 +200,47 @@ VectorX<T> LinearMPC<T>::run(const VectorX<T> &x0) {
     std::cout << "Something else" << std::endl;
   }
 
-  Eigen::Matrix<T, Eigen::Dynamic, 1> xOptVec;
+  Eigen::Matrix<double, Eigen::Dynamic, 1> xOptVec;
   xOptVec =
-      Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(xOpt, nVars, 1).template cast<T>();
+      Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(xOpt, nVars, 1).template cast<double>();
   return xOptVec;
 }
-template<typename T>
-VectorX<T> LinearMPC<T>::run(const VectorX<T> &x0, const MatrixX<T> &A, const MatrixX<T> &B) {
-  return LinearMPC<T>::run(x0);
+VectorXd LinearMPC::run(const VectorXd &x0, const MatrixXd &A, const MatrixXd &B) {
+  return LinearMPC::run(x0);
 }
 
 //////////////////////////////////////////
 /// Linear Time Varying Dynamics MPC
 /////////////////////////////////////////
-template<typename T>
-LinearMPCt<T>::LinearMPCt(const int &_N, const int &_nx, const int &_nu) : LinearMPC<T>(_N, _nx, _nu) {
+LinearMPCt::LinearMPCt(const int &_N, const int &_nx, const int &_nu) : LinearMPC(_N, _nx, _nu) {
 
 }
 
-template<typename T>
-LinearMPCt<T>::~LinearMPCt() = default;
+LinearMPCt::~LinearMPCt() = default;
 
-template<typename T>
-void LinearMPCt<T>::init_dynamics(MatrixX<T> A, MatrixX<T> B) {
+void LinearMPCt::init_dynamics(MatrixXd A, MatrixXd B) {
   Astorage.push_back(A);
   Bstorage.push_back(B);
 }
 
-template<typename T>
-void LinearMPCt<T>::update_dynamics(MatrixX<T> A, MatrixX<T> B) {
+void LinearMPCt::update_dynamics(MatrixXd A, MatrixXd B) {
   Astorage.pop_front(); // removing A_{k} or is it k-1? (whatever!)
   Astorage.push_back(A); // adding A_{k+N}
   Bstorage.pop_front();
   Bstorage.push_back(B);
 }
 
-template<typename T>
-void LinearMPCt<T>::construct() {
+void LinearMPCt::construct() {
   this->Sx.block(0, 0, this->nx, this->nx).setIdentity();
   this->Su.block(0, 0, this->nx, this->N * this->nu).setZero();
 
   for (int i = 0; i < this->N; ++i) {
-    this->Sx.block(this->nx * (i + 1), 0, this->nx, this->nx) = Astorage.at(i) * this->Sx.block(this->nx * i, 0, this->nx, this->nx);
+    this->Sx.block(this->nx * (i + 1), 0, this->nx, this->nx) =
+        Astorage.at(i) * this->Sx.block(this->nx * i, 0, this->nx, this->nx);
     this->Su.block(this->nx * (i + 1), this->nu * i, this->nx, this->nu) = Bstorage.at(i);
     if (i != 0) {
-      this->Su.block(this->nx * (i + 1), 0, this->nx, this->nu * i) = Astorage.at(i) * this->Su.block(this->nx * i, 0, this->nx, this->nu * i);
+      this->Su.block(this->nx * (i + 1), 0, this->nx, this->nu * i) =
+          Astorage.at(i) * this->Su.block(this->nx * i, 0, this->nx, this->nu * i);
     }
   }
   // Cost function
@@ -259,8 +255,7 @@ void LinearMPCt<T>::construct() {
   this->QP_INITIALIZED = false;
 }
 
-template<typename T>
-VectorX<T> LinearMPCt<T>::run(const VectorX<T> &x0, const MatrixX<T> &A, const MatrixX<T> &B) {
+VectorXd LinearMPCt::run(const VectorXd &x0, const MatrixXd &A, const MatrixXd &B) {
   /// update:
   ///  constraints bounds
   ///  linear cost
@@ -277,16 +272,8 @@ VectorX<T> LinearMPCt<T>::run(const VectorX<T> &x0, const MatrixX<T> &A, const M
   construct();
 
   /// return
-//  return this->QP->getOptimizer().template cast<T>();
+//  return this->QP->getOptimizer().template cast();
 }
-
-///////////////////////////////////
-/// templates
-///////////////////////////////////
-template class LinearMPC<float>;
-template class LinearMPC<double>;
-template class LinearMPCt<float>;
-template class LinearMPCt<double>;
 
 }  // namespace nonlinear_controls
 

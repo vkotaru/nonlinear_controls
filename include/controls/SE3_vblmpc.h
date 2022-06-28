@@ -8,27 +8,25 @@
 #include <iostream>
 namespace nonlinear_controls {
 
-template <typename T> class SE3VblMPC : public GeometricController<T> {
+class SE3VblMPC : public GeometricController {
 protected:
-  T mass_;
-  Eigen::Matrix<T, 3, 3> inertia_;
+  double mass_;
+  Eigen::Matrix3d inertia_;
   bool IS_LTI;
   int N;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SE3VblMPC(bool islti, const int &N, const T &dt, const T &m,
-            const Eigen::Matrix<T, 3, 3> &J);
+  SE3VblMPC(bool islti, const int N, const double dt, const double m,
+            const Eigen::Matrix3d &J);
   ~SE3VblMPC();
 
-  DoubleIntMPC<T, 3> pos_mpc_;
-  SO3VblMPC<T> att_mpc_;
+  DoubleIntMPC<3> pos_mpc_;
+  SO3VblMPC att_mpc_;
 
   void init();
-  void run(T dt, TSE3<T> x, TSE3<T> xd, Wrench<T> &u);
+  void run(double dt, TSE3 x, TSE3 xd, Wrench &u);
 };
 
-typedef SE3VblMPC<double> SE3VblMPCd;
-typedef SE3VblMPC<float> SE3VblMPCf;
 } // namespace nonlinear_controls
 #endif // NONLINEAR_CONTROL_SE3_VBLMPC_H

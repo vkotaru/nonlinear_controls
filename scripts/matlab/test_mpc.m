@@ -6,15 +6,19 @@ dt = 1/200;
 A = eye(nx);
 A(1:3, 4:end) = A(1:3, 4:end) + dt*eye(3);
 B = [0.5*dt*dt*eye(3); dt*eye(3)];
-Q = 0.1*eye(6);
-R = 0.01*eye(3);
-P = 0.1*eye(6);
+
+Q = blkdiag(1000*eye(3), 100*eye(3));
+R = eye(3);
+[K, P, ~] = dlqr(A, B, Q, R)
 
 
 Sx = zeros(nx*(N+1), nx);
 Su = zeros(nx*(N+1), N*nu);
 Sx(1:nx, :) = eye(nx);
 Qbar = [];
+Rbar = [];
+
+xlb = 
 
 for i = 1:N
     Sx(nx*(i)+1:nx*(i+1),:) = Sx(nx*(i-1)+1:nx*(i),:)*A;
@@ -26,7 +30,11 @@ for i = 1:N
     Su(nx*(i)+1:nx*(i+1),:) = [tmp, Su(nx*(i-1)+1:nx*(i),1:end-nu)];
     
     Qbar= blkdiag(Qbar, Q);
+    Rbar = blkdiag(Rbar, R);
 end
 Qbar= blkdiag(Qbar, P);
+
+
+lbA = 
 
 
