@@ -6,13 +6,7 @@
 #include <iostream>
 #include <qpOASES.hpp>
 
-#include "common/utils.hpp"
-#include "controls/SE3_vblmpc.h"
-#include "controls/SO3_clf.h"
-#include "controls/double_int_mpc.hpp"
-#include "controls/linear_mpc.h"
-#include "data_types/data_types.hpp"
-
+#include <nonlinear_controls.h>
 #include "matplotlibcpp.h"
 
 namespace plt = matplotlibcpp;
@@ -93,7 +87,7 @@ void test_position_mpc() {
   std::cout << "Testing 3D position MPC with LTI Dynamics... " << std::endl;
   nx = 6;
   nu = 3;
-  N = 1;
+  N = 10;
   nlc::LinearMPC pos_mpc_(N, nx, nu);
 
   // dynamics
@@ -114,24 +108,27 @@ void test_position_mpc() {
   Q.resize(nx, nx);
   P.resize(nx, nx);
   R.resize(nu, nu);
-  Q << 1000 * Eigen::Matrix3d::Identity(), Eigen::Matrix3d::Zero(),
-      Eigen::Matrix3d::Zero(), 100 * Eigen::Matrix3d::Identity();
+  Q << 100 * Eigen::Matrix3d::Identity(), Eigen::Matrix3d::Zero(),
+      Eigen::Matrix3d::Zero(), 10 * Eigen::Matrix3d::Identity();
   P << 8.1314, 0.0000, -0.0000, 0.6327, -0.0000, -0.0000, 0.0000, 8.1314,
       0.0000, 0.0000, 0.6327, 0.0000, -0.0000, 0.0000, 8.1314, -0.0000, 0.0000,
       0.6327, 0.6327, 0.0000, -0.0000, 0.2606, -0.0000, -0.0000, -0.0000,
       0.6327, 0.0000, -0.0000, 0.2606, 0.0000, -0.0000, 0.0000, 0.6327, -0.0000,
       0.0000, 0.2606;
-  P = 1e4 * P;
+  P = 1e2 * P;
   R = 1 * Eigen::Matrix<double, 3, 3>::Identity();
   pos_mpc_.set_mpc_gains(Q, P, R);
 
   // state & input bounds
   Eigen::Matrix<double, 6, 1> state_lb, state_ub;
   Eigen::Matrix<double, 3, 1> input_lb, input_ub;
-  state_lb = -100 * Eigen::Matrix<double, 6, 1>::Ones();
-  state_ub = -state_lb;
-  input_lb = -100 * Eigen::Matrix<double, 3, 1>::Ones();
+
+  state_lb << -2., -2.5, 0., -2, -2, -2;
+  state_ub << 2., 2.5, 4., 2., 2., 2;
+
+  input_lb = -20. * Eigen::Matrix<double, 3, 1>::Ones();
   input_ub = -input_lb;
+
   pos_mpc_.set_input_bounds(input_lb, input_ub);
   pos_mpc_.set_state_bounds(state_lb, state_ub);
   pos_mpc_.set_cpu_time_limit(dt);
@@ -141,10 +138,12 @@ void test_position_mpc() {
 
   // initialize simulation
   Eigen::Matrix<double, 6, 1> goal_state, state;
-  goal_state << 1.0, 2.0, 3.0, 0.0, 0.0, 0.0;
+  goal_state << 1.0, 2.0, 1.5, 0.0, 0.0, 0.0;
   state.setZero();
+
   std::cout << "\n X0: " << state.transpose() << std::endl;
   std::cout << "\n Xgoal: " << goal_state.transpose() << std::endl;
+
   nlc::MatrixXd K, zOpt, uOpt;
   uOpt.resize(nu, 1);
   zOpt.resize(N * nu, 1);
@@ -155,7 +154,15 @@ void test_position_mpc() {
   bool mpc_initialized{false};
 
   clear_plot_vars();
-  for (int j = 0; j < int(2 / dt); ++j) { // only for 2 seconds
+
+  const double simulate_for_seconds = 10;
+  double freq = 0;
+  int MAX_ITER_STEPS = int(simulate_for_seconds / dt);
+  unsigned long prev_time = nlc::utils::get_current_time();
+  unsigned long curr_time = nlc::utils::get_current_time();
+
+  for (int j = 0; j < MAX_ITER_STEPS; ++j) {
+    pos_mpc_.set_state_bounds(state_lb - goal_state, state_ub - goal_state);
 
     /// LQR (for sanity check)
     auto uPD = -K * (state - goal_state);
@@ -176,7 +183,15 @@ void test_position_mpc() {
     ux.push_back(uOpt(0));
     uy.push_back(uOpt(1));
     uz.push_back(uOpt(2));
+
+    curr_time = nlc::utils::get_current_time();
+    auto time_elapsed = (double(curr_time - prev_time) * 1e-6);
+    nlc::Logger::WARN("dt: " + std::to_string(time_elapsed) + " freq: " + std::to_string(1. / dt));
+    freq += 1 / time_elapsed;
+    prev_time = curr_time;
   }
+
+
 
   /// plots
   plt::suptitle("Position MPC LTI");

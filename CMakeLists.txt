@@ -39,7 +39,7 @@ set(CONTROL_SRCS
         src/SE3_vblmpc.cpp
         src/SO3_clf.cpp
         src/tracking_mpc.cpp
-        include/common/constants.h)
+        include/common/constants.h include/common/log.hpp examples/point_mass.cpp)
 
 add_subdirectory(third_party)
 
@@ -49,11 +49,16 @@ add_library(nonlinear_controls ${CONTROL_SRCS} ${QUADPROG_SRCS})
 target_link_libraries(nonlinear_controls qpOASES_cpp epigraph ${PYTHON_LIBRARIES})
 target_include_directories(nonlinear_controls PUBLIC . ${INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# tests
 add_executable(test_main tests/test_nlc.cpp)
 target_link_libraries(test_main nonlinear_controls)
-
 add_executable(test_qp tests/test_qp.cpp)
 target_link_libraries(test_qp nonlinear_controls)
-
 add_executable(test_mpc tests/test_mpc.cpp)
 target_link_libraries(test_mpc nonlinear_controls)
+
+# examples
+add_executable(example_point_mass examples/point_mass.cpp)
+target_link_libraries(example_point_mass nonlinear_controls)
+
+
