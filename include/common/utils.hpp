@@ -5,6 +5,7 @@
 #include <ctime>
 #include <chrono>
 #include "common/constants.h"
+#include <stdexcept>
 
 namespace nonlinear_controls::utils {
 

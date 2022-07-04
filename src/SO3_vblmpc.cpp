@@ -68,7 +68,7 @@ SO3VblMPC::SO3VblMPC(bool islti, int _N, double _dt,
       0.0475, -0.0000, -0.0000, 0.0152;
   P = 1e4 * P;
   R = 1 * Eigen::Matrix<double, 3, 3>::Identity();
-  mpcSolver->set_mpc_gains(Q, P, R);
+  mpcSolver->set_gains(Q, P, R);
 
   /// bounds
   input_lb.resize(nu, 1);
@@ -160,7 +160,7 @@ void SO3VblMPC::set_gains(const MatrixXd &_Q, const MatrixXd &_P,
   std::cout << "R:\n" << std::endl;
   std::cout << _R << std::endl;
 
-  mpcSolver->set_mpc_gains(Q, P, R);
+  mpcSolver->set_gains(Q, P, R);
 }
 
 void SO3VblMPC::set_input_bounds(VectorXd lb, VectorXd ub) {

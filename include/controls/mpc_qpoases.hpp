@@ -1,0 +1,142 @@
+#ifndef _NONLINEAR_CONTROLS_MPC_QPOASES_HPP_
+#define _NONLINEAR_CONTROLS_MPC_QPOASES_HPP_
+
+#include "common/qpoases_eigen.hpp"
+#include <deque>
+#include <vector>
+#include "controls/linear_mpc.hpp"
+
+namespace nonlinear_controls {
+
+class MPCQPOases : public LinearMPC {
+protected:
+
+  qpOASES::SQProblem *solver{};
+  qpOASES::int_t nWSR = 10;
+  qpOASES::Options options;
+  qpOASES::real_t cpu_time_limit{};
+  QPOasesData data_;
+  qpOASES::real_t *Hc{}, *Ac{}, *gc{}, *lbc{}, *ubc{}, *lbAc{}, *ubAc{};
+  bool solver_initialized{false};
+
+  void create_solver() {
+    solver = new qpOASES::SQProblem(nVars, nCons);
+    options.setToMPC();
+    options.printLevel = qpOASES::PL_LOW;
+    solver->setOptions(options);
+    nWSR = 1e7;
+  }
+
+public:
+  MPCQPOases(const long &N, const long &nx, const long &nu) : LinearMPC(N, nx, nu) {
+    /// QP solver Setup
+    create_solver();
+  }
+
+  void set_input_bounds(const VectorXd &lb, const VectorXd &ub) override {
+    LinearMPC::set_input_bounds(lb, ub);
+    /// set only once
+    data_.lb = Ulb;
+    data_.ub = Uub;
+  }
+  void construct() override {
+    LinearMPC::construct();
+
+    /// set only once
+    data_.H = H;
+    data_.lb = Ulb;
+    data_.ub = Uub;
+    data_.A = Su;
+    qp_initialized = false;
+  }
+  void print() override {
+    std::cout << "--------------------------------------------------"
+              << std::endl;
+    std::cout << "*           QP setup       *" << std::endl;
+    std::cout << "--------------------------------------------------"
+              << std::endl;
+    std::cout << "H: \n"
+              << data_.H << "\nf: \n"
+              << data_.g.transpose() << std::endl;
+    std::cout << "\nlbA: \n"
+              << data_.lbA.transpose() << "\nA: \n"
+              << data_.A << "\nubA: \n"
+              << data_.ubA.transpose() << std::endl;
+    std::cout << "\nlb: " << data_.lb.transpose()
+              << "\nub: " << data_.ub.transpose() << std::endl;
+    std::cout << "-------------------*****---------------------------"
+              << std::endl;
+  }
+  void updateCArrays(const VectorXd &x0) override {
+    data_.lbA = (Xlb - Sx * x0);
+    data_.ubA = (Xub - Sx * x0);
+    data_.g = (2 * F.transpose() * x0);
+    //  print();
+    Hc = data_.H.transpose().data();
+    Ac = data_.A.transpose().data();
+    gc = data_.g.transpose().data();
+    lbc = data_.lb.transpose().data();
+    ubc = data_.ub.transpose().data();
+    lbAc = data_.lbA.transpose().data();
+    ubAc = data_.ubA.transpose().data();
+  }
+
+  MatrixXd run(const VectorXd &x0) override {
+    this->updateCArrays(x0);
+    /**
+     * NOTE: the qpOASES solver works only if the
+     * "n" is locally defined and passed to the solver
+     * otherwise, the solver becomes infeasible
+     *
+     * Please refer qpOASES GitHub/forums for discussion on this
+     * https://github.com/coin-or/qpOASES/issues/83#issuecomment-762053495
+     *
+     * nWSR is currently used as an input and an output variable.
+     * This means that the maximum number of allowed working set changes will decrease monotonically
+     * and will eventually trigger the error. Just make sure to set nWSR before each call to hotstart.
+     **/
+    int n = nWSR;
+    qpOASES::real_t cpu_time = cpu_time_limit; //produce result within the time-step
+
+    qpOASES::returnValue sol;
+    if (!solver_initialized) {
+      sol = solver->init(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, n, 0);
+      solver_initialized = true;
+    } else {
+      sol = solver->hotstart(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, n, 0);
+    }
+
+    qpOASES::real_t xOpt[nVars];
+    solver->getPrimalSolution(xOpt);
+
+    if (verbose) {
+      if (sol == qpOASES::SUCCESSFUL_RETURN) {
+        std::cout << "SUCCESSFUL_RETURN" << std::endl;
+      } else if (sol == qpOASES::RET_MAX_NWSR_REACHED) {
+        std::cout << "RET_MAX_NWSR_REACHED" << std::endl;
+      } else if (sol == qpOASES::RET_INIT_FAILED) {
+        std::cout << "RET_INIT_FAILED" << std::endl;
+      } else {
+        std::cout << "Something else" << std::endl;
+      }
+    }
+
+    Eigen::Matrix<double, Eigen::Dynamic, 1> xOptVec;
+    xOptVec =
+        Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(xOpt, nVars, 1);
+    return xOptVec;
+  }
+  MatrixXd run(const VectorXd &x0_, const VectorXd &xd_) override {
+    return run(x0_ - xd_);
+  }
+  MatrixXd run(const VectorXd &x0, const MatrixXd &a, const MatrixXd &b) override {
+    return run(x0);
+  }
+  void reset() override {
+    solver_initialized = false;
+  }
+
+};
+
+} // namespace nonlinear_controls
+#endif // _NONLINEAR_CONTROLS_MPC_QPOASES_HPP_

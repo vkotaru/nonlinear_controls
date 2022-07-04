@@ -1,5 +1,5 @@
-#ifndef QPOASES_EIGEN_H
-#define QPOASES_EIGEN_H
+#ifndef _NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN_H_
+#define _NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN_H_
 
 #include <eigen3/Eigen/Dense>
 #include <iostream>
@@ -116,4 +116,4 @@ public:
 
 } // namespace nonlinear_controls
 
-#endif // QPOASES_EIGEN_H
+#endif // _NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN_H_

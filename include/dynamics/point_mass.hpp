@@ -61,6 +61,7 @@ public:
 
   void init(const Eigen::Matrix<double, 6, 1> &_state, bool do_log = false, const double time_elapsed = 0) {
     state_ = _state;
+    t = 0;
     if (do_log)
       log(0, state_, Eigen::Vector3d::Zero(), time_elapsed); // Note, dummy input for convenience
   }

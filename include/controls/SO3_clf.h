@@ -8,7 +8,7 @@
 #include "data_types/data_types.hpp"
 #include "geometric_control.h"
 #include "SO3_control.h"
-#include "linear_mpc.h"
+#include "mpc_qpoases.hpp"
 #include "common/qpoases_eigen.hpp"
 #include "common/utils.hpp"
 

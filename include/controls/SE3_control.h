@@ -3,7 +3,7 @@
 
 #include "SO3_control.h"
 #include "data_types/data_types.hpp"
-#include "linear_mpc.h"
+#include "mpc_qpoases.hpp"
 #include <iostream>
 
 namespace nonlinear_controls {

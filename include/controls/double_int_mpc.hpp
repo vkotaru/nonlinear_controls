@@ -1,7 +1,7 @@
 #ifndef NONLINEAR_CONTROLS_DOUBLE_INT_MPC_HPP
 #define NONLINEAR_CONTROLS_DOUBLE_INT_MPC_HPP
 
-#include "linear_mpc.h"
+#include "mpc_qpoases.hpp"
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <qpOASES.hpp>
@@ -53,7 +53,7 @@ public:
         0.6327, -0.0000, 0.0000, 0.2606;
     P = 1e4 * P;
     R = 1 * Eigen::Matrix<double, D, D>::Identity();
-    mpcSolver->set_mpc_gains(Q, P, R);
+    mpcSolver->set_gains(Q, P, R);
 
     /// bounds
     input_lb.resize(nu, 1);
@@ -89,7 +89,7 @@ public:
     std::cout << "R:\n" << std::endl;
     std::cout << _R << std::endl;
 
-    mpcSolver->set_mpc_gains(_Q, _P, _R);
+    mpcSolver->set_gains(_Q, _P, _R);
   }
 
   void set_input_bounds(VectorXd lb, VectorXd ub) {

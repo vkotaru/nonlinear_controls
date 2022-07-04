@@ -9,7 +9,7 @@
 #include "common/utils.hpp"
 #include "data_types/data_types.hpp"
 #include "geometric_control.h"
-#include "linear_mpc.h"
+#include "mpc_qpoases.hpp"
 #include "SO3_control.h"
 
 namespace nonlinear_controls {
