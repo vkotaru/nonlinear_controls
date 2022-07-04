@@ -2,9 +2,11 @@
 #define _NONLINEAR_CONTROLS_LINEAR_MPC_HPP_
 
 #include "common/qpoases_eigen.hpp"
+#include "common/constants.h"
 #include <deque>
 #include <vector>
 #include <stdexcept>
+#include <optional>
 
 namespace nonlinear_controls {
 //////////////////////////////////////////
@@ -28,19 +30,19 @@ public:
       ub.setOnes();
 
       lb = -INFY * lb;
-      ub = INFY * lb;
+      ub = INFY * ub;
     }
     VectorXd lb;
     VectorXd ub;
   };
 protected:
   long N, nx, nu;
-  long nVars, nCons;
+  long nVars{}, nCons{};
 
   bool qp_initialized{false};
   bool solver_initialized{false};
   double cpu_time_limit{0};
-  long MAX_ITER{0};
+  long MaxIter{0};
 
   /// stage state cost
   MatrixXd Q;
@@ -67,8 +69,7 @@ protected:
 public:
   LinearMPCBase(const long &N, const long &nx, const long &nu)
       : N(N), nx(nx), nu(nu), state_bnds_(nx), input_bnds_(nu) {
-    nVars = N * nu;
-    nCons = (N + 1) * nx;
+
 
     /// Sizing all Eigen Dynamic Matrices
     A.resize(nx, nx);
@@ -120,21 +121,22 @@ public:
   virtual void construct() {
     throw std::invalid_argument("LinearMPCBase::construct not implemented");
   }
-  virtual void init(const VectorXd &x0_) {
-
+  virtual void init(const VectorXd &_x0) {
     throw std::invalid_argument("LinearMPCBase::init not implemented");
   }
-  virtual MatrixXd run(const VectorXd &x0_) {
+
+  virtual std::optional<MatrixXd> run(const VectorXd &_x0) {
     throw std::invalid_argument("LinearMPCBase::run not implemented");
   }
-  virtual MatrixXd run(const VectorXd &x0_, const VectorXd &xd_) {
+  virtual std::optional<MatrixXd> run(const VectorXd &_x0, const VectorXd &xd_) {
     throw std::invalid_argument("LinearMPCBase::run not implemented");
   }
-  virtual MatrixXd run(const VectorXd &x0_, const MatrixXd &a,
-                       const MatrixXd &b) {
+  virtual std::optional<MatrixXd> run(const VectorXd &_x0, const MatrixXd &a,
+                                      const MatrixXd &b) {
     throw std::invalid_argument("LinearMPCBase::updateCArrays not implemented");
   }
-  virtual void updateCArrays(const VectorXd &x0_) {
+
+  virtual void updateCArrays(const VectorXd &_x0) {
     throw std::invalid_argument("LinearMPCBase::updateCArrays not implemented");
   }
   virtual void print() {
@@ -142,17 +144,27 @@ public:
   }
 
   // setters
-  void set_max_iter(const int MaxIter) { this->MAX_ITER = MaxIter; }
+  void set_max_iter(const int max_iter) { this->MaxIter = max_iter; }
   void set_cpu_time_limit(const qpOASES::real_t t) {
     cpu_time_limit = t;
   }
-
   virtual Eigen::MatrixXd X() {
     throw std::invalid_argument("LinearMPCBase::print not implemented");
   }
-
   virtual void reset() {
     throw std::invalid_argument("LinearMPCBase::reset not implemented");
+  }
+  bool valid_state(const VectorXd &_x0) {
+    if ((state_bnds_.lb - _x0).maxCoeff() < 0 && (_x0 - state_bnds_.ub).maxCoeff() < 0)
+      return true;
+    else
+      return false;
+  }
+  bool valid_input(const VectorXd &_u0) {
+    if ((input_bnds_.lb - _u0).maxCoeff() < 0 && (_u0 - input_bnds_.ub).maxCoeff() < 0)
+      return true;
+    else
+      return false;
   }
 };
 
@@ -165,7 +177,11 @@ protected:
   VectorXd Uarray;
 
 public:
+  // MPC with state substitution in the dynamics
+  // only N inputs are the optimization variables
   LinearMPC(const long &N, const long &nx, const long &nu) : LinearMPCBase(N, nx, nu) {
+    nVars = N * nu;
+    nCons = (N + 1) * nx;
 
     Sx.resize(nx * (N + 1), nx);
     Sx.setZero();

@@ -37,11 +37,13 @@ public:
 
 
       // State and control limits
-//      qp.addConstraint(cvx::box(cvx::par(state_bnds_.lb), x.col(t), cvx::par(state_bnds_.ub)));
-//      qp.addConstraint(cvx::box(cvx::par(input_bnds_.lb), u.col(t), cvx::par(input_bnds_.ub)));
+      qp.addConstraint(cvx::box(cvx::par(state_bnds_.lb), x.col(t + 1), cvx::par(state_bnds_.ub)));
+      qp.addConstraint(cvx::box(cvx::par(input_bnds_.lb), u.col(t), cvx::par(input_bnds_.ub)));
     }
-    qp.addCostTerm((x.col(N) - cvx::par(xref)).transpose() * cvx::par(P) * (x.col(N) - cvx::par(xref)));
 //    qp.addConstraint(cvx::box(cvx::par(Xlb), x.col(N), cvx::par(Xub)));
+
+    // TERMINAL COST
+    qp.addCostTerm((x.col(N) - cvx::par(xref)).transpose() * cvx::par(P) * (x.col(N) - cvx::par(xref)));
 
 
     // Boundary constraints
@@ -52,18 +54,30 @@ public:
 //    solver->setAlpha(1.0);
   }
 
-  MatrixXd run(const VectorXd &x0_, const VectorXd &xd_) override {
+  void init(const VectorXd &_x0) override {
+    x0 = _x0;
+    construct();
+  }
 
-    this->x0 = x0_;
+  std::optional<MatrixXd> run(const VectorXd &_x0, const VectorXd &xd_) override {
+    if (!valid_state(_x0)) {
+      Logger::ERROR("Infeasible initial condition!");
+      return std::nullopt;
+    }
+
+    this->x0 = _x0;
     this->xref = xd_;
-    solver->solve(verbose);
+    solver->solve(false);
     Eigen::MatrixXd x_sol = eval(x);
     Eigen::MatrixXd u_sol = eval(u);
 
-    return u_sol;
+    return std::optional<MatrixXd>{u_sol};
   }
   void reset() override {
 
+  }
+  Eigen::MatrixXd X() override {
+    return eval(x);
   }
 
 };

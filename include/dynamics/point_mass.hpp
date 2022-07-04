@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-#include "nonlinear_controls.h"
+//#include "nonlinear_controls.h"
 #include "matplotlibcpp.h"
 
 namespace nonlinear_controls {
@@ -67,7 +67,7 @@ public:
   }
 
   void step(const Eigen::Vector3d &u, bool do_log = false, const double time_elapsed = 0) {
-    Eigen::Vector3d net_accel = (u - GRAVITY_VECTOR) / mass;
+    Eigen::Vector3d net_accel = (u - Eigen::Vector3d(0., 0., 9.81)) / mass;
     state_ = A_ * state_ + B_ * net_accel;
     t += h;
     if (do_log)

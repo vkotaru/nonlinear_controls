@@ -41,7 +41,11 @@ set(CONTROL_SRCS
         src/qp_interface.cpp
         src/SO3_clf.cpp
         src/tracking_mpc.cpp
-        include/common/constants.h include/common/log.hpp examples/mpc_point_mass.cpp include/controls/mpc_epigraph.hpp include/common/osqp_eigen.h include/controls/linear_mpc.hpp)
+        include/common/constants.h
+        include/common/log.hpp
+        examples/mpc_point_mass.cpp
+        include/controls/mpc_epigraph.hpp
+        include/controls/linear_mpc.hpp)
 
 add_subdirectory(third_party)
 
@@ -56,10 +60,10 @@ add_executable(test_main tests/test_nlc.cpp)
 target_link_libraries(test_main nonlinear_controls)
 add_executable(test_qp tests/test_qp.cpp)
 target_link_libraries(test_qp nonlinear_controls)
-add_executable(test_mpc tests/test_mpc.cpp)
-target_link_libraries(test_mpc nonlinear_controls)
-#add_executable(osqpMPCExample tests/test_osqp_mpc.cpp)
-#target_link_libraries(osqpMPCExample nonlinear_controls)
+#add_executable(test_mpc tests/test_mpc.cpp)
+#target_link_libraries(test_mpc nonlinear_controls)
+add_executable(osqpMPCExample tests/test_osqp_mpc.cpp)
+target_link_libraries(osqpMPCExample nonlinear_controls)
 
 # examples
 add_executable(example_point_mass examples/mpc_point_mass.cpp)

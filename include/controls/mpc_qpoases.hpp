@@ -5,6 +5,7 @@
 #include <deque>
 #include <vector>
 #include "controls/linear_mpc.hpp"
+#include "common/log.hpp"
 
 namespace nonlinear_controls {
 
@@ -25,6 +26,50 @@ protected:
     options.printLevel = qpOASES::PL_LOW;
     solver->setOptions(options);
     nWSR = 1e7;
+  }
+
+  std::optional<MatrixXd> solve(const VectorXd &_x0) {
+    this->updateCArrays(_x0);
+    /**
+     * NOTE: the qpOASES solver works only if the
+     * "n" is locally defined and passed to the solver
+     * otherwise, the solver becomes infeasible
+     *
+     * Please refer qpOASES GitHub/forums for discussion on this
+     * https://github.com/coin-or/qpOASES/issues/83#issuecomment-762053495
+     *
+     * nWSR is currently used as an input and an output variable.
+     * This means that the maximum number of allowed working set changes will decrease monotonically
+     * and will eventually trigger the error. Just make sure to set nWSR before each call to hotstart.
+     **/
+    int n = nWSR;
+    qpOASES::returnValue sol;
+    if (!solver_initialized) {
+      sol = solver->init(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, n, 0);
+      solver_initialized = true;
+    } else {
+      sol = solver->hotstart(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, n, 0);
+    }
+
+    qpOASES::real_t xOpt[nVars];
+    solver->getPrimalSolution(xOpt);
+
+    if (verbose) {
+      if (sol == qpOASES::SUCCESSFUL_RETURN) {
+        std::cout << "SUCCESSFUL_RETURN" << std::endl;
+      } else if (sol == qpOASES::RET_MAX_NWSR_REACHED) {
+        std::cout << "RET_MAX_NWSR_REACHED" << std::endl;
+      } else if (sol == qpOASES::RET_INIT_FAILED) {
+        std::cout << "RET_INIT_FAILED" << std::endl;
+      } else {
+        std::cout << "Something else" << std::endl;
+      }
+    }
+
+    Eigen::Matrix<double, Eigen::Dynamic, 1> xOptVec;
+    xOptVec =
+        Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(xOpt, nVars, 1);
+    return std::optional<MatrixXd>{xOptVec};
   }
 
 public:
@@ -67,10 +112,10 @@ public:
     std::cout << "-------------------*****---------------------------"
               << std::endl;
   }
-  void updateCArrays(const VectorXd &x0) override {
-    data_.lbA = (Xlb - Sx * x0);
-    data_.ubA = (Xub - Sx * x0);
-    data_.g = (2 * F.transpose() * x0);
+  void updateCArrays(const VectorXd &_x0) override {
+    data_.lbA = (Xlb - Sx * _x0);
+    data_.ubA = (Xub - Sx * _x0);
+    data_.g = (2 * F.transpose() * _x0);
     //  print();
     Hc = data_.H.transpose().data();
     Ac = data_.A.transpose().data();
@@ -80,57 +125,14 @@ public:
     lbAc = data_.lbA.transpose().data();
     ubAc = data_.ubA.transpose().data();
   }
-
-  MatrixXd run(const VectorXd &x0) override {
-    this->updateCArrays(x0);
-    /**
-     * NOTE: the qpOASES solver works only if the
-     * "n" is locally defined and passed to the solver
-     * otherwise, the solver becomes infeasible
-     *
-     * Please refer qpOASES GitHub/forums for discussion on this
-     * https://github.com/coin-or/qpOASES/issues/83#issuecomment-762053495
-     *
-     * nWSR is currently used as an input and an output variable.
-     * This means that the maximum number of allowed working set changes will decrease monotonically
-     * and will eventually trigger the error. Just make sure to set nWSR before each call to hotstart.
-     **/
-    int n = nWSR;
-    qpOASES::real_t cpu_time = cpu_time_limit; //produce result within the time-step
-
-    qpOASES::returnValue sol;
-    if (!solver_initialized) {
-      sol = solver->init(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, n, 0);
-      solver_initialized = true;
-    } else {
-      sol = solver->hotstart(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, n, 0);
+  std::optional<MatrixXd> run(const VectorXd &_x0, const VectorXd &xd_) override {
+    if (!valid_state(_x0)) {
+      Logger::ERROR("Infeasible initial condition!");
+      return std::nullopt;
     }
-
-    qpOASES::real_t xOpt[nVars];
-    solver->getPrimalSolution(xOpt);
-
-    if (verbose) {
-      if (sol == qpOASES::SUCCESSFUL_RETURN) {
-        std::cout << "SUCCESSFUL_RETURN" << std::endl;
-      } else if (sol == qpOASES::RET_MAX_NWSR_REACHED) {
-        std::cout << "RET_MAX_NWSR_REACHED" << std::endl;
-      } else if (sol == qpOASES::RET_INIT_FAILED) {
-        std::cout << "RET_INIT_FAILED" << std::endl;
-      } else {
-        std::cout << "Something else" << std::endl;
-      }
-    }
-
-    Eigen::Matrix<double, Eigen::Dynamic, 1> xOptVec;
-    xOptVec =
-        Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(xOpt, nVars, 1);
-    return xOptVec;
-  }
-  MatrixXd run(const VectorXd &x0_, const VectorXd &xd_) override {
-    return run(x0_ - xd_);
-  }
-  MatrixXd run(const VectorXd &x0, const MatrixXd &a, const MatrixXd &b) override {
-    return run(x0);
+    Xlb = (state_bnds_.lb - xd_).replicate(N + 1, 1);
+    Xub = (state_bnds_.ub - xd_).replicate(N + 1, 1);
+    return solve(_x0 - xd_);
   }
   void reset() override {
     solver_initialized = false;

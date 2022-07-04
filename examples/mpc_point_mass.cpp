@@ -10,7 +10,7 @@ namespace plt = matplotlibcpp;
 namespace nlc = nonlinear_controls;
 
 enum class SOLVER_TYPE {
-  EPIGRAPH=0,
+  EPIGRAPH = 0,
   QPOASES,
   COUNT
 };
@@ -74,24 +74,38 @@ void run_simulation(const int horizon, SOLVER_TYPE solve_type_) {
   // state & input bounds
   Eigen::Matrix<double, 6, 1> state_lb, state_ub;
   Eigen::Matrix<double, 3, 1> input_lb, input_ub;
+
   state_lb << -2., -2.5, 0., -2, -2, -2;
   state_ub << 2., 2.5, 4., 2., 2., 2;
+
   input_lb = -G_SI * Eigen::Matrix<double, 3, 1>::Ones();
   input_ub = -input_lb;
 
+//  state_lb = -5*Eigen::Matrix<double, 6, 1>::Ones();
+//  state_ub = 5*Eigen::Matrix<double, 6, 1>::Ones();
+
 //  controller_->set_input_bounds(input_lb, input_ub);
-//  controller_->set_state_bounds(state_lb, state_ub);
+  controller_->set_state_bounds(state_lb, state_ub);
 //  controller_->set_cpu_time_limit(h);
 
   // construct the mpc
   controller_->construct();
 
-  nlc::MatrixXd K, zOpt, uOpt;
+  nlc::MatrixXd K, uOpt;
   uOpt.resize(nu, 1);
-  zOpt.resize(N * nu, 1);
+//  zOpt.resize(N * nu, 1);
   K.resize(nu, nx);
   K << 30.6287 * Eigen::Matrix3d::Identity(),
       12.4527 * Eigen::Matrix3d::Identity();
+
+  Eigen::Matrix<double, 6, 10> x0s;
+  x0s.col(0) << -1, -1, -1, 0, 0, 0;
+  x0s.col(1) << -0.012834, 0.94555, 0.414966, 0.542715, 0.05349, 0.539828;
+  for (int i = 0; i < 7; i++) {
+    x0s.col(i + 2) = Eigen::Matrix<double, 6, 1>::Random();
+    x0s(2, i + 2) = std::abs(x0s(2, i + 2));
+  }
+  x0s.col(9) << 0, 0, -1, 0, 0, 0;
 
   for (int k = 0; k < 10; k++) {
     //
@@ -99,11 +113,7 @@ void run_simulation(const int horizon, SOLVER_TYPE solve_type_) {
     //
     Eigen::Matrix<double, 6, 1> goal_state{}, state{};
 
-    if (k == 0) {
-      state << -0.012834, 0.94555, -0.414966, 0.542715, 0.05349, 0.539828;
-    } else {
-      state = Eigen::Matrix<double, 6, 1>::Random();
-    }
+    state = x0s.col(k);
     goal_state << 0., 0.0, 0, 0.0, 0.0, 0.0;
 
     /// qpOASES fails for this condition
@@ -118,16 +128,17 @@ void run_simulation(const int horizon, SOLVER_TYPE solve_type_) {
     double avg_time_elapsed = 0;
     double max_time_elapsed = -INFY;
     for (int j = 0; j < MAX_ITER_STEPS; ++j) {
-
-      // controller_->set_state_bounds(state_lb - goal_state, state_ub - goal_state);
-
       /// LQR (for sanity check)
       auto uPD = -K * (state - goal_state);
 
       /// running mpc controller
       auto start = nlc::utils::get_current_time();
-      zOpt = controller_->run(state, goal_state);
-      uOpt = zOpt.block(0, 0, nu, 1);
+      auto zOpt = controller_->run(state, goal_state);
+      if (zOpt.has_value()) {
+        uOpt = zOpt.value().block(0, 0, nu, 1);
+      } else {
+        break;
+      }
       auto end = nlc::utils::get_current_time();
       auto time_elapsed = (double(end - start) * 1e-6);
       avg_time_elapsed += time_elapsed;
