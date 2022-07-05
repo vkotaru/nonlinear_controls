@@ -69,6 +69,8 @@ protected:
     Eigen::Matrix<double, Eigen::Dynamic, 1> xOptVec;
     xOptVec =
         Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(xOpt, nVars, 1);
+
+    Uarray = xOptVec; // saved for generating the trajectory
     return std::optional<MatrixXd>{xOptVec};
   }
 
@@ -130,6 +132,9 @@ public:
       Logger::ERROR("Infeasible initial condition!");
       return std::nullopt;
     }
+    this->x0 = _x0;
+    this->xref = xd_;
+
     Xlb = (state_bnds_.lb - xd_).replicate(N + 1, 1);
     Xub = (state_bnds_.ub - xd_).replicate(N + 1, 1);
     return solve(_x0 - xd_);
@@ -137,7 +142,18 @@ public:
   void reset() override {
     solver_initialized = false;
   }
-
+  Eigen::MatrixXd X() override {
+    // use this function only after the solve function is implemented
+    Eigen::MatrixXd x_traj;
+    x_traj.resize(nx, N);
+    x_traj.setZero();
+    Eigen::VectorXd x = x0 - xref;
+    for (int i = 0; i < N; ++i) {
+      x = A * x + B * Uarray.block(nu * i, 0, nu, 1);
+      x_traj.col(i) = x + xref;
+    }
+    return x_traj;
+  }
 };
 
 } // namespace nonlinear_controls
