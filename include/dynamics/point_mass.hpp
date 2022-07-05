@@ -1,3 +1,6 @@
+#ifndef _NONLINEAR_CONTROLS_DYNAMICS_POINT_MASS_HPP_
+#define _NONLINEAR_CONTROLS_DYNAMICS_POINT_MASS_HPP_
+
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <vector>
@@ -5,8 +8,8 @@
 //#include "nonlinear_controls.h"
 #include "matplotlibcpp.h"
 
-namespace nonlinear_controls {
 namespace plt = matplotlibcpp;
+namespace nonlinear_controls {
 
 class PointMass3D {
 public:
@@ -129,4 +132,5 @@ public:
 
 };
 
-}
+} // namespace nonlinear controls
+#endif // _NONLINEAR_CONTROLS_DYNAMICS_POINT_MASS_HPP_
