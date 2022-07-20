@@ -58,11 +58,11 @@ public:
   Eigen::Vector3d Omega;
   Eigen::Vector3d dOmega; // feed-forward usage
 
-
   TSO3 &operator=(const TSO3 &other) {
     this->R = other.R;
     this->Omega = other.Omega;
     this->dOmega = other.dOmega;
+    return *this;
   }
 
   Eigen::Matrix<double, 6, 1> error(const TSO3 &other) {

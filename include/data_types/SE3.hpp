@@ -26,6 +26,7 @@ public:
     this->R = other.R;
     this->Omega = other.Omega;
     this->dOmega = other.dOmega;
+    return *this;
   }
 
   void print() const override {
