@@ -32,7 +32,7 @@ public:
       qp.addConstraint(cvx::equalTo(x.col(t + 1), cvx::par(A) * x.col(t) + cvx::par(B) * u.col(t)));
 
       // cost
-      qp.addCostTerm((x.col(t) - cvx::par(xref)).transpose() * cvx::par(Q) * (x.col(t) - cvx::par(xref)));
+      qp.addCostTerm((x.col(t) - cvx::dynpar(xref)).transpose() * cvx::par(Q) * (x.col(t) - cvx::dynpar(xref)));
       qp.addCostTerm(u.col(t).transpose() * cvx::par(R) * u.col(t));
 
 
@@ -43,7 +43,7 @@ public:
 //    qp.addConstraint(cvx::box(cvx::par(Xlb), x.col(N), cvx::par(Xub)));
 
     // TERMINAL COST
-    qp.addCostTerm((x.col(N) - cvx::par(xref)).transpose() * cvx::par(P) * (x.col(N) - cvx::par(xref)));
+    qp.addCostTerm((x.col(N) - cvx::dynpar(xref)).transpose() * cvx::par(P) * (x.col(N) - cvx::dynpar(xref)));
 
 
     // Boundary constraints
