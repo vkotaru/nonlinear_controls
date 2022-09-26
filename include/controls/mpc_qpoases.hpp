@@ -2,8 +2,6 @@
 #define _NONLINEAR_CONTROLS_MPC_QPOASES_HPP_
 
 #include "common/qpoases_eigen.hpp"
-#include <deque>
-#include <vector>
 #include "controls/linear_mpc.hpp"
 #include "common/log.hpp"
 

@@ -164,7 +164,6 @@ void run_simulation(const int horizon, SOLVER_TYPE solve_type_) {
 }
 
 int main(int argc, char *argv[]) {
-
   int N{5};
   SOLVER_TYPE solver_type_{SOLVER_TYPE::EPIGRAPH};
 
@@ -194,3 +193,4 @@ int main(int argc, char *argv[]) {
   std::cout << "N: " << N << " solver type " << int(solver_type_) << std::endl;
   run_simulation(N, solver_type_);
 }
+

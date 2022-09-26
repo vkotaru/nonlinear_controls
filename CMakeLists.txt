@@ -7,12 +7,12 @@ set(CMAKE_CXX_FLAGS "-O3")
 #set(CMAKE_CXX_FLAGS "-Wall -Os")
 SET(CMAKE_BUILD_TYPE Release)
 
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
 
 find_package(OsqpEigen)
 find_package(Eigen3)
+
+find_package(PythonLibs 3.8 REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 include_directories(
@@ -20,6 +20,9 @@ include_directories(
         third_party/cvxgen
         third_party/qpOASES
         third_party/qpOASES/include
+        /usr/include/python3.8
+        /usr/lib/python3.8/site-packages/numpy/core/include/
+        third_party/matplotlib-cpp
 )
 
 set(INCLUDE_DIRS
@@ -27,7 +30,6 @@ set(INCLUDE_DIRS
         third_party/cvxgen
         third_party/qpOASES
         third_party/qpOASES/include
-        third_party/matplotlib-cpp # TODO learn why this is working and not include_directories
         )
 
 set(QUADPROG_SRCS
@@ -52,8 +54,9 @@ add_subdirectory(third_party)
 set(CMAKE_BUILD_TYPE Debug)
 
 add_library(nonlinear_controls ${CONTROL_SRCS} ${QUADPROG_SRCS})
-target_link_libraries(nonlinear_controls qpOASES_cpp epigraph  OsqpEigen::OsqpEigen ${PYTHON_LIBRARIES})
+target_link_libraries(nonlinear_controls qpOASES epigraph  OsqpEigen::OsqpEigen ${PYTHON_LIBRARIES})
 target_include_directories(nonlinear_controls PUBLIC . ${INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set_target_properties(nonlinear_controls PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # tests
 add_executable(test_main tests/test_nlc.cpp)
@@ -68,5 +71,4 @@ target_link_libraries(osqpMPCExample nonlinear_controls)
 # examples
 add_executable(example_point_mass examples/mpc_point_mass.cpp)
 target_link_libraries(example_point_mass nonlinear_controls)
-
 

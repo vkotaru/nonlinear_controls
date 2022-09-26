@@ -9,3 +9,4 @@ docs/
 cmake-build-release/
 cmake-build-debug/
 cmake-build-relwithdebinfo/
+tmp/
