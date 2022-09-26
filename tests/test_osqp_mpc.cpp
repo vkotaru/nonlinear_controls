@@ -4,11 +4,11 @@
 #include <iostream>
 
 #include "dynamics/point_mass.hpp"
-#include "matplotlibcpp.h"
+// #include "matplotlibcpp.h"
 #include "common/utils.hpp"
 #include "common/log.hpp"
 
-namespace plt = matplotlibcpp;
+// namespace plt = matplotlibcpp;
 namespace nlc = nonlinear_controls;
 
 void setDynamicsMatrices(Eigen::Matrix<double, 6, 6> &a, Eigen::Matrix<double, 6, 3> &b) {

@@ -3,10 +3,10 @@
 #include <vector>
 
 #include "nonlinear_controls.h"
-#include "matplotlibcpp.h"
+// #include "matplotlibcpp.h"
 #include "epigraph.hpp"
 
-namespace plt = matplotlibcpp;
+// namespace plt = matplotlibcpp;
 namespace nlc = nonlinear_controls;
 
 enum class SOLVER_TYPE {

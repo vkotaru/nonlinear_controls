@@ -2,11 +2,11 @@
 #include <iostream>
 #include <vector>
 
-//#include "nonlinear_controls.h"
-#include "matplotlibcpp.h"
+// #include "nonlinear_controls.h"
+// #include "matplotlibcpp.h"
 
 namespace nonlinear_controls {
-namespace plt = matplotlibcpp;
+// namespace plt = matplotlibcpp;
 
 class PointMass3D {
 public:
@@ -94,30 +94,31 @@ public:
   }
 
   void plot() const {
+    // Logger::ERROR("Not Implemented!");
     /// plots
-    plt::suptitle("Position MPC LTI");
-    plt::subplot(2, 2, 1);
-    plt::plot(log_vars.t, log_vars.x, "r-");
-    plt::plot(log_vars.t, log_vars.y, "g--");
-    plt::plot(log_vars.t, log_vars.z, "b-.");
-    plt::grid(true);
+    // plt::suptitle("Position MPC LTI");
+    // plt::subplot(2, 2, 1);
+    // plt::plot(log_vars.t, log_vars.x, "r-");
+    // plt::plot(log_vars.t, log_vars.y, "g--");
+    // plt::plot(log_vars.t, log_vars.z, "b-.");
+    // plt::grid(true);
 
-    plt::subplot(2, 2, 2);
-    plt::plot(log_vars.t, log_vars.ux, "r-");
-    plt::plot(log_vars.t, log_vars.uy, "g--");
-    plt::plot(log_vars.t, log_vars.uz, "b-.");
-    plt::grid(true);
+    // plt::subplot(2, 2, 2);
+    // plt::plot(log_vars.t, log_vars.ux, "r-");
+    // plt::plot(log_vars.t, log_vars.uy, "g--");
+    // plt::plot(log_vars.t, log_vars.uz, "b-.");
+    // plt::grid(true);
 
-    plt::subplot(2, 2, 3);
-    plt::plot(log_vars.t, log_vars.vx, "r-");
-    plt::plot(log_vars.t, log_vars.vy, "g--");
-    plt::plot(log_vars.t, log_vars.vz, "b-.");
-    plt::grid(true);
+    // plt::subplot(2, 2, 3);
+    // plt::plot(log_vars.t, log_vars.vx, "r-");
+    // plt::plot(log_vars.t, log_vars.vy, "g--");
+    // plt::plot(log_vars.t, log_vars.vz, "b-.");
+    // plt::grid(true);
 
-    plt::subplot(2, 2, 4);
-    plt::plot(log_vars.t, log_vars.time_elapsed, "r-");
-    plt::grid(true);
-    plt::show();
+    // plt::subplot(2, 2, 4);
+    // plt::plot(log_vars.t, log_vars.time_elapsed, "r-");
+    // plt::grid(true);
+    // plt::show();
   }
   void clear_log_vars() {
     log_vars.clear();

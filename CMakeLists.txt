@@ -7,10 +7,6 @@ set(CMAKE_CXX_FLAGS "-O3")
 #set(CMAKE_CXX_FLAGS "-Wall -Os")
 SET(CMAKE_BUILD_TYPE Release)
 
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
-
 find_package(OsqpEigen)
 find_package(Eigen3)
 
@@ -27,7 +23,6 @@ set(INCLUDE_DIRS
         third_party/cvxgen
         third_party/qpOASES
         third_party/qpOASES/include
-        third_party/matplotlib-cpp # TODO learn why this is working and not include_directories
         )
 
 set(QUADPROG_SRCS
@@ -52,7 +47,7 @@ add_subdirectory(third_party)
 set(CMAKE_BUILD_TYPE Debug)
 
 add_library(nonlinear_controls ${CONTROL_SRCS} ${QUADPROG_SRCS})
-target_link_libraries(nonlinear_controls qpOASES_cpp epigraph  OsqpEigen::OsqpEigen ${PYTHON_LIBRARIES})
+target_link_libraries(nonlinear_controls qpOASES_cpp epigraph  OsqpEigen::OsqpEigen)
 target_include_directories(nonlinear_controls PUBLIC . ${INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # tests
