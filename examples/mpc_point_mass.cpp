@@ -155,8 +155,8 @@ void run_simulation(const int horizon, SOLVER_TYPE solve_type_) {
     }
     avg_time_elapsed = avg_time_elapsed / MAX_ITER_STEPS;
     nlc::Logger::WARN(
-        "Average time elapsed: " + std::to_string(avg_time_elapsed) + " max time elapsed: "
-            + std::to_string(max_time_elapsed));
+        "Average time elapsed (ms): " + std::to_string(avg_time_elapsed*SECOND_TO_MILLISECOND) + "max time elapsed (ms): "
+            + std::to_string(max_time_elapsed*SECOND_TO_MILLISECOND));
     dynamics_.plot();
     controller_->reset();
   }
