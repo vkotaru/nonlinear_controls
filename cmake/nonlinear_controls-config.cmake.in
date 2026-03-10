@@ -1,0 +1,29 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Required dependencies
+find_dependency(Eigen3 REQUIRED)
+
+# Find the installed library
+find_library(NONLINEAR_CONTROLS_LIBRARY
+    NAMES nonlinear_controls
+    PATHS "${PACKAGE_PREFIX_DIR}/lib"
+)
+
+find_library(QPOASES_LIBRARY
+    NAMES qpOASES
+    PATHS "${PACKAGE_PREFIX_DIR}/lib"
+)
+
+# Create imported target
+if(NOT TARGET nonlinear_controls::nonlinear_controls)
+    add_library(nonlinear_controls::nonlinear_controls STATIC IMPORTED)
+    set_target_properties(nonlinear_controls::nonlinear_controls PROPERTIES
+        IMPORTED_LOCATION "${NONLINEAR_CONTROLS_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${PACKAGE_PREFIX_DIR}/include"
+        INTERFACE_LINK_LIBRARIES "Eigen3::Eigen;${QPOASES_LIBRARY}"
+    )
+endif()
+
+check_required_components(nonlinear_controls)

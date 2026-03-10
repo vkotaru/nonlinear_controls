@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main, develop]
+
+jobs:
+  build-and-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+        compiler:
+          - { cc: gcc-11, cxx: g++-11 }
+          - { cc: gcc-12, cxx: g++-12 }
+          - { cc: clang-14, cxx: clang++-14 }
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libeigen3-dev \
+          ${{ matrix.compiler.cc }} \
+          ${{ matrix.compiler.cxx }}
+
+    - name: Configure CMake
+      env:
+        CC: ${{ matrix.compiler.cc }}
+        CXX: ${{ matrix.compiler.cxx }}
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DNLC_BUILD_TESTS=ON \
+          -DNLC_BUILD_EXAMPLES=ON \
+          -DNLC_ENABLE_MATPLOTLIB=OFF \
+          -DNLC_ENABLE_EPIGRAPH=OFF
+
+    - name: Build
+      run: cmake --build build --config Release -j$(nproc)
+
+    - name: Test
+      working-directory: build
+      run: ctest -C Release --output-on-failure --parallel $(nproc)
+
+  clang-format:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install clang-format
+      run: sudo apt-get update && sudo apt-get install -y clang-format-17
+
+    - name: Check formatting
+      run: |
+        find src include -name '*.cpp' -o -name '*.hpp' -o -name '*.h' | \
+          xargs clang-format-17 --dry-run --Werror
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Doxygen
+      run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+    - name: Generate Documentation
+      run: doxygen Doxyfile
+
+    - name: Upload Documentation Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation
+        path: docs/html
+        retention-days: 7

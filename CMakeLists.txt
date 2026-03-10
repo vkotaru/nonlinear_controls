@@ -1,72 +1,226 @@
-cmake_minimum_required(VERSION 3.3.2)
-project(nonlinear_controls)
+cmake_minimum_required(VERSION 3.20)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-O3")
-#set(CMAKE_CXX_FLAGS "-Wall -Os")
-SET(CMAKE_BUILD_TYPE Release)
-
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
-add_definitions(-DMATPLOTLIBCPP_PYTHON_HEADER=Python.h)
-
-find_package(OsqpEigen)
-find_package(Eigen3)
-
-include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
-include_directories(
-        include
-        third_party/cvxgen
-        third_party/qpOASES
-        third_party/qpOASES/include
+project(nonlinear_controls
+    VERSION 1.0.0
+    LANGUAGES CXX
+    DESCRIPTION "C++ library for nonlinear control systems"
 )
 
-set(INCLUDE_DIRS
-        include
-        third_party/cvxgen
-        third_party/qpOASES
-        third_party/qpOASES/include
-        third_party/matplotlib-cpp # TODO learn why this is working and not include_directories
-        )
+# ------------------------------------------------------------------------------
+# Build Configuration
+# ------------------------------------------------------------------------------
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(QUADPROG_SRCS
-        src/quadprog/quadprog.cpp
-        src/quadprog/qpswift_eigen.cpp
-        )
+# Set default build type if not specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+        "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
+endif()
 
-set(CONTROL_SRCS
-        src/SO3_control.cpp
-        src/SE3_control.cpp
-        src/qp_interface.cpp
-        src/SO3_clf.cpp
-        src/tracking_mpc.cpp
-        include/common/constants.h
-        include/common/log.hpp
-        examples/mpc_point_mass.cpp
-        include/controls/mpc_epigraph.hpp
-        include/controls/linear_mpc.hpp)
+# Export compile commands for IDE support
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# ------------------------------------------------------------------------------
+# Options
+# ------------------------------------------------------------------------------
+option(NLC_BUILD_TESTS "Build unit tests" ON)
+option(NLC_BUILD_EXAMPLES "Build example applications" ON)
+option(NLC_ENABLE_MATPLOTLIB "Enable matplotlib-cpp for plotting (requires Python)" OFF)
+option(NLC_ENABLE_EPIGRAPH "Enable Epigraph solver support" ON)
+
+# ------------------------------------------------------------------------------
+# Dependencies
+# ------------------------------------------------------------------------------
+find_package(Eigen3 REQUIRED)
+find_package(OsqpEigen QUIET)
+
+if(NOT OsqpEigen_FOUND)
+    message(WARNING "OsqpEigen not found. Some features may be unavailable.")
+endif()
+
+# Optional matplotlib support
+if(NLC_ENABLE_MATPLOTLIB)
+    find_package(Python3 COMPONENTS Development REQUIRED)
+endif()
+
+# ------------------------------------------------------------------------------
+# Third-party libraries
+# ------------------------------------------------------------------------------
 add_subdirectory(third_party)
 
-set(CMAKE_BUILD_TYPE Debug)
+# ------------------------------------------------------------------------------
+# Library Sources
+# ------------------------------------------------------------------------------
+set(NLC_SOURCES
+    src/SO3_control.cpp
+    src/SE3_control.cpp
+    src/qp_interface.cpp
+    src/SO3_clf.cpp
+    src/tracking_mpc.cpp
+    src/quadprog/quadprog.cpp
+    src/quadprog/qpswift_eigen.cpp
+)
 
-add_library(nonlinear_controls ${CONTROL_SRCS} ${QUADPROG_SRCS})
-target_link_libraries(nonlinear_controls qpOASES_cpp epigraph  OsqpEigen::OsqpEigen ${PYTHON_LIBRARIES})
-target_include_directories(nonlinear_controls PUBLIC . ${INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# ------------------------------------------------------------------------------
+# Main Library Target
+# ------------------------------------------------------------------------------
+add_library(nonlinear_controls ${NLC_SOURCES})
+add_library(nonlinear_controls::nonlinear_controls ALIAS nonlinear_controls)
 
-# tests
-add_executable(test_main tests/test_nlc.cpp)
-target_link_libraries(test_main nonlinear_controls)
-add_executable(test_qp tests/test_qp.cpp)
-target_link_libraries(test_qp nonlinear_controls)
-#add_executable(test_mpc tests/test_mpc.cpp)
-#target_link_libraries(test_mpc nonlinear_controls)
-add_executable(osqpMPCExample tests/test_osqp_mpc.cpp)
-target_link_libraries(osqpMPCExample nonlinear_controls)
+target_include_directories(nonlinear_controls
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/cvxgen
+)
 
-# examples
-add_executable(example_point_mass examples/mpc_point_mass.cpp)
-target_link_libraries(example_point_mass nonlinear_controls)
+target_link_libraries(nonlinear_controls
+    PUBLIC
+        Eigen3::Eigen
+    PRIVATE
+        qpOASES
+        $<$<BOOL:${OsqpEigen_FOUND}>:OsqpEigen::OsqpEigen>
+)
 
+# Need qpOASES headers for public API (mpc_qpoases.hpp)
+target_include_directories(nonlinear_controls
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/third_party/qpOASES/include>
+)
 
+# Link Epigraph if enabled (PRIVATE since bundled third-party)
+if(NLC_ENABLE_EPIGRAPH)
+    target_link_libraries(nonlinear_controls PRIVATE epigraph)
+    target_compile_definitions(nonlinear_controls PUBLIC NLC_HAS_EPIGRAPH)
+    target_include_directories(nonlinear_controls
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/third_party/Epigraph/include>
+    )
+endif()
+
+# Matplotlib support (optional)
+if(NLC_ENABLE_MATPLOTLIB)
+    target_include_directories(nonlinear_controls PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/matplotlib-cpp)
+    target_link_libraries(nonlinear_controls PRIVATE Python3::Python)
+    target_compile_definitions(nonlinear_controls PRIVATE
+        MATPLOTLIBCPP_PYTHON_HEADER=Python.h
+        NLC_HAS_MATPLOTLIB)
+endif()
+
+# Compiler warnings for our code
+target_compile_options(nonlinear_controls PRIVATE
+    $<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wall -Wextra -Wpedantic>
+    $<$<CXX_COMPILER_ID:MSVC>:/W4>
+)
+
+# ------------------------------------------------------------------------------
+# Tests
+# ------------------------------------------------------------------------------
+if(NLC_BUILD_TESTS)
+    enable_testing()
+    include(FetchContent)
+
+    FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG v1.14.0
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    add_subdirectory(tests)
+endif()
+
+# ------------------------------------------------------------------------------
+# Examples
+# ------------------------------------------------------------------------------
+if(NLC_BUILD_EXAMPLES)
+    # Only build examples that don't require matplotlib, or if matplotlib is enabled
+    if(NLC_ENABLE_MATPLOTLIB AND NLC_ENABLE_EPIGRAPH)
+        add_executable(example_point_mass examples/mpc_point_mass.cpp)
+        target_link_libraries(example_point_mass PRIVATE nonlinear_controls)
+        target_include_directories(example_point_mass PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/third_party/matplotlib-cpp)
+    else()
+        message(STATUS "Skipping example_point_mass (requires NLC_ENABLE_MATPLOTLIB and NLC_ENABLE_EPIGRAPH)")
+    endif()
+endif()
+
+# ------------------------------------------------------------------------------
+# Installation
+# ------------------------------------------------------------------------------
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+# Install library (without export set due to third-party dependencies)
+install(TARGETS nonlinear_controls qpOASES
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+if(NLC_ENABLE_EPIGRAPH)
+    install(TARGETS epigraph
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif()
+
+# Install headers
+install(DIRECTORY include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN "*.hpp"
+)
+
+# Install third-party headers needed by public API
+install(DIRECTORY third_party/qpOASES/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+if(NLC_ENABLE_EPIGRAPH)
+    install(DIRECTORY third_party/Epigraph/include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    )
+endif()
+
+# Generate version file
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/nonlinear_controls-config-version.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+# Generate config file
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/nonlinear_controls-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/nonlinear_controls-config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/nonlinear_controls
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/nonlinear_controls-config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/nonlinear_controls-config-version.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/nonlinear_controls
+)
+
+# ------------------------------------------------------------------------------
+# Summary
+# ------------------------------------------------------------------------------
+message(STATUS "")
+message(STATUS "nonlinear_controls ${PROJECT_VERSION}")
+message(STATUS "  Build type:     ${CMAKE_BUILD_TYPE}")
+message(STATUS "  Tests:          ${NLC_BUILD_TESTS}")
+message(STATUS "  Examples:       ${NLC_BUILD_EXAMPLES}")
+message(STATUS "  Matplotlib:     ${NLC_ENABLE_MATPLOTLIB}")
+message(STATUS "  Epigraph:       ${NLC_ENABLE_EPIGRAPH}")
+message(STATUS "  OsqpEigen:      ${OsqpEigen_FOUND}")
+message(STATUS "")

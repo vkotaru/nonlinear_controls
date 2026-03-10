@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "nonlinear-controls",
+  "version": "1.0.0",
+  "description": "C++ library for nonlinear control systems including MPC, CLF-QP, and geometric controllers",
+  "homepage": "https://github.com/vkotaru/nonlinear_controls",
+  "license": "BSD-3-Clause",
+  "dependencies": [
+    "eigen3"
+  ],
+  "features": {
+    "osqp": {
+      "description": "Enable OSQP solver support via OsqpEigen",
+      "dependencies": ["osqp-eigen"]
+    },
+    "tests": {
+      "description": "Build unit tests",
+      "dependencies": ["gtest"]
+    }
+  }
+}
