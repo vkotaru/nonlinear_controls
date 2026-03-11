@@ -4,6 +4,7 @@
 #include "mpc_qpoases.hpp"
 #include <eigen3/Eigen/Dense>
 #include <iostream>
+#include <memory>
 #include <qpOASES.hpp>
 
 namespace nonlinear_controls {
@@ -14,7 +15,7 @@ protected:
   int N, nx, nu;
   double dt;
 
-  LinearMPC *mpcSolver;
+  std::unique_ptr<LinearMPC> mpcSolver;
   VectorXd err_state, uOpt;
 
   MatrixXd A, B;                                   // Dynamics
@@ -25,7 +26,7 @@ public:
   DoubleIntMPC(const int N, const double _dt) : N(N), dt(_dt) {
     nx = 2 * D;
     nu = D;
-    mpcSolver = new LinearMPC(N, nx, nu);
+    mpcSolver = std::make_unique<LinearMPC>(N, nx, nu);
     /////////////////////////////////////////////////
     /// setting up discrete-translational dynamics
     /// x_{k+1} = x_{k} + dt*v_{k} + 0.5*dt*dt*a_{k}

@@ -3,6 +3,7 @@
 
 #include "common/qpoases_eigen.hpp"
 #include <deque>
+#include <memory>
 #include <vector>
 #include "controls/linear_mpc.hpp"
 #include "common/log.hpp"
@@ -12,7 +13,7 @@ namespace nonlinear_controls {
 class MPCQPOases : public LinearMPC {
 protected:
 
-  qpOASES::SQProblem *solver{};
+  std::unique_ptr<qpOASES::SQProblem> solver;
   qpOASES::int_t nWSR = 10;
   qpOASES::Options options;
   qpOASES::real_t cpu_time_limit{};
@@ -21,7 +22,7 @@ protected:
   bool solver_initialized{false};
 
   void create_solver() {
-    solver = new qpOASES::SQProblem(nVars, nCons);
+    solver = std::make_unique<qpOASES::SQProblem>(nVars, nCons);
     options.setToMPC();
     options.printLevel = qpOASES::PL_LOW;
     solver->setOptions(options);

@@ -3,6 +3,7 @@
 
 #include <eigen3/Eigen/Dense>
 #include <iostream>
+#include <memory>
 #include <qpOASES.hpp>
 
 #include "common/qpoases_eigen.hpp"
@@ -24,7 +25,7 @@ protected:
   Eigen::Matrix3d inertia_, inertia_inv_;
   TSO3 state_;
 
-  LinearMPC *mpcSolver;
+  std::unique_ptr<LinearMPC> mpcSolver;
   VectorXd err_state, uOpt;
   TSO3 state_des;
 

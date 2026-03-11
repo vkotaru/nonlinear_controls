@@ -30,9 +30,9 @@ SO3VblMPC::SO3VblMPC(bool islti, int _N, double _dt,
   }
 
   if (IS_LTI) {
-    mpcSolver = new LinearMPC(N, nx, nu);
+    mpcSolver = std::make_unique<LinearMPC>(N, nx, nu);
   } else {
-    mpcSolver = new LinearMPCt(N, nx, nu);
+    mpcSolver = std::make_unique<LinearMPCt>(N, nx, nu);
   }
 
   // initialize dynamics
