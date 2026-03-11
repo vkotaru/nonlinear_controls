@@ -1,5 +1,5 @@
-#ifndef _NONLINEAR_CONTROLS_LINEAR_MPC_HPP_
-#define _NONLINEAR_CONTROLS_LINEAR_MPC_HPP_
+#ifndef NONLINEAR_CONTROLS_CONTROLS_LINEAR_MPC_HPP
+#define NONLINEAR_CONTROLS_CONTROLS_LINEAR_MPC_HPP
 
 #include "common/qpoases_eigen.hpp"
 #include "common/constants.h"
@@ -306,4 +306,4 @@ public:
 //};
 
 } // namespace nonlinear_controls
-#endif //_NONLINEAR_CONTROLS_LINEAR_MPC_HPP_
+#endif // NONLINEAR_CONTROLS_CONTROLS_LINEAR_MPC_HPP

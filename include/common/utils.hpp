@@ -1,5 +1,5 @@
-#ifndef _NONLINEAR_CONTROLS_UTILS_H_
-#define _NONLINEAR_CONTROLS_UTILS_H_
+#ifndef NONLINEAR_CONTROLS_COMMON_UTILS_HPP
+#define NONLINEAR_CONTROLS_COMMON_UTILS_HPP
 
 #include "eigen3/Eigen/Dense"
 #include <ctime>
@@ -92,4 +92,4 @@ inline Eigen::Vector3d eulerAngleXYZToZYX(const Eigen::Vector3d &rpy) {
 //////////////////////////////////////////
 } // namespace nonlinear_controls
 
-#endif // _NONLINEAR_CONTROLS_UTILS_H_
+#endif // NONLINEAR_CONTROLS_COMMON_UTILS_HPP

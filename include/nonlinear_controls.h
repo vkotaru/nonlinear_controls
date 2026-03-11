@@ -1,5 +1,5 @@
-#ifndef _NONLINEAR_CONTROLS_H_
-#define _NONLINEAR_CONTROLS_H_
+#ifndef NONLINEAR_CONTROLS_H
+#define NONLINEAR_CONTROLS_H
 
 // common
 #include "common/utils.hpp"
@@ -16,4 +16,4 @@
 // dynamics
 #include "dynamics/point_mass.hpp"
 
-#endif //_NONLINEAR_CONTROLS_H_
+#endif // NONLINEAR_CONTROLS_H

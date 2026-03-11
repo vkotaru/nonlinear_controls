@@ -9,3 +9,5 @@ docs/
 cmake-build-release/
 cmake-build-debug/
 cmake-build-relwithdebinfo/
+TODO.md
+IMPROVEMENTS.md

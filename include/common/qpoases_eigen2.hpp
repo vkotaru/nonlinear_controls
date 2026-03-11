@@ -1,5 +1,5 @@
-#ifndef QPOASES_EIGEN_H
-#define QPOASES_EIGEN_H
+#ifndef NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN2_HPP
+#define NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN2_HPP
 
 #include <eigen3/Eigen/Dense>
 #include <iostream>
@@ -125,6 +125,6 @@ QPMatrix qpOases_solve(const int n, const int m, QPOasesData &data) {
 //   }
 // };
 
-} // namespace nonlinear_control
+} // namespace nonlinear_controls
 
-#endif // QPOASES_EIGEN_H
+#endif // NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN2_HPP

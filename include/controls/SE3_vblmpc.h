@@ -1,5 +1,5 @@
-#ifndef NONLINEAR_CONTROL_SE3_VBLMPC_H
-#define NONLINEAR_CONTROL_SE3_VBLMPC_H
+#ifndef NONLINEAR_CONTROLS_CONTROLS_SE3_VBLMPC_H
+#define NONLINEAR_CONTROLS_CONTROLS_SE3_VBLMPC_H
 
 #include "SO3_vblmpc.h"
 #include "data_types/data_types.hpp"
@@ -29,4 +29,4 @@ public:
 };
 
 } // namespace nonlinear_controls
-#endif // NONLINEAR_CONTROL_SE3_VBLMPC_H
+#endif // NONLINEAR_CONTROLS_CONTROLS_SE3_VBLMPC_H
