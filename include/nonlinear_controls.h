@@ -2,8 +2,8 @@
 #define NONLINEAR_CONTROLS_H
 
 // common
-#include "common/utils.hpp"
 #include "common/log.hpp"
+#include "common/utils.hpp"
 
 // data types
 #include "data_types/data_types.hpp"
@@ -16,4 +16,4 @@
 // dynamics
 #include "dynamics/point_mass.hpp"
 
-#endif // NONLINEAR_CONTROLS_H
+#endif  // NONLINEAR_CONTROLS_H

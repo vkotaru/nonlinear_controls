@@ -2,14 +2,13 @@
 #include <iostream>
 #include <vector>
 
-#include "nonlinear_controls.h"
 #include "matplotlibcpp.h"
+#include "nonlinear_controls.h"
 
 namespace plt = matplotlibcpp;
 namespace nlc = nonlinear_controls;
 
 void run_simulation(const int horizon) {
-
   nlc::Logger::INFO("Testing 3D position MPC with LTI Dynamics... ");
 
   //
@@ -45,12 +44,8 @@ void run_simulation(const int horizon) {
   P.resize(nx, nx);
   R.resize(nu, nu);
   Q = q.asDiagonal();
-  P << 4.8221, 0, 0, 0.8945, 0, 0,
-      0, 4.8221, 0, 0, 0.8945, 0,
-      0, 0, 3.2500, 0, 0, 0.8945,
-      0.8945, 0, 0, 1.0861, 0, 0,
-      0, 0.8945, 0, 0, 1.0861, 0,
-      0, 0, 0.8945, 0, 0, 1.0861;
+  P << 4.8221, 0, 0, 0.8945, 0, 0, 0, 4.8221, 0, 0, 0.8945, 0, 0, 0, 3.2500, 0, 0, 0.8945, 0.8945,
+      0, 0, 1.0861, 0, 0, 0, 0.8945, 0, 0, 1.0861, 0, 0, 0, 0.8945, 0, 0, 1.0861;
   P = 1e3 * P;
   R = r.asDiagonal();
   controller_.set_gains(Q, P, R);
@@ -72,8 +67,7 @@ void run_simulation(const int horizon) {
   nlc::MatrixXd K, uOpt;
   uOpt.resize(nu, 1);
   K.resize(nu, nx);
-  K << 30.6287 * Eigen::Matrix3d::Identity(),
-      12.4527 * Eigen::Matrix3d::Identity();
+  K << 30.6287 * Eigen::Matrix3d::Identity(), 12.4527 * Eigen::Matrix3d::Identity();
 
   Eigen::Matrix<double, 6, 10> x0s;
   x0s.col(0) << -1, -1, -1, 0, 0, 0;
@@ -123,17 +117,14 @@ void run_simulation(const int horizon) {
       state = dynamics_.state();
     }
     avg_time_elapsed = avg_time_elapsed / MAX_ITER_STEPS;
-    nlc::Logger::WARN(
-        "Average time elapsed: " + std::to_string(avg_time_elapsed) + " max time elapsed: "
-            + std::to_string(max_time_elapsed));
+    nlc::Logger::WARN("Average time elapsed: " + std::to_string(avg_time_elapsed) +
+                      " max time elapsed: " + std::to_string(max_time_elapsed));
     dynamics_.plot();
     controller_.reset();
   }
-
 }
 
-int main(int argc, char *argv[]) {
-
+int main(int argc, char* argv[]) {
   int N{5};
 
   if (argc >= 3 && std::string("N") == argv[1]) {

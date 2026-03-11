@@ -2,12 +2,10 @@
 
 namespace nonlinear_controls {
 
-SO3Clf::SO3Clf(const Eigen::Matrix3d &J)
-    : SO3Controller(), inertia_(J) {
+SO3Clf::SO3Clf(const Eigen::Matrix3d& J) : SO3Controller(), inertia_(J) {
   Eigen::EigenSolver<Eigen::Matrix3d> s(this->inertia_);
   min_eigval_inertia_ = s.eigenvalues().real().minCoeff();
-  inertia_scaled_ = this->inertia_ *
-      (1 / min_eigval_inertia_);
+  inertia_scaled_ = this->inertia_ * (1 / min_eigval_inertia_);
   // 0.00489992 is min eigenvalue of inertia matrix
 
   /// QP setup
@@ -48,11 +46,9 @@ SO3Clf::SO3Clf(const Eigen::Matrix3d &J)
 SO3Clf::~SO3Clf() = default;
 
 void SO3Clf::print_qp_setup() {
-  std::cout << "--------------------------------------------------"
-            << std::endl;
+  std::cout << "--------------------------------------------------" << std::endl;
   std::cout << "*           QP setup       *" << std::endl;
-  std::cout << "--------------------------------------------------"
-            << std::endl;
+  std::cout << "--------------------------------------------------" << std::endl;
   printf("Cost function: \n\n");
   for (int i = 0; i < 4; i++) {
     printf("[");
@@ -71,16 +67,13 @@ void SO3Clf::print_qp_setup() {
     printf("\t%f", A[i]);
   printf("]x<[%f]\n", ubA[0]);
   printf("\n");
-  std::cout << "-------------------*****---------------------------"
-            << std::endl;
+  std::cout << "-------------------*****---------------------------" << std::endl;
 }
 
 void SO3Clf::print_qp2_setup() {
-  std::cout << "--------------------------------------------------"
-            << std::endl;
+  std::cout << "--------------------------------------------------" << std::endl;
   std::cout << "*           QP_new setup       *" << std::endl;
-  std::cout << "--------------------------------------------------"
-            << std::endl;
+  std::cout << "--------------------------------------------------" << std::endl;
   printf("Cost function: \n\n");
   for (int i = 0; i < 4; i++) {
     printf("[");
@@ -99,8 +92,7 @@ void SO3Clf::print_qp2_setup() {
     printf("\t%f", A_new[i]);
   printf("]x<[%f]\n", ubA_new[0]);
   printf("\n");
-  std::cout << "-------------------*****---------------------------"
-            << std::endl;
+  std::cout << "-------------------*****---------------------------" << std::endl;
 }
 
 void SO3Clf::init() {
@@ -112,8 +104,7 @@ void SO3Clf::init() {
   std::cout << "/////////////////////////////////////////" << std::endl;
 }
 
-void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d &u) {
-
+void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d& u) {
   /// computing errors
   Eigen::Matrix<double, 6, 1> error = x - xd;
   eR = error.block(0, 0, 3, 1);
@@ -127,14 +118,13 @@ void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d &u) {
   deR = 0.5 * (utils::vee(m1) + utils::vee(m2));
 
   /// setting up the CLF-QP
-  V2 = (eOmega.transpose() * inertia_scaled_ * eOmega * 0.5 +
-      epsilon2 * (eR.transpose() * eOmega) + c2 * (eR.transpose() * eR) * 0.5)
-      .value();
+  V2 = (eOmega.transpose() * inertia_scaled_ * eOmega * 0.5 + epsilon2 * (eR.transpose() * eOmega) +
+        c2 * (eR.transpose() * eR) * 0.5)
+           .value();
   LgV2 = (eOmega.transpose() * inertia_scaled_ + epsilon2 * eR.transpose());
   LfV2 = ((epsilon2 * eOmega.transpose() + c2 * eR.transpose()) * deR -
-      LgV2 * (dR.transpose() * xd.R * xd.Omega +
-          x.R.transpose() * xd.R * xd.dOmega))
-      .value();
+          LgV2 * (dR.transpose() * xd.R * xd.Omega + x.R.transpose() * xd.R * xd.dOmega))
+             .value();
 
   for (int i = 0; i < 3; i++) {
     A_new[i] = LgV2(0, i);
@@ -144,9 +134,9 @@ void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d &u) {
   print_qp2_setup();
   /// solving the QP
   qpOASES::int_t nwsr = 1000;
-  qpOASES::real_t cpu_time = 1 / 500; // << modify this >>
-  qpOASES::returnValue sol_info = solver.hotstart(
-      H_new, g_new, A_new, lb_new, ub_new, lbA_new, ubA_new, nwsr);
+  qpOASES::real_t cpu_time = 1 / 500;  // << modify this >>
+  qpOASES::returnValue sol_info =
+      solver.hotstart(H_new, g_new, A_new, lb_new, ub_new, lbA_new, ubA_new, nwsr);
   if (sol_info == qpOASES::SUCCESSFUL_RETURN) {
     this->pause = false;
     std::cout << "Optimal solution found" << std::endl;
@@ -165,4 +155,4 @@ void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d &u) {
   u = this->inertia_ * dOmega + utils::hat(x.Omega) * this->inertia_ * x.Omega;
 }
 
-} // namespace nonlinear_controls
+}  // namespace nonlinear_controls

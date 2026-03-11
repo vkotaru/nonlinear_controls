@@ -13,7 +13,6 @@ struct QuadProgData {
 
 class QPInterface {
 protected:
-
 public:
   QPInterface(/* args */);
   ~QPInterface();

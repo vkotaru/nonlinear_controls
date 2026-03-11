@@ -23,7 +23,7 @@ protected:
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  QuadProg(const int &n, const int &m, const int &p);
+  QuadProg(const int& n, const int& m, const int& p);
   ~QuadProg();
 
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> H;
@@ -41,6 +41,6 @@ public:
   virtual int solve();
 };
 
-} // namespace nonlinear_controls
+}  // namespace nonlinear_controls
 
-#endif // NONLINEAR_CONTROLS_QUADPROG_H
+#endif  // NONLINEAR_CONTROLS_QUADPROG_H

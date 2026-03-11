@@ -5,9 +5,7 @@
 
 namespace nonlinear_controls {
 
-TrackingMPC::TrackingMPC(const int &_N, const int &_nx, const int &_nu)
-    : N(_N), nx(_nx), nu(_nu) {
-
+TrackingMPC::TrackingMPC(const int& _N, const int& _nx, const int& _nu) : N(_N), nx(_nx), nu(_nu) {
   nv = N * nu;
   ni = N * nx * 2 /* state-bounds */;
   ne = 0;
@@ -52,8 +50,7 @@ TrackingMPC::TrackingMPC(const int &_N, const int &_nx, const int &_nu)
 
 TrackingMPC::~TrackingMPC() = default;
 
-void TrackingMPC::set_mpc_gains(const MatrixXd &_Q, const MatrixXd &_P,
-                                const MatrixXd &_R) {
+void TrackingMPC::set_mpc_gains(const MatrixXd& _Q, const MatrixXd& _P, const MatrixXd& _R) {
   assert(_Q.rows() == nx && _Q.cols() == nx);
   assert(_P.rows() == nx && _P.cols() == nx);
   assert(_R.rows() == nu && _R.cols() == nu);
@@ -69,21 +66,21 @@ void TrackingMPC::set_mpc_gains(const MatrixXd &_Q, const MatrixXd &_P,
   }
 }
 
-void TrackingMPC::set_input_bounds(const VectorXd &_ulb, const VectorXd &_uub) {
+void TrackingMPC::set_input_bounds(const VectorXd& _ulb, const VectorXd& _uub) {
   assert(_ulb.rows() == nu && _ulb.cols() == 1);
   assert(_uub.rows() == nu && _uub.cols() == 1);
   Ulb = _ulb.replicate(N, 1);
   Uub = _uub.replicate(N, 1);
 }
 
-void TrackingMPC::set_state_bounds(const VectorXd &_xlb, const VectorXd &_xub) {
+void TrackingMPC::set_state_bounds(const VectorXd& _xlb, const VectorXd& _xub) {
   assert(_xlb.rows() == nx && _xlb.cols() == 1);
   assert(_xub.rows() == nx && _xub.cols() == 1);
   Xlb = _xlb.replicate(N, 1);
   Xub = _xub.replicate(N, 1);
 }
 
-void TrackingMPC::set_lti_dynamics(const MatrixXd &_A, const MatrixXd &_B) {
+void TrackingMPC::set_lti_dynamics(const MatrixXd& _A, const MatrixXd& _B) {
   assert(_A.rows() == nx && _A.cols() == nx);
   assert(_B.rows() == nx && _B.cols() == nu);
   this->A = _A;
@@ -103,13 +100,12 @@ void TrackingMPC::construct() {
     } else {
       Sx.block(nx * i, 0, nx, nx) = A * Sx.block(nx * (i - 1), 0, nx, nx);
 
-      Su.block(nx * i, 0, nx, nu) = A * Su.block(nx * (i-1), 0, nx, nu);
+      Su.block(nx * i, 0, nx, nu) = A * Su.block(nx * (i - 1), 0, nx, nu);
       Su.block(nx * i, nu, nx, nu * (N - 1)) = Su.block(nx * (i - 1), 0, nx, nu * (N - 1));
 
-/*      Su.block(nx * i, 0, nx, nu) = A * Su.block(nx * (i - 1), 0, nx, nu);
-      Su.block(nx * i, nu, nx, nu * (N - 1)) =
-          Su.block(nx * (i - 1), 0, nx, nu * (N - 1)); */
-
+      /*      Su.block(nx * i, 0, nx, nu) = A * Su.block(nx * (i - 1), 0, nx, nu);
+            Su.block(nx * i, nu, nx, nu * (N - 1)) =
+                Su.block(nx * (i - 1), 0, nx, nu * (N - 1)); */
     }
   }
   // Cost function
@@ -117,11 +113,10 @@ void TrackingMPC::construct() {
   F = Sx.transpose() * Qbar * Su;
 }
 
-void TrackingMPC::run(const VectorXd &x0, const VectorXd &Xd,
-                      const VectorXd &Ud) {
+void TrackingMPC::run(const VectorXd& x0, const VectorXd& Xd, const VectorXd& Ud) {
   assert(x0.rows() == nx && x0.cols() == 1);
   assert(Xd.rows() == nx * N && Xd.cols() == 1);
   assert(Ud.rows() == nu * N && Ud.cols() == 1);
 }
 
-} // namespace nonlinear_controls
+}  // namespace nonlinear_controls

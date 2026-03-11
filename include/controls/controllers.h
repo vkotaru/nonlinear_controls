@@ -7,4 +7,4 @@
 #include "controls/SE3_control.h"
 #include "controls/SE3_vblmpc.h"
 
-#endif // NONLINEAR_CONTROLS_CONTROLLERS_H_
+#endif  // NONLINEAR_CONTROLS_CONTROLLERS_H_

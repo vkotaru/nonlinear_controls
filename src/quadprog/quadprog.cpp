@@ -5,8 +5,7 @@
 
 namespace nonlinear_controls {
 
-QuadProg::QuadProg(const int &n, const int &m, const int &p)
-    : nv(n), ni(m), ne(p) {
+QuadProg::QuadProg(const int& n, const int& m, const int& p) : nv(n), ni(m), ne(p) {
   H.resize(nv, nv);
   f.resize(nv);
   A.resize(ni, nv);
@@ -25,4 +24,4 @@ int QuadProg::solve() {
   throw std::string("Quadprog::Solve is not implemented yet.");
 }
 
-} // namespace nonlinear_controls
+}  // namespace nonlinear_controls

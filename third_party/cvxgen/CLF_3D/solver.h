@@ -8,8 +8,8 @@
 /* Description: Header file with relevant definitions. */
 #ifndef SOLVER_H_CLF3D
 #define SOLVER_H_CLF3D
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
 #define pm(A, m, n) printmatrix(#A, A, m, n, 1)
 typedef struct Params_t {
   double Q[9];
@@ -20,19 +20,19 @@ typedef struct Params_t {
   double xub[3];
 } Params;
 typedef struct Vars_t {
-  double *x; /* 3 rows. */
+  double* x; /* 3 rows. */
 } Vars;
 typedef struct Workspace_t {
   double h[7];
   double s_inv[7];
   double s_inv_z[7];
-  double *b;
+  double* b;
   double q[3];
   double rhs[17];
   double x[17];
-  double *s;
-  double *z;
-  double *y;
+  double* s;
+  double* z;
+  double* y;
   double lhs_aff[17];
   double lhs_cc[17];
   double buffer[17];
@@ -71,19 +71,19 @@ extern Params params;
 extern Workspace work;
 extern Settings settings;
 /* Function definitions in ldl.c: */
-void ldl_solve(double *target, double *var);
+void ldl_solve(double* target, double* var);
 void ldl_factor(void);
 double check_factorization(void);
-void matrix_multiply(double *result, double *source);
-double check_residual(double *target, double *multiplicand);
+void matrix_multiply(double* result, double* source);
+double check_residual(double* target, double* multiplicand);
 void fill_KKT(void);
 
 /* Function definitions in matrix_support.c: */
-void multbymA(double *lhs, double *rhs);
-void multbymAT(double *lhs, double *rhs);
-void multbymG(double *lhs, double *rhs);
-void multbymGT(double *lhs, double *rhs);
-void multbyP(double *lhs, double *rhs);
+void multbymA(double* lhs, double* rhs);
+void multbymAT(double* lhs, double* rhs);
+void multbymG(double* lhs, double* rhs);
+void multbymGT(double* lhs, double* rhs);
+void multbyP(double* lhs, double* rhs);
 void fillq(void);
 void fillh(void);
 void fillb(void);
@@ -98,7 +98,7 @@ void set_start(void);
 double eval_objv(void);
 void fillrhs_aff(void);
 void fillrhs_cc(void);
-void refine(double *target, double *var);
+void refine(double* target, double* var);
 double calc_ineq_resid_squared(void);
 double calc_eq_resid_squared(void);
 void better_start(void);
@@ -113,10 +113,10 @@ void load_default_data(void);
 void tic(void);
 float toc(void);
 float tocq(void);
-void printmatrix(char *name, double *A, int m, int n, int sparse);
+void printmatrix(char* name, double* A, int m, int n, int sparse);
 double unif(double lower, double upper);
-float ran1(long*idum, int reset);
-float randn_internal(long *idum, int reset);
+float ran1(long* idum, int reset);
+float randn_internal(long* idum, int reset);
 double randn(void);
 void reset_rand(void);
 

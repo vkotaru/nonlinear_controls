@@ -5,12 +5,12 @@
 #include <iostream>
 #include <qpOASES.hpp>
 
-#include "data_types/data_types.hpp"
-#include "geometric_control.h"
 #include "SO3_control.h"
-#include "mpc_qpoases.hpp"
 #include "common/qpoases_eigen.hpp"
 #include "common/utils.hpp"
+#include "data_types/data_types.hpp"
+#include "geometric_control.h"
+#include "mpc_qpoases.hpp"
 
 namespace nonlinear_controls {
 
@@ -50,15 +50,15 @@ protected:
 public:
   //    SO3Clf();
   ~SO3Clf();
-  SO3Clf(const Eigen::Matrix3d &J);
+  SO3Clf(const Eigen::Matrix3d& J);
 
   virtual void init() override;
   virtual void run(double dt) {
     std::cout << "This is not the correct way to call this function" << std::endl;
   }
-  void run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d &u);
+  void run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d& u);
 };
 
-}
+}  // namespace nonlinear_controls
 
-#endif // NONLINEAR_CONTROLS_SO3_CLF_H
+#endif  // NONLINEAR_CONTROLS_SO3_CLF_H

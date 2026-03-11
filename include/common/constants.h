@@ -11,6 +11,6 @@ namespace nonlinear_controls {
 #define E1 Eigen::Vector3d(1., 0., 0)
 #define E2 Eigen::Vector3d(0., 1., 0)
 #define E3 Eigen::Vector3d(0., 0., 1.)
-}
+}  // namespace nonlinear_controls
 
-#endif //NONLINEAR_CONTROLS_COMMON_CONSTANTS_H
+#endif  // NONLINEAR_CONTROLS_COMMON_CONSTANTS_H

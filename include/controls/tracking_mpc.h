@@ -5,10 +5,11 @@
 #ifndef NONLINEAR_CONTROLS_TRACKING_MPC_H
 #define NONLINEAR_CONTROLS_TRACKING_MPC_H
 
-#include "controls/mpc_qpoases.hpp"
-#include "quadprog/quadprog.h"
 #include <deque>
 #include <vector>
+
+#include "controls/mpc_qpoases.hpp"
+#include "quadprog/quadprog.h"
 
 namespace nonlinear_controls {
 
@@ -44,7 +45,7 @@ protected:
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> H, F;
 
 public:
-  TrackingMPC(const int &_N, const int &_nx, const int &_nu);
+  TrackingMPC(const int& _N, const int& _nx, const int& _nu);
   ~TrackingMPC();
 
   /**
@@ -53,32 +54,31 @@ public:
    * @param _P
    * @param _R
    */
-  void set_mpc_gains(const MatrixXd &_Q, const MatrixXd &_P,
-                     const MatrixXd &_R);
+  void set_mpc_gains(const MatrixXd& _Q, const MatrixXd& _P, const MatrixXd& _R);
   /**
    * Function to set MPC input bounds
    * @param _ulb
    * @param _uub
    */
-  void set_input_bounds(const VectorXd &_ulb, const VectorXd &_uub);
+  void set_input_bounds(const VectorXd& _ulb, const VectorXd& _uub);
   /**
    * Function o set MPC state bounds
    * @param _xlb
    * @param _xub
    */
-  void set_state_bounds(const VectorXd &_xlb, const VectorXd &_xub);
+  void set_state_bounds(const VectorXd& _xlb, const VectorXd& _xub);
   /**
    * Function to set the linear dynamics matrices
    * @param _A
    * @param _B
    */
-  void set_lti_dynamics(const MatrixXd &_A, const MatrixXd &_B);
+  void set_lti_dynamics(const MatrixXd& _A, const MatrixXd& _B);
 
   void construct();
-  void run(const VectorXd &x0);
-  void run(const VectorXd &x0, const VectorXd &Xd, const VectorXd &Ud);
+  void run(const VectorXd& x0);
+  void run(const VectorXd& x0, const VectorXd& Xd, const VectorXd& Ud);
 };
 
-} // namespace nonlinear_controls
+}  // namespace nonlinear_controls
 
-#endif // NONLINEAR_CONTROLS_TRACKING_MPC_H
+#endif  // NONLINEAR_CONTROLS_TRACKING_MPC_H

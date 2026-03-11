@@ -2,22 +2,12 @@
 
 namespace nonlinear_controls {
 
-QPInterface::QPInterface() {
+QPInterface::QPInterface() {}
 
-}
+QPInterface::~QPInterface() {}
 
-QPInterface::~QPInterface() {
+void QPInterface::setup() {}
 
-}
+void QPInterface::solve() {}
 
-void QPInterface::setup() {
-
-}
-
-void QPInterface::solve() {
-
-}
-
-
-}
-
+}  // namespace nonlinear_controls

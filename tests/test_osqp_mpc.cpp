@@ -1,82 +1,76 @@
 
-#include "OsqpEigen/OsqpEigen.h"
 #include <Eigen/Dense>
+
 #include <iostream>
 
+#include "OsqpEigen/OsqpEigen.h"
+#include "common/log.hpp"
+#include "common/utils.hpp"
 #include "dynamics/point_mass.hpp"
 #include "matplotlibcpp.h"
-#include "common/utils.hpp"
-#include "common/log.hpp"
 
 namespace plt = matplotlibcpp;
 namespace nlc = nonlinear_controls;
 
-void setDynamicsMatrices(Eigen::Matrix<double, 6, 6> &a, Eigen::Matrix<double, 6, 3> &b) {
-//  a << 1., 0., 0., 0., 0., 0., 0.1, 0., 0., 0., 0., 0.,
-//      0., 1., 0., 0., 0., 0., 0., 0.1, 0., 0., 0., 0.,
-//      0., 0., 1., 0., 0., 0., 0., 0., 0.1, 0., 0., 0.,
-//      0.0488, 0., 0., 1., 0., 0., 0.0016, 0., 0., 0.0992, 0., 0.,
-//      0., -0.0488, 0., 0., 1., 0., 0., -0.0016, 0., 0., 0.0992, 0.,
-//      0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.0992,
-//      0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0.,
-//      0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0.,
-//      0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0.,
-//      0.9734, 0., 0., 0., 0., 0., 0.0488, 0., 0., 0.9846, 0., 0.,
-//      0., -0.9734, 0., 0., 0., 0., 0., -0.0488, 0., 0., 0.9846, 0.,
-//      0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.9846;
-//
-//  b << 0., -0.0726, 0., 0.0726,
-//      -0.0726, 0., 0.0726, 0.,
-//      -0.0152, 0.0152, -0.0152, 0.0152,
-//      -0., -0.0006, -0., 0.0006,
-//      0.0006, 0., -0.0006, 0.0000,
-//      0.0106, 0.0106, 0.0106, 0.0106,
-//      0, -1.456, 0., 1.456,
-//      -1.456, 0., 1.456, 0.,
-//      -0.3049, 0.3049, -0.3049, 0.3049,
-//      -0., -0.0236, 0., 0.0236,
-//      0.0236, 0., -0.0236, 0.,
-//      0.2107, 0.2107, 0.2107, 0.2107;
+void setDynamicsMatrices(Eigen::Matrix<double, 6, 6>& a, Eigen::Matrix<double, 6, 3>& b) {
+  //  a << 1., 0., 0., 0., 0., 0., 0.1, 0., 0., 0., 0., 0.,
+  //      0., 1., 0., 0., 0., 0., 0., 0.1, 0., 0., 0., 0.,
+  //      0., 0., 1., 0., 0., 0., 0., 0., 0.1, 0., 0., 0.,
+  //      0.0488, 0., 0., 1., 0., 0., 0.0016, 0., 0., 0.0992, 0., 0.,
+  //      0., -0.0488, 0., 0., 1., 0., 0., -0.0016, 0., 0., 0.0992, 0.,
+  //      0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.0992,
+  //      0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0.,
+  //      0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0.,
+  //      0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0.,
+  //      0.9734, 0., 0., 0., 0., 0., 0.0488, 0., 0., 0.9846, 0., 0.,
+  //      0., -0.9734, 0., 0., 0., 0., 0., -0.0488, 0., 0., 0.9846, 0.,
+  //      0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.9846;
+  //
+  //  b << 0., -0.0726, 0., 0.0726,
+  //      -0.0726, 0., 0.0726, 0.,
+  //      -0.0152, 0.0152, -0.0152, 0.0152,
+  //      -0., -0.0006, -0., 0.0006,
+  //      0.0006, 0., -0.0006, 0.0000,
+  //      0.0106, 0.0106, 0.0106, 0.0106,
+  //      0, -1.456, 0., 1.456,
+  //      -1.456, 0., 1.456, 0.,
+  //      -0.3049, 0.3049, -0.3049, 0.3049,
+  //      -0., -0.0236, 0., 0.0236,
+  //      0.0236, 0., -0.0236, 0.,
+  //      0.2107, 0.2107, 0.2107, 0.2107;
 }
 
-void setInequalityConstraints(Eigen::Matrix<double, 6, 1> &xMax, Eigen::Matrix<double, 6, 1> &xMin,
-                              Eigen::Matrix<double, 3, 1> &uMax, Eigen::Matrix<double, 3, 1> &uMin) {
+void setInequalityConstraints(Eigen::Matrix<double, 6, 1>& xMax, Eigen::Matrix<double, 6, 1>& xMin,
+                              Eigen::Matrix<double, 3, 1>& uMax,
+                              Eigen::Matrix<double, 3, 1>& uMin) {
   double u0 = 10.5916;
 
   // input inequality constraints
-  uMin << 9.6 - u0,
-      9.6 - u0,
-      9.6 - u0,
-      9.6 - u0;
+  uMin << 9.6 - u0, 9.6 - u0, 9.6 - u0, 9.6 - u0;
 
-  uMax << 13 - u0,
-      13 - u0,
-      13 - u0,
-      13 - u0;
+  uMax << 13 - u0, 13 - u0, 13 - u0, 13 - u0;
 
   // state inequality constraints
   xMin << -M_PI / 6, -M_PI / 6, -OsqpEigen::INFTY, -OsqpEigen::INFTY, -OsqpEigen::INFTY, -1.,
-      -OsqpEigen::INFTY, -OsqpEigen::INFTY, -OsqpEigen::INFTY, -OsqpEigen::INFTY,
-      -OsqpEigen::INFTY, -OsqpEigen::INFTY;
+      -OsqpEigen::INFTY, -OsqpEigen::INFTY, -OsqpEigen::INFTY, -OsqpEigen::INFTY, -OsqpEigen::INFTY,
+      -OsqpEigen::INFTY;
 
   xMax << M_PI / 6, M_PI / 6, OsqpEigen::INFTY, OsqpEigen::INFTY, OsqpEigen::INFTY,
-      OsqpEigen::INFTY, OsqpEigen::INFTY, OsqpEigen::INFTY, OsqpEigen::INFTY,
-      OsqpEigen::INFTY, OsqpEigen::INFTY, OsqpEigen::INFTY;
+      OsqpEigen::INFTY, OsqpEigen::INFTY, OsqpEigen::INFTY, OsqpEigen::INFTY, OsqpEigen::INFTY,
+      OsqpEigen::INFTY, OsqpEigen::INFTY;
 }
 
-void setWeightMatrices(Eigen::DiagonalMatrix<double, 6> &Q, Eigen::DiagonalMatrix<double, 3> &R) {
+void setWeightMatrices(Eigen::DiagonalMatrix<double, 6>& Q, Eigen::DiagonalMatrix<double, 3>& R) {
   Q.diagonal() << 0, 0, 10., 10., 10., 10., 0, 0, 0, 5., 5., 5.;
   R.diagonal() << 0.1, 0.1, 0.1, 0.1;
 }
 
-void castMPCToQPHessian(const Eigen::DiagonalMatrix<double, 6> &Q,
-                        const Eigen::DiagonalMatrix<double, 3> &R,
-                        int mpcWindow,
-                        Eigen::SparseMatrix<double> &hessianMatrix) {
-
+void castMPCToQPHessian(const Eigen::DiagonalMatrix<double, 6>& Q,
+                        const Eigen::DiagonalMatrix<double, 3>& R, int mpcWindow,
+                        Eigen::SparseMatrix<double>& hessianMatrix) {
   hessianMatrix.resize(6 * (mpcWindow + 1) + 3 * mpcWindow, 6 * (mpcWindow + 1) + 3 * mpcWindow);
 
-  //populate hessian matrix
+  // populate hessian matrix
   for (int i = 0; i < 6 * (mpcWindow + 1) + 3 * mpcWindow; i++) {
     if (i < 6 * (mpcWindow + 1)) {
       int posQ = i % 6;
@@ -92,11 +86,9 @@ void castMPCToQPHessian(const Eigen::DiagonalMatrix<double, 6> &Q,
   }
 }
 
-void castMPCToQPGradient(const Eigen::DiagonalMatrix<double, 6> &Q,
-                         const Eigen::Matrix<double, 6, 1> &xRef,
-                         int mpcWindow,
-                         Eigen::VectorXd &gradient) {
-
+void castMPCToQPGradient(const Eigen::DiagonalMatrix<double, 6>& Q,
+                         const Eigen::Matrix<double, 6, 1>& xRef, int mpcWindow,
+                         Eigen::VectorXd& gradient) {
   Eigen::Matrix<double, 6, 1> Qx_ref;
   Qx_ref = Q * (-xRef);
 
@@ -109,10 +101,9 @@ void castMPCToQPGradient(const Eigen::DiagonalMatrix<double, 6> &Q,
   }
 }
 
-void castMPCToQPConstraintMatrix(const Eigen::Matrix<double, 6, 6> &dynamicMatrix,
-                                 const Eigen::Matrix<double, 6, 3> &controlMatrix,
-                                 int mpcWindow,
-                                 Eigen::SparseMatrix<double> &constraintMatrix) {
+void castMPCToQPConstraintMatrix(const Eigen::Matrix<double, 6, 6>& dynamicMatrix,
+                                 const Eigen::Matrix<double, 6, 3>& controlMatrix, int mpcWindow,
+                                 Eigen::SparseMatrix<double>& constraintMatrix) {
   constraintMatrix.resize(6 * (mpcWindow + 1) + 6 * (mpcWindow + 1) + 3 * mpcWindow,
                           6 * (mpcWindow + 1) + 3 * mpcWindow);
 
@@ -144,10 +135,12 @@ void castMPCToQPConstraintMatrix(const Eigen::Matrix<double, 6, 6> &dynamicMatri
   }
 }
 
-void castMPCToQPConstraintVectors(const Eigen::Matrix<double, 6, 1> &xMax, const Eigen::Matrix<double, 6, 1> &xMin,
-                                  const Eigen::Matrix<double, 3, 1> &uMax, const Eigen::Matrix<double, 3, 1> &uMin,
-                                  const Eigen::Matrix<double, 6, 1> &x0,
-                                  int mpcWindow, Eigen::VectorXd &lowerBound, Eigen::VectorXd &upperBound) {
+void castMPCToQPConstraintVectors(const Eigen::Matrix<double, 6, 1>& xMax,
+                                  const Eigen::Matrix<double, 6, 1>& xMin,
+                                  const Eigen::Matrix<double, 3, 1>& uMax,
+                                  const Eigen::Matrix<double, 3, 1>& uMin,
+                                  const Eigen::Matrix<double, 6, 1>& x0, int mpcWindow,
+                                  Eigen::VectorXd& lowerBound, Eigen::VectorXd& upperBound) {
   // evaluate the lower and the upper inequality vectors
   Eigen::VectorXd lowerInequality = Eigen::MatrixXd::Zero(6 * (mpcWindow + 1) + 3 * mpcWindow, 1);
   Eigen::VectorXd upperInequality = Eigen::MatrixXd::Zero(6 * (mpcWindow + 1) + 3 * mpcWindow, 1);
@@ -169,22 +162,19 @@ void castMPCToQPConstraintVectors(const Eigen::Matrix<double, 6, 1> &xMax, const
 
   // merge inequality and equality vectors
   lowerBound = Eigen::MatrixXd::Zero(2 * 6 * (mpcWindow + 1) + 3 * mpcWindow, 1);
-  lowerBound << lowerEquality,
-      lowerInequality;
+  lowerBound << lowerEquality, lowerInequality;
 
   upperBound = Eigen::MatrixXd::Zero(2 * 6 * (mpcWindow + 1) + 3 * mpcWindow, 1);
-  upperBound << upperEquality,
-      upperInequality;
+  upperBound << upperEquality, upperInequality;
 }
 
-void updateConstraintVectors(const Eigen::Matrix<double, 6, 1> &x0,
-                             Eigen::VectorXd &lowerBound, Eigen::VectorXd &upperBound) {
+void updateConstraintVectors(const Eigen::Matrix<double, 6, 1>& x0, Eigen::VectorXd& lowerBound,
+                             Eigen::VectorXd& upperBound) {
   lowerBound.block(0, 0, 6, 1) = -x0;
   upperBound.block(0, 0, 6, 1) = -x0;
 }
 
-double getErrorNorm(const Eigen::Matrix<double, 6, 1> &x,
-                    const Eigen::Matrix<double, 6, 1> &xRef) {
+double getErrorNorm(const Eigen::Matrix<double, 6, 1>& x, const Eigen::Matrix<double, 6, 1>& xRef) {
   // evaluate the error
   Eigen::Matrix<double, 6, 1> error = x - xRef;
 
@@ -193,16 +183,13 @@ double getErrorNorm(const Eigen::Matrix<double, 6, 1> &x,
 }
 
 int main() {
-
   // simulation parameters
   double h = 1. / 200.;
   const double simulate_for_seconds = 10;
   int MAX_ITER_STEPS = int(simulate_for_seconds / h);
 
-
   // point-mass dynamics
   nlc::PointMass3D dynamics_{h};
-
 
   // set the preview window
   int mpcWindow = 20;
@@ -234,8 +221,8 @@ int main() {
   Eigen::VectorXd upperBound;
 
   // set the initial and the desired states
-//  x0 << 0, 0, 0, 0, 0, 0;
-  x0 <<  -0.012834, 0.94555, -0.414966,0,0,0;
+  //  x0 << 0, 0, 0, 0, 0, 0;
+  x0 << -0.012834, 0.94555, -0.414966, 0, 0, 0;
   xRef << 0, 0, 1, 0, 0, 0;
 
   // set MPC problem quantities
@@ -259,7 +246,7 @@ int main() {
   OsqpEigen::Solver solver;
 
   // settings
-  //solver.settings()->setVerbosity(false);
+  // solver.settings()->setVerbosity(false);
   solver.settings()->setWarmStart(true);
 
   // set the initial data of the QP solver
@@ -288,13 +275,12 @@ int main() {
   int numberOfSteps = 50;
 
   for (int i = 0; i < numberOfSteps; i++) {
-
     auto start = nlc::utils::get_current_time();
     // solve the QP problem
     if (solver.solveProblem() != OsqpEigen::ErrorExitFlag::NoError)
       return 1;
-    auto end =  nlc::utils::get_current_time();
-    nlc::Logger::INFO("time elapsed "+std::to_string(double(end-start)*1.e-6));
+    auto end = nlc::utils::get_current_time();
+    nlc::Logger::INFO("time elapsed " + std::to_string(double(end - start) * 1.e-6));
 
     // get the controller input
     QPSolution = solver.getSolution();
