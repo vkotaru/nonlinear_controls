@@ -6,11 +6,20 @@
 
 namespace nonlinear_controls {
 
+/**
+ * @brief Base class for geometric controllers on Lie groups.
+ *
+ * Provides foundation for controllers that operate on manifolds such as
+ * SO(3) and SE(3). Geometric controllers exploit the structure of these
+ * manifolds to achieve globally valid control laws.
+ *
+ * @see SO3Controller, SE3Controller
+ */
 class GeometricController : public BaseController {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  GeometricController(/* args */) = default;
-  ~GeometricController() = default;
+  GeometricController() = default;
+  ~GeometricController() override = default;
 
   void init() override {}
   void run() override {}

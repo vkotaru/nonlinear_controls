@@ -7,7 +7,7 @@
 #include <qpOASES.hpp>
 
 namespace nonlinear_controls {
-typedef Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic> QPMatrix;
+using QPMatrix = Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic>;
 
 QPMatrix qpOases_solve(const int n, const int m, QPOasesData& data) {
   qpOASES::QProblem problem(n, m);

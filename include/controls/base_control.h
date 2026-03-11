@@ -5,16 +5,23 @@
 
 namespace nonlinear_controls {
 
+/**
+ * @brief Abstract base class for all controllers.
+ *
+ * Provides a common interface for controller initialization and execution.
+ * Derived classes should override init() and run() to implement specific
+ * control algorithms.
+ */
 class BaseController {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   BaseController() = default;
-  ~BaseController() = default;
+  virtual ~BaseController() = default;
 
+  /// @brief Initialize controller state and parameters
   virtual void init() {}
+  /// @brief Execute one control step
   virtual void run() {}
-
-private:
 };
 
 }  // namespace nonlinear_controls
