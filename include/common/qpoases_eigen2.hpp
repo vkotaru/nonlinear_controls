@@ -1,34 +1,33 @@
 #ifndef NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN2_HPP
 #define NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN2_HPP
 
+#include <common/qpoases_eigen.hpp>
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <qpOASES.hpp>
-#include <common/qpoases_eigen.hpp>
 
 namespace nonlinear_controls {
 typedef Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic> QPMatrix;
 
-QPMatrix qpOases_solve(const int n, const int m, QPOasesData &data) {
-    qpOASES::QProblem problem(n, m);
-    qpOASES::Options options;
-    qpOASES::real_t *H, *A, *g, *lb, *ub, *lbA, *ubA;
-    qpOASES::int_t nWSR; 
+QPMatrix qpOases_solve(const int n, const int m, QPOasesData& data) {
+  qpOASES::QProblem problem(n, m);
+  qpOASES::Options options;
+  qpOASES::real_t *H, *A, *g, *lb, *ub, *lbA, *ubA;
+  qpOASES::int_t nWSR;
 
-    // data transfer
-    H       = data_.H.transpose().data();
-    A       = data_.A.transpose().data();
-    g       = data_.g.transpose().data();
-    lb      = data_.lb.transpose().data();
-    ub      = data_.ub.transpose().data();
-    lbA     = data_.lbA.transpose().data();
-    ubA     = data_.ubA.transpose().data();
-    nWSR    = data_.nWSR;
+  // data transfer
+  H = data_.H.transpose().data();
+  A = data_.A.transpose().data();
+  g = data_.g.transpose().data();
+  lb = data_.lb.transpose().data();
+  ub = data_.ub.transpose().data();
+  lbA = data_.lbA.transpose().data();
+  ubA = data_.ubA.transpose().data();
+  nWSR = data_.nWSR;
 
-    options.printLevel = qpOASES::PL_NONE;
-    problem.setOptions(options);
-    problem.init(H, g, A, lb, ub, lbA, ubA, nWSR);
-
+  options.printLevel = qpOASES::PL_NONE;
+  problem.setOptions(options);
+  problem.init(H, g, A, lb, ub, lbA, ubA, nWSR);
 }
 
 // class QPOasesEigen2 {
@@ -125,6 +124,6 @@ QPMatrix qpOases_solve(const int n, const int m, QPOasesData &data) {
 //   }
 // };
 
-} // namespace nonlinear_controls
+}  // namespace nonlinear_controls
 
-#endif // NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN2_HPP
+#endif  // NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN2_HPP

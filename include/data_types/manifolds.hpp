@@ -14,27 +14,27 @@ public:
   SpecialOrthogonal(void) : Eigen::Matrix<T, _Dim, _Dim>() {}
 
   template <typename OtherDerived>
-  SpecialOrthogonal(const Eigen::MatrixBase<OtherDerived> &other)
+  SpecialOrthogonal(const Eigen::MatrixBase<OtherDerived>& other)
       : Eigen::Matrix<T, _Dim, _Dim>(other) {}
 
   template <typename OtherDerived>
-  SpecialOrthogonal &operator=(const Eigen::MatrixBase<OtherDerived> &other) {
+  SpecialOrthogonal& operator=(const Eigen::MatrixBase<OtherDerived>& other) {
     this->Eigen::Matrix<T, _Dim, _Dim>::operator=(other);
     return *this;
   }
   SpecialOrthogonal inverse() { return this->transpose(); }
 };
 
-template <typename T, size_t _Dim> class Sn : public Eigen::Matrix<T, _Dim, 1> {
+template <typename T, size_t _Dim>
+class Sn : public Eigen::Matrix<T, _Dim, 1> {
 public:
   Sn(void) : Eigen::Matrix<T, _Dim, 1>() {}
 
   template <typename OtherDerived>
-  Sn(const Eigen::MatrixBase<OtherDerived> &other)
-      : Eigen::Matrix<T, _Dim, 1>(other) {}
+  Sn(const Eigen::MatrixBase<OtherDerived>& other) : Eigen::Matrix<T, _Dim, 1>(other) {}
 
   template <typename OtherDerived>
-  Sn &operator=(const Eigen::MatrixBase<OtherDerived> &other) {
+  Sn& operator=(const Eigen::MatrixBase<OtherDerived>& other) {
     this->Eigen::Matrix<T, _Dim, 1>::operator=(other);
     return *this;
   }
@@ -42,6 +42,6 @@ public:
   Sn inverse() = delete;
 };
 
-} // namespace manifolds
-} // namespace nonlinear_controls
-#endif // NLC_MANIFOLDS_H
+}  // namespace manifolds
+}  // namespace nonlinear_controls
+#endif  // NLC_MANIFOLDS_H

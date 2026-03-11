@@ -1,15 +1,17 @@
 #ifndef NONLINEAR_CONTROLS_DOUBLE_INT_MPC_HPP
 #define NONLINEAR_CONTROLS_DOUBLE_INT_MPC_HPP
 
-#include "mpc_qpoases.hpp"
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <memory>
 #include <qpOASES.hpp>
 
+#include "mpc_qpoases.hpp"
+
 namespace nonlinear_controls {
 
-template<unsigned int D> class DoubleIntMPC {
+template <unsigned int D>
+class DoubleIntMPC {
 protected:
   const double g{G_SI};
   int N, nx, nu;
@@ -18,9 +20,9 @@ protected:
   std::unique_ptr<LinearMPC> mpcSolver;
   VectorXd err_state, uOpt;
 
-  MatrixXd A, B;                                   // Dynamics
-  MatrixXd Q, P, R;                                // gains
-  VectorXd state_lb, state_ub, input_lb, input_ub; // bounds
+  MatrixXd A, B;                                    // Dynamics
+  MatrixXd Q, P, R;                                 // gains
+  VectorXd state_lb, state_ub, input_lb, input_ub;  // bounds
 
 public:
   DoubleIntMPC(const int N, const double _dt) : N(N), dt(_dt) {
@@ -44,14 +46,12 @@ public:
     Q.resize(nx, nx);
     P.resize(nx, nx);
     R.resize(nu, nu);
-    Q << 1000 * Eigen::Matrix<double, D, D>::Identity(),
-        Eigen::Matrix<double, D, D>::Zero(), Eigen::Matrix<double, D, D>::Zero(),
-        100 * Eigen::Matrix<double, D, D>::Identity();
-    P << 8.1314, 0.0000, -0.0000, 0.6327, -0.0000, -0.0000, 0.0000, 8.1314,
-        0.0000, 0.0000, 0.6327, 0.0000, -0.0000, 0.0000, 8.1314, -0.0000,
-        0.0000, 0.6327, 0.6327, 0.0000, -0.0000, 0.2606, -0.0000, -0.0000,
-        -0.0000, 0.6327, 0.0000, -0.0000, 0.2606, 0.0000, -0.0000, 0.0000,
-        0.6327, -0.0000, 0.0000, 0.2606;
+    Q << 1000 * Eigen::Matrix<double, D, D>::Identity(), Eigen::Matrix<double, D, D>::Zero(),
+        Eigen::Matrix<double, D, D>::Zero(), 100 * Eigen::Matrix<double, D, D>::Identity();
+    P << 8.1314, 0.0000, -0.0000, 0.6327, -0.0000, -0.0000, 0.0000, 8.1314, 0.0000, 0.0000, 0.6327,
+        0.0000, -0.0000, 0.0000, 8.1314, -0.0000, 0.0000, 0.6327, 0.6327, 0.0000, -0.0000, 0.2606,
+        -0.0000, -0.0000, -0.0000, 0.6327, 0.0000, -0.0000, 0.2606, 0.0000, -0.0000, 0.0000, 0.6327,
+        -0.0000, 0.0000, 0.2606;
     P = 1e4 * P;
     R = 1 * Eigen::Matrix<double, D, D>::Identity();
     mpcSolver->set_gains(Q, P, R);
@@ -77,8 +77,7 @@ public:
 
   ~DoubleIntMPC() = default;
 
-  void set_gains(const MatrixXd &_Q, const MatrixXd &_P,
-                 const MatrixXd &_R) {
+  void set_gains(const MatrixXd& _Q, const MatrixXd& _P, const MatrixXd& _R) {
     this->Q = _Q;
     this->P = _P;
     this->R = _R;
@@ -115,10 +114,8 @@ public:
     return uOpt.block(0, 0, nu, 1);
   }
 
-  VectorXd updateState(VectorXd state, VectorXd input) {
-    return this->A * state + this->B * input;
-  }
+  VectorXd updateState(VectorXd state, VectorXd input) { return this->A * state + this->B * input; }
 };
 
-} // namespace nonlinear_controls
-#endif // NONLINEAR_CONTROLS_DOUBLE_INT_MPC_HPP
+}  // namespace nonlinear_controls
+#endif  // NONLINEAR_CONTROLS_DOUBLE_INT_MPC_HPP

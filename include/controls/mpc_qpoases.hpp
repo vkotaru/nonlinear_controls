@@ -1,18 +1,18 @@
 #ifndef NONLINEAR_CONTROLS_CONTROLS_MPC_QPOASES_HPP
 #define NONLINEAR_CONTROLS_CONTROLS_MPC_QPOASES_HPP
 
-#include "common/qpoases_eigen.hpp"
 #include <deque>
 #include <memory>
 #include <vector>
-#include "controls/linear_mpc.hpp"
+
 #include "common/log.hpp"
+#include "common/qpoases_eigen.hpp"
+#include "controls/linear_mpc.hpp"
 
 namespace nonlinear_controls {
 
 class MPCQPOases : public LinearMPC {
 protected:
-
   std::unique_ptr<qpOASES::SQProblem> solver;
   qpOASES::int_t nWSR = 10;
   qpOASES::Options options;
@@ -29,7 +29,7 @@ protected:
     nWSR = 1e7;
   }
 
-  std::optional<MatrixXd> solve(const VectorXd &_x0) {
+  std::optional<MatrixXd> solve(const VectorXd& _x0) {
     this->updateCArrays(_x0);
     /**
      * NOTE: the qpOASES solver works only if the
@@ -41,7 +41,8 @@ protected:
      *
      * nWSR is currently used as an input and an output variable.
      * This means that the maximum number of allowed working set changes will decrease monotonically
-     * and will eventually trigger the error. Just make sure to set nWSR before each call to hotstart.
+     * and will eventually trigger the error. Just make sure to set nWSR before each call to
+     *hotstart.
      **/
     int n = nWSR;
     qpOASES::returnValue sol;
@@ -68,20 +69,19 @@ protected:
     }
 
     Eigen::Matrix<double, Eigen::Dynamic, 1> x_optVec;
-    x_optVec =
-        Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(x_opt, n_vars, 1);
+    x_optVec = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(x_opt, n_vars, 1);
 
-    Uarray = x_optVec; // saved for generating the trajectory
+    Uarray = x_optVec;  // saved for generating the trajectory
     return std::optional<MatrixXd>{x_optVec};
   }
 
 public:
-  MPCQPOases(const long &N, const long &nx, const long &nu) : LinearMPC(N, nx, nu) {
+  MPCQPOases(const long& N, const long& nx, const long& nu) : LinearMPC(N, nx, nu) {
     /// QP solver Setup
     create_solver();
   }
 
-  void set_input_bounds(const VectorXd &lb, const VectorXd &ub) override {
+  void set_input_bounds(const VectorXd& lb, const VectorXd& ub) override {
     LinearMPC::set_input_bounds(lb, ub);
     /// set only once
     data_.lb = Ulb;
@@ -98,24 +98,18 @@ public:
     qp_initialized = false;
   }
   void print() override {
-    std::cout << "--------------------------------------------------"
-              << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
     std::cout << "*           QP setup       *" << std::endl;
-    std::cout << "--------------------------------------------------"
-              << std::endl;
-    std::cout << "H: \n"
-              << data_.H << "\nf: \n"
-              << data_.g.transpose() << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
+    std::cout << "H: \n" << data_.H << "\nf: \n" << data_.g.transpose() << std::endl;
     std::cout << "\nlbA: \n"
               << data_.lbA.transpose() << "\nA: \n"
               << data_.A << "\nubA: \n"
               << data_.ubA.transpose() << std::endl;
-    std::cout << "\nlb: " << data_.lb.transpose()
-              << "\nub: " << data_.ub.transpose() << std::endl;
-    std::cout << "-------------------*****---------------------------"
-              << std::endl;
+    std::cout << "\nlb: " << data_.lb.transpose() << "\nub: " << data_.ub.transpose() << std::endl;
+    std::cout << "-------------------*****---------------------------" << std::endl;
   }
-  void updateCArrays(const VectorXd &_x0) override {
+  void updateCArrays(const VectorXd& _x0) override {
     data_.lbA = (Xlb - Sx * _x0);
     data_.ubA = (Xub - Sx * _x0);
     data_.g = (2 * F.transpose() * _x0);
@@ -128,7 +122,7 @@ public:
     lbAc = data_.lbA.transpose().data();
     ubAc = data_.ubA.transpose().data();
   }
-  std::optional<MatrixXd> run(const VectorXd &_x0, const VectorXd &xd_) override {
+  std::optional<MatrixXd> run(const VectorXd& _x0, const VectorXd& xd_) override {
     if (!valid_state(_x0)) {
       Logger::ERROR("Infeasible initial condition!");
       return std::nullopt;
@@ -140,9 +134,7 @@ public:
     Xub = (state_bnds_.ub - xd_).replicate(N + 1, 1);
     return solve(_x0 - xd_);
   }
-  void reset() override {
-    solver_initialized = false;
-  }
+  void reset() override { solver_initialized = false; }
   Eigen::MatrixXd X() override {
     // use this function only after the solve function is implemented
     Eigen::MatrixXd x_traj;
@@ -157,5 +149,5 @@ public:
   }
 };
 
-} // namespace nonlinear_controls
-#endif // NONLINEAR_CONTROLS_CONTROLS_MPC_QPOASES_HPP
+}  // namespace nonlinear_controls
+#endif  // NONLINEAR_CONTROLS_CONTROLS_MPC_QPOASES_HPP

@@ -4,8 +4,8 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/unsupported/Eigen/MatrixFunctions>
 
-#include "manifolds.hpp"
 #include "SO3.hpp"
+#include "manifolds.hpp"
 
 namespace nonlinear_controls {
 using namespace manifolds;
@@ -17,9 +17,9 @@ public:
 
   Eigen::Vector3d position{};
   Eigen::Vector3d velocity{};
-  Eigen::Vector3d acceleration{}; // feed-forward
+  Eigen::Vector3d acceleration{};  // feed-forward
 
-  TSE3 &operator=(const TSE3 &other) {
+  TSE3& operator=(const TSE3& other) {
     this->position = other.position;
     this->velocity = other.velocity;
     this->acceleration = other.acceleration;
@@ -35,24 +35,21 @@ public:
     TSO3::print();
   }
 
-  Eigen::Matrix<double, 12, 1> error(const TSE3 &other) {
-//    std::cout << "this " << std::endl;
-//    this->print();
-//    std::cout << "other" << std::endl;
-//    other.print();
+  Eigen::Matrix<double, 12, 1> error(const TSE3& other) {
+    //    std::cout << "this " << std::endl;
+    //    this->print();
+    //    std::cout << "other" << std::endl;
+    //    other.print();
 
     Eigen::Vector3d pos_err = this->position - other.position;
     Eigen::Vector3d vel_err = this->velocity - other.velocity;
     Eigen::Vector3d rot_err = this->R.error(other.R);
-    Eigen::Vector3d ang_vel_err =
-        this->Omega - this->R.transpose() * other.R * other.Omega;
+    Eigen::Vector3d ang_vel_err = this->Omega - this->R.transpose() * other.R * other.Omega;
 
     return (Eigen::Matrix<double, 12, 1>() << pos_err, vel_err, rot_err, ang_vel_err).finished();
   }
 
-  Eigen::Matrix<double, 12, 1> operator-(const TSE3 &other) {
-    return this->error(other);
-  }
+  Eigen::Matrix<double, 12, 1> operator-(const TSE3& other) { return this->error(other); }
 
   TSO3 extractTSO3() {
     TSO3 att;
@@ -62,6 +59,6 @@ public:
   }
 };
 
-} // namespace nonlinear_controls
+}  // namespace nonlinear_controls
 
-#endif // NLC_SE3_HPP
+#endif  // NLC_SE3_HPP

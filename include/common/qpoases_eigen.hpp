@@ -9,8 +9,7 @@ namespace nonlinear_controls {
 
 struct QPOasesData {
   Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic> H, A;
-  Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic> g, lb, ub, lbA,
-      ubA;
+  Eigen::Matrix<qpOASES::real_t, Eigen::Dynamic, Eigen::Dynamic> g, lb, ub, lbA, ubA;
   qpOASES::int_t nWSR{};
 };
 
@@ -76,8 +75,7 @@ public:
     qpOASES::real_t x_opt[nvars];
     problem.getPrimalSolution(x_opt);
     Eigen::Matrix<double, Eigen::Dynamic, 1> x_optVec;
-    x_optVec =
-        Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(x_opt, nvars, 1);
+    x_optVec = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(x_opt, nvars, 1);
     return x_optVec;
   }
 
@@ -85,22 +83,16 @@ public:
   qpOASES::Options options;
 
   void print() {
-    std::cout << "--------------------------------------------------"
-              << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
     std::cout << "*           QP setup       *" << std::endl;
-    std::cout << "--------------------------------------------------"
-              << std::endl;
-    std::cout << "H: \n"
-              << data_.H << "\nf: \n"
-              << data_.g.transpose() << std::endl;
+    std::cout << "--------------------------------------------------" << std::endl;
+    std::cout << "H: \n" << data_.H << "\nf: \n" << data_.g.transpose() << std::endl;
     std::cout << "\nlbA: \n"
               << data_.lbA.transpose() << "\nA: \n"
               << data_.A << "\nubA: \n"
               << data_.ubA.transpose() << std::endl;
-    std::cout << "\nlb: " << data_.lb.transpose()
-              << "\nub: " << data_.ub.transpose() << std::endl;
-    std::cout << "-------------------*****---------------------------"
-              << std::endl;
+    std::cout << "\nlb: " << data_.lb.transpose() << "\nub: " << data_.ub.transpose() << std::endl;
+    std::cout << "-------------------*****---------------------------" << std::endl;
   }
 
   void reset_data() {
@@ -114,6 +106,6 @@ public:
   }
 };
 
-} // namespace nonlinear_controls
+}  // namespace nonlinear_controls
 
-#endif // NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN_HPP
+#endif  // NONLINEAR_CONTROLS_COMMON_QPOASES_EIGEN_HPP

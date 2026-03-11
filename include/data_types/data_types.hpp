@@ -3,10 +3,10 @@
 
 #include <utility>
 
-#include "manifolds.hpp"
-#include "SO3.hpp"
-#include "SE3.hpp"
 #include "S2.hpp"
+#include "SE3.hpp"
+#include "SO3.hpp"
+#include "manifolds.hpp"
 
 namespace nonlinear_controls {
 using namespace manifolds;
@@ -25,17 +25,11 @@ public:
   inline Eigen::Vector3d ki() const { return ki_; }
   inline Eigen::Vector3d kd() const { return kd_; }
 
-  void set_kp(Eigen::Vector3d _kp) {
-    kp_ = std::move(_kp);
-  }
+  void set_kp(Eigen::Vector3d _kp) { kp_ = std::move(_kp); }
 
-  void set_ki(Eigen::Vector3d _ki) {
-    ki_ = std::move(_ki);
-  }
+  void set_ki(Eigen::Vector3d _ki) { ki_ = std::move(_ki); }
 
-  void set_kd(Eigen::Vector3d _kd) {
-    kd_ = std::move(_kd);
-  }
+  void set_kd(Eigen::Vector3d _kd) { kd_ = std::move(_kd); }
 };
 
 class Wrench {
@@ -56,5 +50,5 @@ public:
   }
 };
 
-} // namespace nonlinear_controls
-#endif // NLC_DATA_TYPES_HPP
+}  // namespace nonlinear_controls
+#endif  // NLC_DATA_TYPES_HPP

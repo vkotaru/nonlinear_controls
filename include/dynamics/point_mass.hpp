@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-//#include "nonlinear_controls.h"
+// #include "nonlinear_controls.h"
 #include "matplotlibcpp.h"
 
 namespace nonlinear_controls {
@@ -53,20 +53,20 @@ public:
   explicit PointMass3D(const double dt) : h(dt) {
     A_.setIdentity();
     A_.topRightCorner(3, 3) += dt * Eigen::Matrix3d::Identity();
-    B_ << 0.5 * dt * dt * Eigen::Matrix3d::Identity(),
-        dt * Eigen::Matrix3d::Identity();
+    B_ << 0.5 * dt * dt * Eigen::Matrix3d::Identity(), dt * Eigen::Matrix3d::Identity();
   }
 
   ~PointMass3D() = default;
 
-  void init(const Eigen::Matrix<double, 6, 1> &_state, bool do_log = false, const double time_elapsed = 0) {
+  void init(const Eigen::Matrix<double, 6, 1>& _state, bool do_log = false,
+            const double time_elapsed = 0) {
     state_ = _state;
     t = 0;
     if (do_log)
-      log(0, state_, Eigen::Vector3d::Zero(), time_elapsed); // Note, dummy input for convenience
+      log(0, state_, Eigen::Vector3d::Zero(), time_elapsed);  // Note, dummy input for convenience
   }
 
-  void step(const Eigen::Vector3d &u, bool do_log = false, const double time_elapsed = 0) {
+  void step(const Eigen::Vector3d& u, bool do_log = false, const double time_elapsed = 0) {
     Eigen::Vector3d net_accel = (u - Eigen::Vector3d(0., 0., 9.81)) / mass;
     state_ = A_ * state_ + B_ * net_accel;
     t += h;
@@ -74,9 +74,7 @@ public:
       log(t, state_, u, time_elapsed);
   }
 
-  void log(const double _t,
-           const Eigen::Matrix<double, 6, 1> &st,
-           const Eigen::Vector3d &u,
+  void log(const double _t, const Eigen::Matrix<double, 6, 1>& st, const Eigen::Vector3d& u,
            const double time_elapsed = 0) {
     log_vars.t.push_back(_t);
     log_vars.x.push_back(st(0));
@@ -119,14 +117,11 @@ public:
     plt::grid(true);
     plt::show();
   }
-  void clear_log_vars() {
-    log_vars.clear();
-  }
+  void clear_log_vars() { log_vars.clear(); }
 
   inline const Eigen::Matrix<double, 6, 6> A() const { return A_; }
   inline const Eigen::Matrix<double, 6, 3> B() const { return B_; }
   inline const Eigen::Matrix<double, 6, 1> state() const { return state_; }
-
 };
 
-}
+}  // namespace nonlinear_controls
