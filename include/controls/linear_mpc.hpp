@@ -116,35 +116,31 @@ public:
   }
 
   // main functions
-  virtual void construct() {
-    throw std::invalid_argument("LinearMPCBase::construct not implemented");
-  }
+  virtual void construct() { throw std::logic_error("LinearMPCBase::construct not implemented"); }
   virtual void init(const VectorXd& _x0) {
-    throw std::invalid_argument("LinearMPCBase::init not implemented");
+    throw std::logic_error("LinearMPCBase::init not implemented");
   }
 
   virtual std::optional<MatrixXd> run(const VectorXd& _x0) {
-    throw std::invalid_argument("LinearMPCBase::run not implemented");
+    throw std::logic_error("LinearMPCBase::run not implemented");
   }
   virtual std::optional<MatrixXd> run(const VectorXd& _x0, const VectorXd& xd_) {
-    throw std::invalid_argument("LinearMPCBase::run not implemented");
+    throw std::logic_error("LinearMPCBase::run not implemented");
   }
   virtual std::optional<MatrixXd> run(const VectorXd& _x0, const MatrixXd& a, const MatrixXd& b) {
-    throw std::invalid_argument("LinearMPCBase::updateCArrays not implemented");
+    throw std::logic_error("LinearMPCBase::updateCArrays not implemented");
   }
 
   virtual void updateCArrays(const VectorXd& _x0) {
-    throw std::invalid_argument("LinearMPCBase::updateCArrays not implemented");
+    throw std::logic_error("LinearMPCBase::updateCArrays not implemented");
   }
-  virtual void print() { throw std::invalid_argument("LinearMPCBase::print not implemented"); }
+  virtual void print() { throw std::logic_error("LinearMPCBase::print not implemented"); }
 
   // setters
   void set_max_iter(const int max_iter) { this->max_iter = max_iter; }
   void set_cpu_time_limit(const qpOASES::real_t t) { cpu_time_limit = t; }
-  virtual Eigen::MatrixXd X() {
-    throw std::invalid_argument("LinearMPCBase::print not implemented");
-  }
-  virtual void reset() { throw std::invalid_argument("LinearMPCBase::reset not implemented"); }
+  virtual Eigen::MatrixXd X() { throw std::logic_error("LinearMPCBase::print not implemented"); }
+  virtual void reset() { throw std::logic_error("LinearMPCBase::reset not implemented"); }
   bool valid_state(const VectorXd& _x0) const {
     return (state_bnds_.lb - _x0).maxCoeff() < 0 && (_x0 - state_bnds_.ub).maxCoeff() < 0;
   }

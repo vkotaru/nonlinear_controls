@@ -3,6 +3,7 @@
 
 #include <deque>
 #include <memory>
+#include <sstream>
 #include <vector>
 
 #include "common/log.hpp"
@@ -98,16 +99,19 @@ public:
     qp_initialized = false;
   }
   void print() override {
-    std::cout << "--------------------------------------------------" << std::endl;
-    std::cout << "*           QP setup       *" << std::endl;
-    std::cout << "--------------------------------------------------" << std::endl;
-    std::cout << "H: \n" << data_.H << "\nf: \n" << data_.g.transpose() << std::endl;
-    std::cout << "\nlbA: \n"
-              << data_.lbA.transpose() << "\nA: \n"
-              << data_.A << "\nubA: \n"
-              << data_.ubA.transpose() << std::endl;
-    std::cout << "\nlb: " << data_.lb.transpose() << "\nub: " << data_.ub.transpose() << std::endl;
-    std::cout << "-------------------*****---------------------------" << std::endl;
+    std::ostringstream oss;
+    oss << "--------------------------------------------------\n"
+        << "*           QP setup       *\n"
+        << "--------------------------------------------------\n"
+        << "H: \n"
+        << data_.H << "\nf: \n"
+        << data_.g.transpose() << "\n\nlbA: \n"
+        << data_.lbA.transpose() << "\nA: \n"
+        << data_.A << "\nubA: \n"
+        << data_.ubA.transpose() << "\n\nlb: " << data_.lb.transpose()
+        << "\nub: " << data_.ub.transpose()
+        << "\n-------------------*****---------------------------";
+    Logger::INFO(oss.str());
   }
   void updateCArrays(const VectorXd& _x0) override {
     data_.lbA = (Xlb - Sx * _x0);

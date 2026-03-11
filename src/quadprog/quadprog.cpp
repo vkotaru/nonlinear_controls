@@ -3,6 +3,8 @@
 //
 #include "quadprog/quadprog.h"
 
+#include <stdexcept>
+
 namespace nonlinear_controls {
 
 QuadProg::QuadProg(const int& n, const int& m, const int& p) : nv(n), ni(m), ne(p) {
@@ -21,7 +23,7 @@ QuadProg::QuadProg(const int& n, const int& m, const int& p) : nv(n), ni(m), ne(
 QuadProg::~QuadProg() = default;
 
 int QuadProg::solve() {
-  throw std::string("Quadprog::Solve is not implemented yet.");
+  throw std::logic_error("QuadProg::solve is not implemented");
 }
 
 }  // namespace nonlinear_controls
