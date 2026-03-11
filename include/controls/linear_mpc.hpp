@@ -145,17 +145,11 @@ public:
     throw std::invalid_argument("LinearMPCBase::print not implemented");
   }
   virtual void reset() { throw std::invalid_argument("LinearMPCBase::reset not implemented"); }
-  bool valid_state(const VectorXd& _x0) {
-    if ((state_bnds_.lb - _x0).maxCoeff() < 0 && (_x0 - state_bnds_.ub).maxCoeff() < 0)
-      return true;
-    else
-      return false;
+  bool valid_state(const VectorXd& _x0) const {
+    return (state_bnds_.lb - _x0).maxCoeff() < 0 && (_x0 - state_bnds_.ub).maxCoeff() < 0;
   }
-  bool valid_input(const VectorXd& _u0) {
-    if ((input_bnds_.lb - _u0).maxCoeff() < 0 && (_u0 - input_bnds_.ub).maxCoeff() < 0)
-      return true;
-    else
-      return false;
+  bool valid_input(const VectorXd& _u0) const {
+    return (input_bnds_.lb - _u0).maxCoeff() < 0 && (_u0 - input_bnds_.ub).maxCoeff() < 0;
   }
 };
 

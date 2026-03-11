@@ -58,13 +58,13 @@ protected:
 
     if (verbose) {
       if (sol == qpOASES::SUCCESSFUL_RETURN) {
-        std::cout << "SUCCESSFUL_RETURN" << std::endl;
+        Logger::SUCCESS("QP solved: SUCCESSFUL_RETURN");
       } else if (sol == qpOASES::RET_MAX_NWSR_REACHED) {
-        std::cout << "RET_MAX_NWSR_REACHED" << std::endl;
+        Logger::WARN("QP solver: RET_MAX_NWSR_REACHED");
       } else if (sol == qpOASES::RET_INIT_FAILED) {
-        std::cout << "RET_INIT_FAILED" << std::endl;
+        Logger::ERROR("QP solver: RET_INIT_FAILED");
       } else {
-        std::cout << "Something else" << std::endl;
+        Logger::ERROR("QP solver: Unknown return value");
       }
     }
 

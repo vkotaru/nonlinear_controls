@@ -5,6 +5,8 @@
 #include <iostream>
 #include <qpOASES.hpp>
 
+#include "common/log.hpp"
+
 namespace nonlinear_controls {
 
 struct QPOasesData {
@@ -57,13 +59,13 @@ public:
     eigen_to_array();
     qpOASES::returnValue sol = problem.init(H, g, A, lb, ub, lbA, ubA, nWSR);
     if (sol == qpOASES::SUCCESSFUL_RETURN) {
-      std::cout << "SUCCESSFUL_RETURN" << std::endl;
+      Logger::SUCCESS("QP solved: SUCCESSFUL_RETURN");
     } else if (sol == qpOASES::RET_MAX_NWSR_REACHED) {
-      std::cout << "RET_MAX_NWSR_REACHED" << std::endl;
+      Logger::WARN("QP solver: RET_MAX_NWSR_REACHED");
     } else if (sol == qpOASES::RET_INIT_FAILED) {
-      std::cout << "RET_INIT_FAILED" << std::endl;
+      Logger::ERROR("QP solver: RET_INIT_FAILED");
     } else {
-      std::cout << "Something else" << std::endl;
+      Logger::ERROR("QP solver: Unknown return value");
     }
     return sol;
   }

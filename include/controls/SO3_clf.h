@@ -6,6 +6,7 @@
 #include <qpOASES.hpp>
 
 #include "SO3_control.h"
+#include "common/log.hpp"
 #include "common/qpoases_eigen.hpp"
 #include "common/utils.hpp"
 #include "data_types/data_types.hpp"
@@ -54,7 +55,7 @@ public:
 
   virtual void init() override;
   virtual void run(double dt) {
-    std::cout << "This is not the correct way to call this function" << std::endl;
+    Logger::ERROR("This is not the correct way to call this function");
   }
   void run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d& u);
 };

@@ -7,6 +7,7 @@
 #include <qpOASES.hpp>
 
 #include "SO3_control.h"
+#include "common/log.hpp"
 #include "common/qpoases_eigen.hpp"
 #include "common/utils.hpp"
 #include "data_types/data_types.hpp"
@@ -62,7 +63,7 @@ public:
 
   /// function to integrate dynamics
   void updateState(Eigen::Matrix<double, 6, 1>& state, const Eigen::Vector3d& input) {
-    std::cout << "updateState: not implemented" << std::endl;
+    Logger::WARN("updateState: not implemented");
   }
 };
 
