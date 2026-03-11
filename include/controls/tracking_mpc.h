@@ -6,10 +6,9 @@
 #define NONLINEAR_CONTROLS_TRACKING_MPC_H
 
 #include "controls/mpc_qpoases.hpp"
-#include "deque"
-#include "quadprog/qpswift_eigen.h"
 #include "quadprog/quadprog.h"
-#include "vector"
+#include <deque>
+#include <vector>
 
 namespace nonlinear_controls {
 

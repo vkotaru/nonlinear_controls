@@ -3,16 +3,12 @@
 [![CI](https://github.com/vkotaru/nonlinear_controls/actions/workflows/ci.yml/badge.svg)](https://github.com/vkotaru/nonlinear_controls/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE)
 
-A modern C++ library for nonlinear control systems, including Model Predictive Control (MPC), Control Lyapunov Function based QP (CLF-QP), and geometric controllers for robotics applications.
+A modern C++ library for nonlinear control systems, including Model Predictive Control (MPC) and geometric controllers for robotics applications.
 
 ## Features
 
-- **Linear MPC**: Time-invariant linear MPC with multiple solver backends
-  - qpOASES solver (bundled)
-  - OSQP via OsqpEigen (optional)
-  - Epigraph (optional, supports OSQP and ECOS)
+- **Linear MPC**: Time-invariant linear MPC with qpOASES solver (bundled)
 - **Geometric Controllers**: SO(3) and SE(3) pose controllers
-- **CLF-QP**: Control Lyapunov Function based Quadratic Program controllers
 - **Manifold Data Types**: SO3, SE3, S2 with proper error computations
 
 ## Requirements
@@ -44,7 +40,6 @@ sudo cmake --install build
 | `NLC_BUILD_TESTS` | ON | Build unit tests |
 | `NLC_BUILD_EXAMPLES` | ON | Build example applications |
 | `NLC_ENABLE_MATPLOTLIB` | OFF | Enable matplotlib plotting (requires Python) |
-| `NLC_ENABLE_EPIGRAPH` | ON | Enable Epigraph solver support |
 
 ### Using in Your Project
 
@@ -143,7 +138,7 @@ nonlinear_controls/
 ├── src/                # Implementation files
 ├── tests/              # Unit tests (Google Test)
 ├── examples/           # Example applications
-└── third_party/        # Bundled dependencies (qpOASES, Epigraph)
+└── third_party/        # Bundled dependencies (qpOASES)
 ```
 
 ## Contributing
@@ -157,5 +152,4 @@ This project is licensed under the BSD 3-Clause License - see [LICENSE](LICENSE)
 ## Acknowledgments
 
 - [qpOASES](https://github.com/coin-or/qpOASES) - Quadratic Programming solver
-- [Epigraph](https://github.com/EmbersArc/Epigraph) - Convex optimization modeling
 - [OsqpEigen](https://github.com/robotology/osqp-eigen) - OSQP C++ interface

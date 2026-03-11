@@ -29,7 +29,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 option(NLC_BUILD_TESTS "Build unit tests" ON)
 option(NLC_BUILD_EXAMPLES "Build example applications" ON)
 option(NLC_ENABLE_MATPLOTLIB "Enable matplotlib-cpp for plotting (requires Python)" OFF)
-option(NLC_ENABLE_EPIGRAPH "Enable Epigraph solver support" ON)
 
 # ------------------------------------------------------------------------------
 # Dependencies
@@ -38,7 +37,7 @@ find_package(Eigen3 REQUIRED)
 find_package(OsqpEigen QUIET)
 
 if(NOT OsqpEigen_FOUND)
-    message(WARNING "OsqpEigen not found. Some features may be unavailable.")
+    message(STATUS "OsqpEigen not found. OSQP solver features unavailable.")
 endif()
 
 # Optional matplotlib support
@@ -61,7 +60,6 @@ set(NLC_SOURCES
     src/SO3_clf.cpp
     src/tracking_mpc.cpp
     src/quadprog/quadprog.cpp
-    src/quadprog/qpswift_eigen.cpp
 )
 
 # ------------------------------------------------------------------------------
@@ -92,16 +90,6 @@ target_include_directories(nonlinear_controls
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/third_party/qpOASES/include>
 )
-
-# Link Epigraph if enabled (PRIVATE since bundled third-party)
-if(NLC_ENABLE_EPIGRAPH)
-    target_link_libraries(nonlinear_controls PRIVATE epigraph)
-    target_compile_definitions(nonlinear_controls PUBLIC NLC_HAS_EPIGRAPH)
-    target_include_directories(nonlinear_controls
-        PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/third_party/Epigraph/include>
-    )
-endif()
 
 # Matplotlib support (optional)
 if(NLC_ENABLE_MATPLOTLIB)
@@ -142,14 +130,13 @@ endif()
 # Examples
 # ------------------------------------------------------------------------------
 if(NLC_BUILD_EXAMPLES)
-    # Only build examples that don't require matplotlib, or if matplotlib is enabled
-    if(NLC_ENABLE_MATPLOTLIB AND NLC_ENABLE_EPIGRAPH)
+    if(NLC_ENABLE_MATPLOTLIB)
         add_executable(example_point_mass examples/mpc_point_mass.cpp)
         target_link_libraries(example_point_mass PRIVATE nonlinear_controls)
         target_include_directories(example_point_mass PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/third_party/matplotlib-cpp)
     else()
-        message(STATUS "Skipping example_point_mass (requires NLC_ENABLE_MATPLOTLIB and NLC_ENABLE_EPIGRAPH)")
+        message(STATUS "Skipping example_point_mass (requires NLC_ENABLE_MATPLOTLIB)")
     endif()
 endif()
 
@@ -159,19 +146,12 @@ endif()
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
-# Install library (without export set due to third-party dependencies)
+# Install library
 install(TARGETS nonlinear_controls qpOASES
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-if(NLC_ENABLE_EPIGRAPH)
-    install(TARGETS epigraph
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    )
-endif()
 
 # Install headers
 install(DIRECTORY include/
@@ -185,12 +165,6 @@ install(DIRECTORY include/
 install(DIRECTORY third_party/qpOASES/include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
-
-if(NLC_ENABLE_EPIGRAPH)
-    install(DIRECTORY third_party/Epigraph/include/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    )
-endif()
 
 # Generate version file
 write_basic_package_version_file(
@@ -221,6 +195,5 @@ message(STATUS "  Build type:     ${CMAKE_BUILD_TYPE}")
 message(STATUS "  Tests:          ${NLC_BUILD_TESTS}")
 message(STATUS "  Examples:       ${NLC_BUILD_EXAMPLES}")
 message(STATUS "  Matplotlib:     ${NLC_ENABLE_MATPLOTLIB}")
-message(STATUS "  Epigraph:       ${NLC_ENABLE_EPIGRAPH}")
 message(STATUS "  OsqpEigen:      ${OsqpEigen_FOUND}")
 message(STATUS "")

@@ -11,7 +11,6 @@
 // controls
 #include "controls/SO3_clf.h"
 #include "controls/linear_mpc.hpp"
-#include "controls/mpc_epigraph.hpp"
 #include "controls/mpc_qpoases.hpp"
 
 // dynamics

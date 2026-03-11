@@ -41,8 +41,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DNLC_BUILD_TESTS=ON \
           -DNLC_BUILD_EXAMPLES=ON \
-          -DNLC_ENABLE_MATPLOTLIB=OFF \
-          -DNLC_ENABLE_EPIGRAPH=OFF
+          -DNLC_ENABLE_MATPLOTLIB=OFF
 
     - name: Build
       run: cmake --build build --config Release -j$(nproc)

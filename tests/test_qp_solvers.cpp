@@ -1,13 +1,12 @@
 /**
  * @file test_qp_solvers.cpp
- * @brief Unit tests for QP solvers (qpOASES, QPSwift)
+ * @brief Unit tests for QP solvers (qpOASES)
  */
 
 #include <gtest/gtest.h>
 #include <Eigen/Dense>
 
 #include "common/qpoases_eigen.hpp"
-#include "quadprog/qpswift_eigen.h"
 
 namespace nlc = nonlinear_controls;
 
@@ -117,43 +116,6 @@ TEST_F(QPOasesEigenTest, ThreeVariableQP) {
     // Verify constraint is satisfied
     double constraint_val = x_opt(0) + 3.0 * x_opt(1) + 4.0 * x_opt(2);
     EXPECT_LE(constraint_val, -3.0 + 1e-6);
-}
-
-// =============================================================================
-// QPSwiftEigen Tests
-// Note: QPSwift solver is not fully implemented, so these tests are disabled
-// =============================================================================
-
-class QPSwiftEigenTest : public ::testing::Test {
-protected:
-    void SetUp() override {
-        // QPSwift uses inequality constraints: Ax <= b
-    }
-};
-
-TEST_F(QPSwiftEigenTest, DISABLED_SimpleQPWithBoxConstraints) {
-    // Note: QPSwift solver implementation is incomplete
-    // This test is disabled until the solver is properly implemented
-    nlc::QPSwiftEigen qp(2, 6, 0);
-    qp.H << 1.0, 0.0, 0.0, 0.5;
-    qp.f << 1.5, 1.0;
-    qp.c = 0;
-
-    qp.A << 1.0, 0.0,
-           -1.0, 0.0,
-            0.0, 1.0,
-            0.0, -1.0,
-            1.0, 1.0,
-           -1.0, -1.0;
-
-    qp.b << 5.0, -0.5, 2.0, 2.0, 2.0, 1.0;
-
-    int status = qp.solve();
-    EXPECT_EQ(status, 0) << "QPSwift should return 0 for successful solve";
-
-    // Result is stored in xOpt member
-    EXPECT_GE(qp.xOpt(0), 0.5 - 1e-4);
-    EXPECT_LE(qp.xOpt(0), 5.0 + 1e-4);
 }
 
 // =============================================================================
