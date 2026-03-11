@@ -1,5 +1,7 @@
 #include "controls/SO3_vblmpc.h"
 
+#include <sstream>
+
 namespace nonlinear_controls {
 
 SO3VblMPC::SO3VblMPC(bool islti, int _N, double _dt) {
@@ -18,14 +20,17 @@ SO3VblMPC::SO3VblMPC(bool islti, int _N, double _dt, Eigen::Matrix<double, 3, 3>
   inertia_inv_ = inertia_.inverse();
 
   if (!IS_LTI) {
-    std::cout << "IS LTV is not yet implemented" << std::endl;
+    Logger::WARN("IS LTV is not yet implemented");
   }
 
   if (verbose) {
-    std::cout << "//////////////////////////////" << std::endl;
-    std::cout << "SO3VblMPC constructor" << std::endl;
-    std::cout << "inertia\n" << inertia_ << std::endl;
-    std::cout << "inertia_inv\n" << inertia_inv_ << std::endl;
+    std::ostringstream oss;
+    oss << "//////////////////////////////\n"
+        << "SO3VblMPC constructor\n"
+        << "inertia\n"
+        << inertia_ << "\ninertia_inv\n"
+        << inertia_inv_;
+    Logger::INFO(oss.str());
   }
 
   if (IS_LTI) {
@@ -47,11 +52,14 @@ SO3VblMPC::SO3VblMPC(bool islti, int _N, double _dt, Eigen::Matrix<double, 3, 3>
     mpcSolver->init_dynamics(A, B);
   }
   if (verbose) {
-    std::cout << "//////////////////////////////" << std::endl;
-    std::cout << "dt " << dt << std::endl;
-    std::cout << "Initializing dynamics ... " << std::endl;
-    std::cout << "A: \n" << A << std::endl;
-    std::cout << "B: \n" << B << std::endl;
+    std::ostringstream oss;
+    oss << "//////////////////////////////\n"
+        << "dt " << dt << "\n"
+        << "Initializing dynamics ...\n"
+        << "A:\n"
+        << A << "\nB:\n"
+        << B;
+    Logger::INFO(oss.str());
   }
   /// gains
   Q.resize(nx, nx);
@@ -101,11 +109,12 @@ void SO3VblMPC::init_dynamics(Eigen::Matrix<double, 3, 1> Omd) {
   generate_dynamics(Omd, A);
   mpcSolver->init_dynamics(A, B);
   if (verbose) {
-    std::cout << "////////////////////////////////////\n"
-                 "Omega "
-              << Omd.transpose() << std::endl;
-    std::cout << "A\n" << A << std::endl;
-    std::cout << "B\n" << B << std::endl;
+    std::ostringstream oss;
+    oss << "////////////////////////////////////\n"
+        << "Omega " << Omd.transpose() << "\nA\n"
+        << A << "\nB\n"
+        << B;
+    Logger::INFO(oss.str());
   }
 }
 void SO3VblMPC::init_dynamics(TSO3 attd) {
@@ -118,11 +127,13 @@ void SO3VblMPC::run(double dt, TSO3 x, TSO3 xd, Eigen::Matrix<double, 3, 1>& u) 
   // for the next N steps
   auto x0 = x - xd;
   if (verbose) {
-    std::cout << "x\n" << std::endl;
+    Logger::INFO("x:");
     x.print();
-    std::cout << "xd\n" << std::endl;
+    Logger::INFO("xd:");
     xd.print();
-    std::cout << "x0: " << x0.transpose() << std::endl;
+    std::ostringstream oss;
+    oss << "x0: " << x0.transpose();
+    Logger::INFO(oss.str());
   }
 
   if (IS_LTI) {
@@ -130,7 +141,9 @@ void SO3VblMPC::run(double dt, TSO3 x, TSO3 xd, Eigen::Matrix<double, 3, 1>& u) 
     uOpt = mpcSolver->run(x0);
 
     if (verbose) {
-      std::cout << "uOpt " << uOpt.transpose() << std::endl;
+      std::ostringstream oss;
+      oss << "uOpt " << uOpt.transpose();
+      Logger::INFO(oss.str());
     }
   } else {
     generate_dynamics(xd.Omega, A);
@@ -139,7 +152,7 @@ void SO3VblMPC::run(double dt, TSO3 x, TSO3 xd, Eigen::Matrix<double, 3, 1>& u) 
   u = uOpt.block(0, 0, 3, 1);
   u += x.Omega.cross(inertia_ * x.Omega);
   u += -inertia_ *
-       (x.Omega.cross(x.R.transpose() * xd.R * xd.Omega) - x.R.transpose() * xd.R * xd.dOmega);
+       (x.Omega.cross(x.R.transpose() * xd.R * xd.Omega) - x.R.transpose() * xd.R * xd.d_omega);
 }
 
 void SO3VblMPC::set_gains(const MatrixXd& _Q, const MatrixXd& _P, const MatrixXd& _R) {
@@ -147,12 +160,9 @@ void SO3VblMPC::set_gains(const MatrixXd& _Q, const MatrixXd& _P, const MatrixXd
   this->P = _P;
   this->R = _R;
 
-  std::cout << "SO3VblMPC: setting gains\n Q:\n" << std::endl;
-  std::cout << _Q << std::endl;
-  std::cout << "P:\n";
-  std::cout << _P << std::endl;
-  std::cout << "R:\n" << std::endl;
-  std::cout << _R << std::endl;
+  std::ostringstream oss;
+  oss << "SO3VblMPC: setting gains\nQ:\n" << _Q << "\nP:\n" << _P << "\nR:\n" << _R;
+  Logger::INFO(oss.str());
 
   mpcSolver->set_gains(Q, P, R);
 }

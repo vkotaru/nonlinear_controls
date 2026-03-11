@@ -5,7 +5,9 @@
 #include <iostream>
 #include <memory>
 #include <qpOASES.hpp>
+#include <sstream>
 
+#include "common/log.hpp"
 #include "mpc_qpoases.hpp"
 
 namespace nonlinear_controls {
@@ -82,12 +84,9 @@ public:
     this->P = _P;
     this->R = _R;
 
-    std::cout << "SO3VblMPC: setting gains\n Q:\n" << std::endl;
-    std::cout << _Q << std::endl;
-    std::cout << "P:\n";
-    std::cout << _P << std::endl;
-    std::cout << "R:\n" << std::endl;
-    std::cout << _R << std::endl;
+    std::ostringstream oss;
+    oss << "DoubleIntMPC: setting gains\nQ:\n" << _Q << "\nP:\n" << _P << "\nR:\n" << _R;
+    Logger::INFO(oss.str());
 
     mpcSolver->set_gains(_Q, _P, _R);
   }

@@ -1,6 +1,9 @@
 #ifndef NLC_SO3_HPP
 #define NLC_SO3_HPP
 
+#include <sstream>
+
+#include "common/log.hpp"
 #include "manifolds.hpp"
 
 namespace nonlinear_controls {
@@ -47,17 +50,17 @@ public:
   TSO3(/* args */) {
     R.setIdentity();
     Omega.setZero();
-    dOmega.setZero();
+    d_omega.setZero();
   }
   ~TSO3() = default;
   SO3 R;
   Eigen::Vector3d Omega;
-  Eigen::Vector3d dOmega;  // feed-forward usage
+  Eigen::Vector3d d_omega;  // feed-forward usage
 
   TSO3& operator=(const TSO3& other) {
     this->R = other.R;
     this->Omega = other.Omega;
-    this->dOmega = other.dOmega;
+    this->d_omega = other.d_omega;
     return *this;
   }
 
@@ -70,9 +73,9 @@ public:
   Eigen::Matrix<double, 6, 1> operator-(const TSO3& other) { return this->error(other); }
 
   virtual void print() const {
-    // TODO overload operator<<
-    std::cout << "rotation: " << this->R << std::endl;
-    std::cout << "angular velocity: " << this->Omega.transpose() << std::endl;
+    std::ostringstream oss;
+    oss << "rotation:\n" << this->R << "\nangular velocity: " << this->Omega.transpose();
+    Logger::INFO(oss.str());
   }
 };
 

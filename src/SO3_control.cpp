@@ -25,7 +25,7 @@ void SO3Controller::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d& u) {
   u = -gains_.kp().cwiseProduct(eR) - gains_.kd().cwiseProduct(eOm);
   u += x.Omega.cross(inertia_ * x.Omega);
   u += -inertia_ *
-       (x.Omega.cross(x.R.transpose() * xd.R * xd.Omega) - x.R.transpose() * xd.R * xd.dOmega);
+       (x.Omega.cross(x.R.transpose() * xd.R * xd.Omega) - x.R.transpose() * xd.R * xd.d_omega);
 }
 
 }  // namespace nonlinear_controls

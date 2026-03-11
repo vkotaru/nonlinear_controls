@@ -25,7 +25,7 @@ void SE3VblMPC::run(double dt, TSE3 x, TSE3 xd, Wrench& u) {
 
   // rotational torque
   Eigen::Vector3d torque;
-  att_mpc_.run(dt, x.extractTSO3(), xd.extractTSO3(), torque);
+  att_mpc_.run(dt, x.extract_tso3(), xd.extract_tso3(), torque);
   u.torque = torque;
 }
 

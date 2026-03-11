@@ -69,11 +69,11 @@ protected:
       }
     }
 
-    Eigen::Matrix<double, Eigen::Dynamic, 1> x_optVec;
-    x_optVec = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(x_opt, n_vars, 1);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> x_opt_vec;
+    x_opt_vec = Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(x_opt, n_vars, 1);
 
-    Uarray = x_optVec;  // saved for generating the trajectory
-    return std::optional<MatrixXd>{x_optVec};
+    Uarray = x_opt_vec;  // saved for generating the trajectory
+    return std::optional<MatrixXd>{x_opt_vec};
   }
 
 public:

@@ -25,13 +25,15 @@ public:
     this->acceleration = other.acceleration;
     this->R = other.R;
     this->Omega = other.Omega;
-    this->dOmega = other.dOmega;
+    this->d_omega = other.d_omega;
     return *this;
   }
 
   void print() const override {
-    std::cout << "position: " << this->position.transpose() << std::endl;
-    std::cout << "velocity: " << this->velocity.transpose() << std::endl;
+    std::ostringstream oss;
+    oss << "position: " << this->position.transpose()
+        << "\nvelocity: " << this->velocity.transpose();
+    Logger::INFO(oss.str());
     TSO3::print();
   }
 
@@ -51,7 +53,7 @@ public:
 
   Eigen::Matrix<double, 12, 1> operator-(const TSE3& other) { return this->error(other); }
 
-  TSO3 extractTSO3() {
+  TSO3 extract_tso3() {
     TSO3 att;
     att.R = this->R;
     att.Omega = this->Omega;

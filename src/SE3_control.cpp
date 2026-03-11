@@ -17,7 +17,7 @@ void SE3Controller::run(double dt, TSE3 x, TSE3 xd, Wrench& u) {
   u.torque = -this->gains_.kp().cwiseProduct(eR) - this->gains_.kd().cwiseProduct(eOm);
   u.torque += x.Omega.cross(this->inertia_ * x.Omega);
   u.torque += -this->inertia_ * (x.Omega.cross(x.R.transpose() * xd.R * xd.Omega) -
-                                 x.R.transpose() * xd.R * xd.dOmega);
+                                 x.R.transpose() * xd.R * xd.d_omega);
 }
 
 }  // namespace nonlinear_controls

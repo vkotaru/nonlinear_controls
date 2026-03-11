@@ -1,5 +1,7 @@
 #include "controls/SO3_clf.h"
 
+#include <sstream>
+
 namespace nonlinear_controls {
 
 SO3Clf::SO3Clf(const Eigen::Matrix3d& J) : SO3Controller(), inertia_(J) {
@@ -46,62 +48,67 @@ SO3Clf::SO3Clf(const Eigen::Matrix3d& J) : SO3Controller(), inertia_(J) {
 SO3Clf::~SO3Clf() = default;
 
 void SO3Clf::print_qp_setup() {
-  std::cout << "--------------------------------------------------" << std::endl;
-  std::cout << "*           QP setup       *" << std::endl;
-  std::cout << "--------------------------------------------------" << std::endl;
-  printf("Cost function: \n\n");
+  std::ostringstream oss;
+  oss << "--------------------------------------------------\n"
+      << "*           QP setup       *\n"
+      << "--------------------------------------------------\n"
+      << "Cost function:\n";
   for (int i = 0; i < 4; i++) {
-    printf("[");
+    oss << "[";
     for (int j = 0; j < 4; j++) {
-      printf("%f\t", H[4 * i + j]);
+      oss << H[4 * i + j] << "\t";
     }
-    printf("]\t[%f]\n", g[i]);
+    oss << "]\t[" << g[i] << "]\n";
   }
-  printf("Bounds: \n\n");
+  oss << "Bounds:\n";
   for (int i = 0; i < 4; i++) {
-    printf("[%f]\t<x%d<\t[%f]\n", lb[i], (i + 1), ub[i]);
+    oss << "[" << lb[i] << "]\t<x" << (i + 1) << "<\t[" << ub[i] << "]\n";
   }
-  printf("Constraints: \n\n");
-  printf("[%f]<[", lbA[0]);
-  for (int i = 0; i < 4; i++)
-    printf("\t%f", A[i]);
-  printf("]x<[%f]\n", ubA[0]);
-  printf("\n");
-  std::cout << "-------------------*****---------------------------" << std::endl;
+  oss << "Constraints:\n[" << lbA[0] << "]<[";
+  for (int i = 0; i < 4; i++) {
+    oss << "\t" << A[i];
+  }
+  oss << "]x<[" << ubA[0] << "]\n"
+      << "-------------------*****---------------------------";
+  Logger::INFO(oss.str());
 }
 
 void SO3Clf::print_qp2_setup() {
-  std::cout << "--------------------------------------------------" << std::endl;
-  std::cout << "*           QP_new setup       *" << std::endl;
-  std::cout << "--------------------------------------------------" << std::endl;
-  printf("Cost function: \n\n");
+  std::ostringstream oss;
+  oss << "--------------------------------------------------\n"
+      << "*           QP_new setup       *\n"
+      << "--------------------------------------------------\n"
+      << "Cost function:\n";
   for (int i = 0; i < 4; i++) {
-    printf("[");
+    oss << "[";
     for (int j = 0; j < 4; j++) {
-      printf("%f\t", H_new[4 * i + j]);
+      oss << H_new[4 * i + j] << "\t";
     }
-    printf("]\t[%f]\n", g_new[i]);
+    oss << "]\t[" << g_new[i] << "]\n";
   }
-  printf("Bounds: \n\n");
+  oss << "Bounds:\n";
   for (int i = 0; i < 4; i++) {
-    printf("[%f]\t<x%d<\t[%f]\n", lb_new[i], (i + 1), ub_new[i]);
+    oss << "[" << lb_new[i] << "]\t<x" << (i + 1) << "<\t[" << ub_new[i] << "]\n";
   }
-  printf("Constraints: \n\n");
-  printf("[%f]<[", lbA_new[0]);
-  for (int i = 0; i < 4; i++)
-    printf("\t%f", A_new[i]);
-  printf("]x<[%f]\n", ubA_new[0]);
-  printf("\n");
-  std::cout << "-------------------*****---------------------------" << std::endl;
+  oss << "Constraints:\n[" << lbA_new[0] << "]<[";
+  for (int i = 0; i < 4; i++) {
+    oss << "\t" << A_new[i];
+  }
+  oss << "]x<[" << ubA_new[0] << "]\n"
+      << "-------------------*****---------------------------";
+  Logger::INFO(oss.str());
 }
 
 void SO3Clf::init() {
-  std::cout << "/////////////////////////////////////////" << std::endl;
-  std::cout << "///////////////// init //////////////////" << std::endl;
-  std::cout << "inertia \n" << this->inertia_ << std::endl;
+  std::ostringstream oss;
+  oss << "/////////////////////////////////////////\n"
+      << "///////////////// init //////////////////\n"
+      << "inertia\n"
+      << this->inertia_;
+  Logger::INFO(oss.str());
   solver.init(H, g, A, lb, ub, lbA, ubA, nWSR);
   print_qp_setup();
-  std::cout << "/////////////////////////////////////////" << std::endl;
+  Logger::INFO("/////////////////////////////////////////");
 }
 
 void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d& u) {
@@ -123,7 +130,7 @@ void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d& u) {
            .value();
   LgV2 = (eOmega.transpose() * inertia_scaled_ + epsilon2 * eR.transpose());
   LfV2 = ((epsilon2 * eOmega.transpose() + c2 * eR.transpose()) * deR -
-          LgV2 * (dR.transpose() * xd.R * xd.Omega + x.R.transpose() * xd.R * xd.dOmega))
+          LgV2 * (dR.transpose() * xd.R * xd.Omega + x.R.transpose() * xd.R * xd.d_omega))
              .value();
 
   for (int i = 0; i < 3; i++) {
@@ -139,20 +146,21 @@ void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d& u) {
       solver.hotstart(H_new, g_new, A_new, lb_new, ub_new, lbA_new, ubA_new, nwsr);
   if (sol_info == qpOASES::SUCCESSFUL_RETURN) {
     this->pause = false;
-    std::cout << "Optimal solution found" << std::endl;
+    Logger::SUCCESS("Optimal solution found");
   } else {
     this->pause = true;
-    std::cout << "Optimal solution NOT found" << std::endl;
+    Logger::ERROR("Optimal solution NOT found");
   }
   solver.getPrimalSolution(x_opt);
-  Eigen::Vector3d dOmega;
-  dOmega << x_opt[0], x_opt[1], x_opt[2];
-  printf("\nx_opt = [ %e, %e, %e ];  objVal = %e\n\n", x_opt[0], x_opt[1], x_opt[2],
-         solver.getObjVal());
+  Eigen::Vector3d d_omega;
+  d_omega << x_opt[0], x_opt[1], x_opt[2];
+  std::ostringstream oss;
+  oss << "x_opt = [ " << x_opt[0] << ", " << x_opt[1] << ", " << x_opt[2]
+      << " ];  objVal = " << solver.getObjVal();
+  Logger::INFO(oss.str());
 
-  //    while(1);
   /// computing the input
-  u = this->inertia_ * dOmega + utils::hat(x.Omega) * this->inertia_ * x.Omega;
+  u = this->inertia_ * d_omega + utils::hat(x.Omega) * this->inertia_ * x.Omega;
 }
 
 }  // namespace nonlinear_controls
