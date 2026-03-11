@@ -57,7 +57,7 @@ void ClfQP::solve() {
   num_iters = clf3D::solve();
 }
 
-Eigen::Vector3d ClfQP::getOptimizer() {
+Eigen::Vector3d ClfQP::get_optimizer() {
   return Eigen::Vector3d(clf3D::vars.x[0], clf3D::vars.x[1], clf3D::vars.x[2]);
 }
 

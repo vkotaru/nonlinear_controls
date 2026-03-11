@@ -11,3 +11,4 @@ cmake-build-debug/
 cmake-build-relwithdebinfo/
 TODO.md
 IMPROVEMENTS.md
+.claude/

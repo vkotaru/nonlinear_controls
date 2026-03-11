@@ -36,7 +36,7 @@ public:
   Eigen::Matrix<double, Eigen::Dynamic, 1> lb;
   Eigen::Matrix<double, Eigen::Dynamic, 1> ub;
   Eigen::Matrix<double, Eigen::Dynamic, 1> x0;
-  Eigen::Matrix<double, Eigen::Dynamic, 1> xOpt;
+  Eigen::Matrix<double, Eigen::Dynamic, 1> x_opt;
 
   virtual int solve();
 };

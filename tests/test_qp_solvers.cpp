@@ -38,7 +38,7 @@ TEST_F(QPOasesEigenTest, SimpleUnconstrainedQP) {
 
   EXPECT_EQ(status, qpOASES::SUCCESSFUL_RETURN);
 
-  auto x_opt = qp.getOptimizer();
+  auto x_opt = qp.get_optimizer();
   EXPECT_NEAR(x_opt(0), 0.0, 1e-6);
   EXPECT_NEAR(x_opt(1), 0.0, 1e-6);
 }
@@ -56,7 +56,7 @@ TEST_F(QPOasesEigenTest, SimpleLinearCostQP) {
   qp.setup();
   qp.solve();
 
-  auto x_opt = qp.getOptimizer();
+  auto x_opt = qp.get_optimizer();
   EXPECT_NEAR(x_opt(0), 1.0, 1e-6);
   EXPECT_NEAR(x_opt(1), 1.0, 1e-6);
 }
@@ -83,7 +83,7 @@ TEST_F(QPOasesEigenTest, QPWithLinearConstraints) {
 
   EXPECT_EQ(status, qpOASES::SUCCESSFUL_RETURN);
 
-  auto x_opt = qp.getOptimizer();
+  auto x_opt = qp.get_optimizer();
   // Verify solution satisfies constraints
   EXPECT_GE(x_opt(0), 0.5 - 1e-6);
   EXPECT_LE(x_opt(0), 5.0 + 1e-6);
@@ -113,7 +113,7 @@ TEST_F(QPOasesEigenTest, ThreeVariableQP) {
 
   EXPECT_EQ(status, qpOASES::SUCCESSFUL_RETURN);
 
-  auto x_opt = qp.getOptimizer();
+  auto x_opt = qp.get_optimizer();
   // Verify constraint is satisfied
   double constraint_val = x_opt(0) + 3.0 * x_opt(1) + 4.0 * x_opt(2);
   EXPECT_LE(constraint_val, -3.0 + 1e-6);

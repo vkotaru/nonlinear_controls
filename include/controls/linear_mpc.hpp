@@ -37,12 +37,12 @@ public:
   };
 protected:
   long N, nx, nu;
-  long nVars{}, nCons{};
+  long n_vars{}, n_cons{};
 
   bool qp_initialized{false};
   bool solver_initialized{false};
   double cpu_time_limit{0};
-  long MaxIter{0};
+  long max_iter{0};
 
   /// stage state cost
   MatrixXd Q;
@@ -144,7 +144,7 @@ public:
   }
 
   // setters
-  void set_max_iter(const int max_iter) { this->MaxIter = max_iter; }
+  void set_max_iter(const int max_iter) { this->max_iter = max_iter; }
   void set_cpu_time_limit(const qpOASES::real_t t) {
     cpu_time_limit = t;
   }
@@ -180,8 +180,8 @@ public:
   // MPC with state substitution in the dynamics
   // only N inputs are the optimization variables
   LinearMPC(const long &N, const long &nx, const long &nu) : LinearMPCBase(N, nx, nu) {
-    nVars = N * nu;
-    nCons = (N + 1) * nx;
+    n_vars = N * nu;
+    n_cons = (N + 1) * nx;
 
     Sx.resize(nx * (N + 1), nx);
     Sx.setZero();
@@ -194,9 +194,9 @@ public:
     Rbar.resize(nu * N, nu * N);
     Rbar.setIdentity();
 
-    H.resize(nVars, nVars);
+    H.resize(n_vars, n_vars);
     H.setIdentity();
-    F.resize(nx, nVars);
+    F.resize(nx, n_vars);
     F.setZero();
 
     for (int i = 0; i < N; ++i) {

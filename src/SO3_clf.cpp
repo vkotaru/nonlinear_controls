@@ -144,10 +144,10 @@ void SO3Clf::run(double dt, TSO3 x, TSO3 xd, Eigen::Vector3d& u) {
     this->pause = true;
     std::cout << "Optimal solution NOT found" << std::endl;
   }
-  solver.getPrimalSolution(xOpt);
+  solver.getPrimalSolution(x_opt);
   Eigen::Vector3d dOmega;
-  dOmega << xOpt[0], xOpt[1], xOpt[2];
-  printf("\nxOpt = [ %e, %e, %e ];  objVal = %e\n\n", xOpt[0], xOpt[1], xOpt[2],
+  dOmega << x_opt[0], x_opt[1], x_opt[2];
+  printf("\nx_opt = [ %e, %e, %e ];  objVal = %e\n\n", x_opt[0], x_opt[1], x_opt[2],
          solver.getObjVal());
 
   //    while(1);

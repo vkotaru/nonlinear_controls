@@ -36,7 +36,7 @@ protected:
   qpOASES::real_t g[4], A[4], g_new[4], A_new[4];
   qpOASES::real_t lb[4], ub[4], lb_new[4], ub_new[4];
   qpOASES::real_t lbA[1], ubA[1], lbA_new[1], ubA_new[1];
-  qpOASES::real_t xOpt[4];
+  qpOASES::real_t x_opt[4];
 
   qpOASES::SQProblem solver{4, 1};
   qpOASES::int_t nWSR = 10, nWSR_new;

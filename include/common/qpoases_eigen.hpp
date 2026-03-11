@@ -22,7 +22,7 @@ protected:
   qpOASES::real_t *H{}, *A{}, *g{}, *lb{}, *ub{}, *lbA{}, *ubA{};
   qpOASES::int_t nWSR{};
 
-  void eigen2array() {
+  void eigen_to_array() {
     H = data_.H.transpose().data();
     A = data_.A.transpose().data();
     g = data_.g.transpose().data();
@@ -55,7 +55,7 @@ public:
   void setup() { problem.setOptions(options); }
 
   qpOASES::returnValue solve() {
-    eigen2array();
+    eigen_to_array();
     qpOASES::returnValue sol = problem.init(H, g, A, lb, ub, lbA, ubA, nWSR);
     if (sol == qpOASES::SUCCESSFUL_RETURN) {
       std::cout << "SUCCESSFUL_RETURN" << std::endl;
@@ -69,16 +69,16 @@ public:
     return sol;
   }
   void hotstart() {
-    eigen2array();
+    eigen_to_array();
     problem.hotstart(g, lb, ub, lbA, ubA, nWSR);
   }
-  Eigen::Matrix<double, Eigen::Dynamic, 1> getOptimizer() {
-    qpOASES::real_t xOpt[nvars];
-    problem.getPrimalSolution(xOpt);
-    Eigen::Matrix<double, Eigen::Dynamic, 1> xOptVec;
-    xOptVec =
-        Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(xOpt, nvars, 1);
-    return xOptVec;
+  Eigen::Matrix<double, Eigen::Dynamic, 1> get_optimizer() {
+    qpOASES::real_t x_opt[nvars];
+    problem.getPrimalSolution(x_opt);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> x_optVec;
+    x_optVec =
+        Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(x_opt, nvars, 1);
+    return x_optVec;
   }
 
   QPOasesData data_;

@@ -15,7 +15,7 @@ QuadProg::QuadProg(const int& n, const int& m, const int& p) : nv(n), ni(m), ne(
   lb.resize(nv);
   ub.resize(nv);
   x0.resize(nv);
-  xOpt.resize(nv);
+  x_opt.resize(nv);
 }
 
 QuadProg::~QuadProg() = default;

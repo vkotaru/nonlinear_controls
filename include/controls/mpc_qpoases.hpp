@@ -22,7 +22,7 @@ protected:
   bool solver_initialized{false};
 
   void create_solver() {
-    solver = std::make_unique<qpOASES::SQProblem>(nVars, nCons);
+    solver = std::make_unique<qpOASES::SQProblem>(n_vars, n_cons);
     options.setToMPC();
     options.printLevel = qpOASES::PL_LOW;
     solver->setOptions(options);
@@ -52,8 +52,8 @@ protected:
       sol = solver->hotstart(Hc, gc, Ac, lbc, ubc, lbAc, ubAc, n, 0);
     }
 
-    qpOASES::real_t xOpt[nVars];
-    solver->getPrimalSolution(xOpt);
+    qpOASES::real_t x_opt[n_vars];
+    solver->getPrimalSolution(x_opt);
 
     if (verbose) {
       if (sol == qpOASES::SUCCESSFUL_RETURN) {
@@ -67,12 +67,12 @@ protected:
       }
     }
 
-    Eigen::Matrix<double, Eigen::Dynamic, 1> xOptVec;
-    xOptVec =
-        Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(xOpt, nVars, 1);
+    Eigen::Matrix<double, Eigen::Dynamic, 1> x_optVec;
+    x_optVec =
+        Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, 1>>(x_opt, n_vars, 1);
 
-    Uarray = xOptVec; // saved for generating the trajectory
-    return std::optional<MatrixXd>{xOptVec};
+    Uarray = x_optVec; // saved for generating the trajectory
+    return std::optional<MatrixXd>{x_optVec};
   }
 
 public:
